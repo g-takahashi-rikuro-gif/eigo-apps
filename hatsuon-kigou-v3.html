@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>発音記号マスター ver3 | 中学英語 発音記号学習アプリ</title>
+<style>
+  :root{
+    --bg1:#fef6e4;
+    --bg2:#e0f4ff;
+    --accent:#ff8a5c;
+    --accent2:#4a9dec;
+    --vowel:#ff8a5c;
+    --diph:#7bc86c;
+    --cons:#4a9dec;
+    --text:#33313a;
+    --card-bg:#ffffff;
+    --shadow: 0 6px 18px rgba(0,0,0,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: "Hiragino Maru Gothic ProN","Yu Gothic","Meiryo",sans-serif;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    color:var(--text);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  header{
+    text-align:center;
+    padding:28px 16px 12px;
+  }
+  header h1{
+    font-size:1.7rem;
+    margin:0 0 6px;
+    color:#4a4458;
+  }
+  header p{
+    margin:0;
+    font-size:0.95rem;
+    color:#6b6675;
+  }
+  .tabs{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:18px auto 8px;
+    max-width:700px;
+    padding:0 12px;
+  }
+  .tab-btn{
+    border:none;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:0.95rem;
+    font-weight:bold;
+    cursor:pointer;
+    background:#fff;
+    color:#6b6675;
+    box-shadow: var(--shadow);
+    transition: all .15s ease;
+  }
+  .tab-btn.active{
+    color:#fff;
+  }
+  .tab-btn[data-cat="all"].active{ background:#8b7bd8; }
+  .tab-btn[data-cat="vowel"].active{ background:var(--vowel); }
+  .tab-btn[data-cat="diphthong"].active{ background:var(--diph); }
+  .tab-btn[data-cat="consonant"].active{ background:var(--cons); }
+
+  .progress-bar-wrap{
+    max-width:700px;
+    margin:10px auto;
+    padding:0 16px;
+  }
+  .progress-track{
+    background:#ffffffaa;
+    border-radius:999px;
+    height:14px;
+    overflow:hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,#ffb26b,#ff8a5c);
+    width:0%;
+    transition: width .3s ease;
+  }
+  .progress-label{
+    text-align:center;
+    font-size:0.85rem;
+    color:#6b6675;
+    margin-top:4px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap:16px;
+    max-width:1000px;
+    margin:20px auto;
+    padding:0 16px;
+  }
+
+  .card{
+    perspective:1000px;
+    height:210px;
+    cursor:pointer;
+  }
+  .card-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    transition: transform .5s;
+    transform-style: preserve-3d;
+    box-shadow: var(--shadow);
+    border-radius:16px;
+  }
+  .card.flipped .card-inner{
+    transform: rotateY(180deg);
+  }
+  .card-face{
+    position:absolute;
+    width:100%;
+    height:100%;
+    backface-visibility:hidden;
+    border-radius:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:10px;
+    background:var(--card-bg);
+  }
+  .card-front{
+    border-top:8px solid var(--vowel);
+  }
+  .card[data-cat="diphthong"] .card-front{ border-top-color:var(--diph); }
+  .card[data-cat="consonant"] .card-front{ border-top-color:var(--cons); }
+
+  .symbol{
+    font-size:2.4rem;
+    font-weight:bold;
+    color:#4a4458;
+  }
+  .cat-label{
+    font-size:0.7rem;
+    background:#f1eefc;
+    color:#8b7bd8;
+    padding:3px 10px;
+    border-radius:999px;
+    margin-top:6px;
+  }
+  .mastered-badge{
+    position:absolute;
+    top:8px;
+    right:10px;
+    font-size:1.1rem;
+  }
+  .front-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-top:10px;
+    width:100%;
+    align-items:center;
+  }
+  .point-btn{
+    border:none;
+    color:#fff;
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:0.75rem;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    background:#8b7bd8;
+  }
+  .point-btn:active{
+    transform: scale(0.95);
+  }
+
+  .card-back{
+    transform: rotateY(180deg);
+    justify-content:flex-start;
+    gap:6px;
+    overflow-y:auto;
+  }
+  .example{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#faf9ff;
+    border-radius:10px;
+    padding:6px 10px;
+    font-size:0.85rem;
+  }
+  .example .word{
+    font-weight:bold;
+    color:#3d3a47;
+  }
+  .example .word u{
+    color:#fff;
+    background:var(--accent2);
+    text-decoration:none;
+    border-radius:4px;
+    padding:0 3px;
+    font-weight:bold;
+  }
+  .example .meaning{
+    font-size:0.72rem;
+    color:#8b879a;
+  }
+  .play-btn{
+    border:none;
+    background:#8b7bd8;
+    color:#fff;
+    border-radius:50%;
+    width:26px;
+    height:26px;
+    font-size:0.8rem;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .back-controls{
+    display:flex;
+    gap:6px;
+    width:100%;
+    margin-top:4px;
+  }
+  .mark-btn{
+    flex:1;
+    border:none;
+    border-radius:8px;
+    padding:6px 4px;
+    font-size:0.75rem;
+    cursor:pointer;
+    font-weight:bold;
+  }
+  .mark-know{
+    background:#dff5df;
+    color:#3d8b3d;
+  }
+  .mark-again{
+    background:#ffe7e0;
+    color:#c9573f;
+  }
+
+  footer{
+    text-align:center;
+    color:#8b879a;
+    font-size:0.8rem;
+    margin-top:24px;
+    padding:0 16px;
+  }
+
+  .toolbar{
+    max-width:700px;
+    margin:0 auto;
+    padding:0 16px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+  }
+  .reset-btn{
+    border:none;
+    background:#fff;
+    color:#6b6675;
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:0.8rem;
+    cursor:pointer;
+    box-shadow: var(--shadow);
+  }
+
+  /* ---- modal ---- */
+  .modal-overlay{
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(51,49,58,0.55);
+    z-index:100;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+  }
+  .modal-overlay.open{
+    display:flex;
+  }
+  .modal-box{
+    background:#fff;
+    border-radius:20px;
+    max-width:420px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+    padding:22px 20px 24px;
+    position:relative;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  }
+  .modal-close{
+    position:absolute;
+    top:12px;
+    right:14px;
+    border:none;
+    background:#f1eefc;
+    color:#6b6675;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    font-size:1rem;
+    cursor:pointer;
+  }
+  .modal-symbol{
+    text-align:center;
+    font-size:2.2rem;
+    font-weight:bold;
+    color:#4a4458;
+    margin-bottom:4px;
+  }
+  .modal-catlabel{
+    text-align:center;
+    margin-bottom:10px;
+  }
+  .modal-diagram{
+    display:flex;
+    justify-content:center;
+    margin:8px 0 14px;
+  }
+  .modal-diagram svg{
+    max-width:280px;
+    width:100%;
+    height:auto;
+  }
+  .modal-tip{
+    background:#fff8ee;
+    border-left:5px solid var(--accent);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:0.9rem;
+    line-height:1.6;
+    color:#4a4458;
+  }
+  .modal-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin-top:10px;
+    font-size:0.72rem;
+    color:#8b879a;
+  }
+  .modal-legend span{
+    background:#f5f4fa;
+    padding:3px 8px;
+    border-radius:999px;
+  }
+
+  /* ---- test mode ---- */
+  .quiz-section{
+    max-width:700px;
+    margin:26px auto 0;
+    padding:0 16px;
+  }
+  .quiz-section h2{
+    text-align:center;
+    font-size:1.1rem;
+    color:#4a4458;
+    margin-bottom:10px;
+  }
+  .quiz-start-row{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .quiz-start-btn{
+    border:none;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:0.9rem;
+    font-weight:bold;
+    cursor:pointer;
+    background:#fff;
+    color:#4a4458;
+    box-shadow: var(--shadow);
+  }
+  .quiz-start-btn:active{
+    transform: scale(0.96);
+  }
+
+  .quiz-overlay{
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(51,49,58,0.6);
+    z-index:200;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+  }
+  .quiz-overlay.open{
+    display:flex;
+  }
+  .quiz-box{
+    background:#fff;
+    border-radius:20px;
+    max-width:460px;
+    width:100%;
+    max-height:88vh;
+    overflow-y:auto;
+    padding:22px 20px 24px;
+    position:relative;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  }
+  .quiz-close{
+    position:absolute;
+    top:12px;
+    right:14px;
+    border:none;
+    background:#f1eefc;
+    color:#6b6675;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    font-size:1rem;
+    cursor:pointer;
+  }
+  .quiz-progress{
+    text-align:center;
+    font-size:0.8rem;
+    color:#8b879a;
+    margin-bottom:6px;
+  }
+  .quiz-score{
+    text-align:center;
+    font-size:0.8rem;
+    color:#4a9dec;
+    font-weight:bold;
+    margin-bottom:14px;
+  }
+  .quiz-question{
+    text-align:center;
+    background:#faf9ff;
+    border-radius:14px;
+    padding:20px 12px;
+    margin-bottom:16px;
+  }
+  .quiz-question .q-label{
+    font-size:0.8rem;
+    color:#8b879a;
+    margin-bottom:8px;
+  }
+  .quiz-question .q-main{
+    font-size:2rem;
+    font-weight:bold;
+    color:#4a4458;
+  }
+  .quiz-question .audio-reveal{
+    display:none;
+    margin-top:16px;
+    font-size:1.6rem;
+    font-weight:bold;
+    color:#4a4458;
+  }
+  .quiz-question .audio-reveal.show{
+    display:block;
+  }
+  .quiz-question .audio-reveal .reveal-meaning{
+    display:block;
+    font-size:0.75rem;
+    font-weight:normal;
+    color:#8b879a;
+    margin-top:4px;
+  }
+  .quiz-question .q-main u,
+  .quiz-question .audio-reveal u{
+    color:#fff;
+    background:var(--accent2);
+    text-decoration:none;
+    border-radius:6px;
+    padding:0 6px;
+  }
+  .audio-play-btn{
+    border:none;
+    background:var(--accent2);
+    color:#fff;
+    border-radius:999px;
+    padding:14px 28px;
+    font-size:1.1rem;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  .audio-play-btn:active{
+    transform: scale(0.96);
+  }
+  .quiz-options{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+  }
+  .quiz-option{
+    border:2px solid #e6e3f5;
+    background:#fff;
+    border-radius:12px;
+    padding:12px 8px;
+    font-size:1rem;
+    cursor:pointer;
+    color:#4a4458;
+    font-weight:bold;
+  }
+  .quiz-option .opt-meaning{
+    display:block;
+    font-size:0.7rem;
+    font-weight:normal;
+    color:#8b879a;
+    margin-top:3px;
+  }
+  .quiz-option .opt-symbol{
+    display:block;
+    font-size:0.75rem;
+    font-weight:bold;
+    color:#8b7bd8;
+    margin-top:4px;
+  }
+  .quiz-option.correct{
+    background:#dff5df;
+    border-color:#3d8b3d;
+    color:#2e6e2e;
+  }
+  .quiz-option.wrong{
+    background:#ffe7e0;
+    border-color:#c9573f;
+    color:#a5452f;
+  }
+  .quiz-option:disabled{
+    cursor:default;
+  }
+  .quiz-next-btn{
+    display:block;
+    margin:16px auto 0;
+    border:none;
+    background:var(--accent2);
+    color:#fff;
+    border-radius:999px;
+    padding:9px 26px;
+    font-size:0.9rem;
+    font-weight:bold;
+    cursor:pointer;
+  }
+  .quiz-result{
+    text-align:center;
+  }
+  .quiz-result .result-score{
+    font-size:2.4rem;
+    font-weight:bold;
+    color:var(--accent);
+    margin:10px 0;
+  }
+  .quiz-result .result-msg{
+    font-size:0.95rem;
+    color:#6b6675;
+    margin-bottom:18px;
+  }
+  .quiz-result-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .quiz-result-buttons button{
+    border:none;
+    border-radius:999px;
+    padding:9px 18px;
+    font-size:0.85rem;
+    font-weight:bold;
+    cursor:pointer;
+  }
+  .retry-btn{
+    background:var(--accent2);
+    color:#fff;
+  }
+  .review-btn{
+    background:var(--accent);
+    color:#fff;
+  }
+  .close-btn2{
+    background:#f1eefc;
+    color:#6b6675;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔤 発音記号マスター ver3</h1>
+  <p>「👄 発音のポイント」で口の形やコツをイラスト付きで確認できるよ。タップして裏返すと単語・意味・発音が見られるよ。下の「テストモード」で理解度をチェックしよう。単語当て・記号当てだけでなく、音声を聞いて答える問題も出るよ。間違えた問題はテストの後にまとめて復習できるよ。</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-cat="all">すべて</button>
+  <button class="tab-btn" data-cat="vowel">母音</button>
+  <button class="tab-btn" data-cat="diphthong">二重母音</button>
+  <button class="tab-btn" data-cat="consonant">子音</button>
+</div>
+
+<div class="toolbar">
+  <button class="reset-btn" id="resetBtn">進捗をリセット</button>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">覚えた記号: 0 / 0</div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="quiz-section">
+  <h2>📝 テストモード</h2>
+  <div class="quiz-start-row">
+    <button class="quiz-start-btn" data-cat="all">すべて</button>
+    <button class="quiz-start-btn" data-cat="vowel">母音</button>
+    <button class="quiz-start-btn" data-cat="diphthong">二重母音</button>
+    <button class="quiz-start-btn" data-cat="consonant">子音</button>
+  </div>
+</div>
+
+<div class="quiz-overlay" id="quizOverlay">
+  <div class="quiz-box" id="quizBox">
+    <button class="quiz-close" id="quizClose">✕</button>
+    <div id="quizContent"></div>
+  </div>
+</div>
+
+<footer>
+  ※ 単語の発音音声はブラウザの読み上げ機能を使用しています。イラストは口の中の様子を分かりやすく簡略化した模式図です。端末や環境によって聞こえ方・見え方が異なる場合があります。
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-symbol" id="modalSymbol"></div>
+    <div class="modal-catlabel" id="modalCatLabel"></div>
+    <div class="modal-diagram" id="modalDiagram"></div>
+    <div class="modal-tip" id="modalTip"></div>
+    <div class="modal-legend" id="modalLegend"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  // ===== 母音 (vowel) =====
+  { symbol:"iː", symbolSound:"ee", category:"vowel",
+    tip:"「イー」を少し長めに、口を横にしっかり引いて発音します。日本語の「イ」より口を横に開くのがポイントです。",
+    diagram:{type:"vowel", x:55, y:28},
+    examples:[
+      {word:"s<u>ee</u>", plain:"see", meaning:"見る"},
+      {word:"sh<u>ee</u>p", plain:"sheep", meaning:"羊"},
+      {word:"t<u>ea</u>", plain:"tea", meaning:"紅茶"},
+      {word:"h<u>e</u>", plain:"he", meaning:"彼"},
+      {word:"gr<u>ee</u>n", plain:"green", meaning:"緑"},
+      {word:"<u>ea</u>t", plain:"eat", meaning:"食べる"},
+      {word:"thr<u>ee</u>", plain:"three", meaning:"3"}
+    ]},
+  { symbol:"ɪ", symbolSound:"ih", category:"vowel",
+    tip:"日本語の「イ」より力を抜いて短く発音します。口の開きは「イー」より少し大きめです。",
+    diagram:{type:"vowel", x:65, y:48},
+    examples:[
+      {word:"s<u>i</u>t", plain:"sit", meaning:"座る"},
+      {word:"b<u>i</u>g", plain:"big", meaning:"大きい"},
+      {word:"f<u>i</u>sh", plain:"fish", meaning:"魚"},
+      {word:"p<u>i</u>nk", plain:"pink", meaning:"ピンク"},
+      {word:"m<u>i</u>lk", plain:"milk", meaning:"牛乳"},
+      {word:"w<u>i</u>n", plain:"win", meaning:"勝つ"},
+      {word:"<u>i</u>t", plain:"it", meaning:"それ"}
+    ]},
+  { symbol:"e", symbolSound:"eh", category:"vowel",
+    tip:"日本語の「エ」とほぼ同じ感覚で、短くはっきり発音します。",
+    diagram:{type:"vowel", x:68, y:66},
+    examples:[
+      {word:"b<u>e</u>d", plain:"bed", meaning:"ベッド"},
+      {word:"p<u>e</u>n", plain:"pen", meaning:"ペン"},
+      {word:"t<u>e</u>n", plain:"ten", meaning:"10"},
+      {word:"r<u>e</u>d", plain:"red", meaning:"赤"},
+      {word:"<u>e</u>gg", plain:"egg", meaning:"卵"},
+      {word:"fri<u>e</u>nd", plain:"friend", meaning:"友達"},
+      {word:"<u>a</u>ny", plain:"any", meaning:"いくつかの"}
+    ]},
+  { symbol:"æ", symbolSound:"am", category:"vowel",
+    tip:"口を大きく横に開いて「ア」と「エ」の中間のような音を出します。「キャット」のように「ヤ」の音を入れないよう注意しましょう。",
+    diagram:{type:"vowel", x:63, y:104},
+    examples:[
+      {word:"c<u>a</u>t", plain:"cat", meaning:"猫"},
+      {word:"b<u>a</u>g", plain:"bag", meaning:"かばん"},
+      {word:"<u>a</u>pple", plain:"apple", meaning:"りんご"},
+      {word:"h<u>a</u>nd", plain:"hand", meaning:"手"},
+      {word:"bl<u>a</u>ck", plain:"black", meaning:"黒"},
+      {word:"h<u>a</u>ppy", plain:"happy", meaning:"幸せな"},
+      {word:"f<u>a</u>mily", plain:"family", meaning:"家族"}
+    ]},
+  { symbol:"ɑː", symbolSound:"ah", category:"vowel",
+    tip:"口を縦に大きく開けて、喉の奥から「アー」と長く伸ばします。",
+    diagram:{type:"vowel", x:138, y:120},
+    examples:[
+      {word:"c<u>ar</u>", plain:"car", meaning:"車"},
+      {word:"f<u>a</u>ther", plain:"father", meaning:"父"},
+      {word:"<u>ar</u>m", plain:"arm", meaning:"腕"},
+      {word:"st<u>ar</u>t", plain:"start", meaning:"始める"},
+      {word:"f<u>ar</u>m", plain:"farm", meaning:"農場"},
+      {word:"p<u>ar</u>k", plain:"park", meaning:"公園"},
+      {word:"h<u>ear</u>t", plain:"heart", meaning:"心臓"}
+    ]},
+  { symbol:"ʌ", symbolSound:"uh", category:"vowel",
+    tip:"口はあまり開けず、力を抜いて短く「ア」と言うイメージです。日本語の「ア」より軽く発音します。",
+    diagram:{type:"vowel", x:100, y:88},
+    examples:[
+      {word:"c<u>u</u>p", plain:"cup", meaning:"カップ"},
+      {word:"s<u>u</u>n", plain:"sun", meaning:"太陽"},
+      {word:"l<u>o</u>ve", plain:"love", meaning:"愛"},
+      {word:"m<u>o</u>ther", plain:"mother", meaning:"母"},
+      {word:"c<u>o</u>me", plain:"come", meaning:"来る"},
+      {word:"c<u>o</u>lor", plain:"color", meaning:"色"},
+      {word:"y<u>ou</u>ng", plain:"young", meaning:"若い"}
+    ]},
+  { symbol:"ɔː", symbolSound:"aw", category:"vowel",
+    tip:"唇を丸めて「オー」と長く伸ばします。日本語の「オ」より唇をしっかり丸めるのがコツです。",
+    diagram:{type:"vowel", x:133, y:96},
+    examples:[
+      {word:"b<u>a</u>ll", plain:"ball", meaning:"ボール"},
+      {word:"t<u>al</u>l", plain:"tall", meaning:"背が高い"},
+      {word:"d<u>oo</u>r", plain:"door", meaning:"ドア"},
+      {word:"m<u>or</u>ning", plain:"morning", meaning:"朝"},
+      {word:"sm<u>a</u>ll", plain:"small", meaning:"小さい"},
+      {word:"t<u>al</u>k", plain:"talk", meaning:"話す"},
+      {word:"w<u>al</u>k", plain:"walk", meaning:"歩く"}
+    ]},
+  { symbol:"ʊ", symbolSound:"oor", category:"vowel",
+    tip:"唇を軽く丸めて短く「ウ」と言います。日本語の「ウ」より唇の丸めは弱めで大丈夫です。",
+    diagram:{type:"vowel", x:128, y:46},
+    examples:[
+      {word:"b<u>oo</u>k", plain:"book", meaning:"本"},
+      {word:"g<u>oo</u>d", plain:"good", meaning:"良い"},
+      {word:"f<u>oo</u>t", plain:"foot", meaning:"足"},
+      {word:"l<u>oo</u>k", plain:"look", meaning:"見る"},
+      {word:"p<u>u</u>t", plain:"put", meaning:"置く"},
+      {word:"c<u>ou</u>ld", plain:"could", meaning:"〜できた"},
+      {word:"w<u>oo</u>d", plain:"wood", meaning:"木材"}
+    ]},
+  { symbol:"uː", symbolSound:"oo", category:"vowel",
+    tip:"唇をしっかり丸めて前に突き出し、「ウー」と長く伸ばします。",
+    diagram:{type:"vowel", x:140, y:28},
+    examples:[
+      {word:"f<u>oo</u>d", plain:"food", meaning:"食べ物"},
+      {word:"bl<u>ue</u>", plain:"blue", meaning:"青"},
+      {word:"sch<u>oo</u>l", plain:"school", meaning:"学校"},
+      {word:"r<u>oo</u>m", plain:"room", meaning:"部屋"},
+      {word:"J<u>u</u>ne", plain:"June", meaning:"6月"},
+      {word:"t<u>wo</u>", plain:"two", meaning:"2"},
+      {word:"tr<u>ue</u>", plain:"true", meaning:"本当の"}
+    ]},
+  { symbol:"ɜːr", symbolSound:"er", category:"vowel",
+    tip:"舌を少し丸めながら、口の中央で「アー」に近い音を出します。アメリカ英語のrの音です。",
+    diagram:{type:"vowel", x:100, y:70},
+    examples:[
+      {word:"b<u>ir</u>d", plain:"bird", meaning:"鳥"},
+      {word:"g<u>ir</u>l", plain:"girl", meaning:"女の子"},
+      {word:"w<u>or</u>k", plain:"work", meaning:"働く"},
+      {word:"sh<u>ir</u>t", plain:"shirt", meaning:"シャツ"},
+      {word:"f<u>ir</u>st", plain:"first", meaning:"最初の"},
+      {word:"n<u>ur</u>se", plain:"nurse", meaning:"看護師"},
+      {word:"w<u>or</u>ld", plain:"world", meaning:"世界"}
+    ]},
+  { symbol:"ə", symbolSound:"uh", category:"vowel",
+    tip:"力を完全に抜いた、あいまいな「ア」に近い音です。強く発音しないのがポイントです。",
+    diagram:{type:"vowel", x:100, y:76},
+    examples:[
+      {word:"<u>a</u>bout", plain:"about", meaning:"〜について"},
+      {word:"br<u>ea</u>d", plain:"bread", meaning:"パン"},
+      {word:"ban<u>a</u>na", plain:"banana", meaning:"バナナ"},
+      {word:"<u>a</u>round", plain:"around", meaning:"〜のまわりに"},
+      {word:"sof<u>a</u>", plain:"sofa", meaning:"ソファ"},
+      {word:"t<u>o</u>day", plain:"today", meaning:"今日"},
+      {word:"camer<u>a</u>", plain:"camera", meaning:"カメラ"}
+    ]},
+
+  // ===== 二重母音 (diphthong) =====
+  { symbol:"eɪ", symbolSound:"ay", category:"diphthong",
+    tip:"「エ」から「イ」へ滑らかに変化させます。「エ・イ」とはっきり2つに分けすぎないようにしましょう。",
+    diagram:{type:"diphthong", x1:68, y1:66, x2:65, y2:48},
+    examples:[
+      {word:"n<u>a</u>me", plain:"name", meaning:"名前"},
+      {word:"r<u>ai</u>n", plain:"rain", meaning:"雨"},
+      {word:"d<u>ay</u>", plain:"day", meaning:"日"},
+      {word:"t<u>a</u>ble", plain:"table", meaning:"テーブル"},
+      {word:"<u>eig</u>ht", plain:"eight", meaning:"8"},
+      {word:"pl<u>ay</u>", plain:"play", meaning:"遊ぶ"},
+      {word:"c<u>a</u>ke", plain:"cake", meaning:"ケーキ"}
+    ]},
+  { symbol:"aɪ", symbolSound:"eye", category:"diphthong",
+    tip:"「ア」から「イ」へ滑らかにつなげます。日本語の「アイ」よりなめらかに一続きで発音します。",
+    diagram:{type:"diphthong", x1:78, y1:112, x2:65, y2:48},
+    examples:[
+      {word:"m<u>y</u>", plain:"my", meaning:"私の"},
+      {word:"n<u>i</u>ce", plain:"nice", meaning:"素敵な"},
+      {word:"n<u>igh</u>t", plain:"night", meaning:"夜"},
+      {word:"l<u>i</u>ke", plain:"like", meaning:"好き"},
+      {word:"f<u>i</u>ve", plain:"five", meaning:"5"},
+      {word:"t<u>i</u>me", plain:"time", meaning:"時間"},
+      {word:"r<u>igh</u>t", plain:"right", meaning:"正しい"}
+    ]},
+  { symbol:"ɔɪ", symbolSound:"oy", category:"diphthong",
+    tip:"唇を丸めた「オ」から「イ」へなめらかに変化させます。",
+    diagram:{type:"diphthong", x1:133, y1:96, x2:65, y2:48},
+    examples:[
+      {word:"b<u>oy</u>", plain:"boy", meaning:"男の子"},
+      {word:"t<u>oy</u>", plain:"toy", meaning:"おもちゃ"},
+      {word:"v<u>oi</u>ce", plain:"voice", meaning:"声"},
+      {word:"j<u>oi</u>n", plain:"join", meaning:"参加する"},
+      {word:"enj<u>oy</u>", plain:"enjoy", meaning:"楽しむ"},
+      {word:"p<u>oi</u>nt", plain:"point", meaning:"点"},
+      {word:"n<u>oi</u>se", plain:"noise", meaning:"騒音"}
+    ]},
+  { symbol:"aʊ", symbolSound:"ow", category:"diphthong",
+    tip:"「ア」から唇を丸めた「ウ」へなめらかにつなげます。",
+    diagram:{type:"diphthong", x1:78, y1:112, x2:128, y2:46},
+    examples:[
+      {word:"h<u>ow</u>", plain:"how", meaning:"どのように"},
+      {word:"h<u>ou</u>se", plain:"house", meaning:"家"},
+      {word:"n<u>ow</u>", plain:"now", meaning:"今"},
+      {word:"br<u>ow</u>n", plain:"brown", meaning:"茶色"},
+      {word:"m<u>ou</u>th", plain:"mouth", meaning:"口"},
+      {word:"d<u>ow</u>n", plain:"down", meaning:"下へ"},
+      {word:"t<u>ow</u>n", plain:"town", meaning:"町"}
+    ]},
+  { symbol:"oʊ", symbolSound:"oh", category:"diphthong",
+    tip:"唇を丸めた「オ」から「ウ」へ変化させます。日本語の「オー」にならないよう、口の形が変わることを意識しましょう。",
+    diagram:{type:"diphthong", x1:133, y1:76, x2:128, y2:46},
+    examples:[
+      {word:"g<u>o</u>", plain:"go", meaning:"行く"},
+      {word:"h<u>o</u>me", plain:"home", meaning:"家"},
+      {word:"kn<u>ow</u>", plain:"know", meaning:"知っている"},
+      {word:"<u>o</u>pen", plain:"open", meaning:"開ける"},
+      {word:"m<u>o</u>st", plain:"most", meaning:"最も"},
+      {word:"n<u>o</u>", plain:"no", meaning:"いいえ"},
+      {word:"c<u>o</u>ld", plain:"cold", meaning:"寒い"}
+    ]},
+
+  // ===== 子音 (consonant) =====
+  { symbol:"p", symbolSound:"puh", category:"consonant",
+    tip:"上下の唇をしっかり閉じてから、息を破裂させるように出します。声は震えません(無声音)。",
+    diagram:{type:"consonant", place:"lips", voiced:false, nasal:false, lips:"closed"},
+    examples:[
+      {word:"<u>p</u>en", plain:"pen", meaning:"ペン"},
+      {word:"<u>p</u>ark", plain:"park", meaning:"公園"},
+      {word:"ha<u>pp</u>y", plain:"happy", meaning:"幸せな"},
+      {word:"sto<u>p</u>", plain:"stop", meaning:"止まる"},
+      {word:"a<u>pp</u>le", plain:"apple", meaning:"りんご"},
+      {word:"<u>p</u>lay", plain:"play", meaning:"遊ぶ"},
+      {word:"hel<u>p</u>", plain:"help", meaning:"助ける"}
+    ]},
+  { symbol:"b", symbolSound:"buh", category:"consonant",
+    tip:"pと同じく上下の唇を閉じてから息を出しますが、喉が震えます(有声音)。",
+    diagram:{type:"consonant", place:"lips", voiced:true, nasal:false, lips:"closed"},
+    examples:[
+      {word:"<u>b</u>ig", plain:"big", meaning:"大きい"},
+      {word:"<u>b</u>all", plain:"ball", meaning:"ボール"},
+      {word:"ta<u>b</u>le", plain:"table", meaning:"机"},
+      {word:"<u>b</u>aby", plain:"baby", meaning:"赤ちゃん"},
+      {word:"clu<u>b</u>", plain:"club", meaning:"クラブ"},
+      {word:"<u>b</u>ook", plain:"book", meaning:"本"},
+      {word:"num<u>b</u>er", plain:"number", meaning:"数"}
+    ]},
+  { symbol:"t", symbolSound:"tuh", category:"consonant",
+    tip:"舌先を上の歯ぐき(歯の裏側の少し上)につけてから、息を破裂させて離します。声は震えません。",
+    diagram:{type:"consonant", place:"ridge", voiced:false, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>t</u>en", plain:"ten", meaning:"10"},
+      {word:"<u>t</u>ime", plain:"time", meaning:"時間"},
+      {word:"ca<u>t</u>", plain:"cat", meaning:"猫"},
+      {word:"s<u>t</u>art", plain:"start", meaning:"始める"},
+      {word:"wa<u>t</u>er", plain:"water", meaning:"水"},
+      {word:"<u>t</u>eacher", plain:"teacher", meaning:"先生"},
+      {word:"bes<u>t</u>", plain:"best", meaning:"最高の"}
+    ]},
+  { symbol:"d", symbolSound:"duh", category:"consonant",
+    tip:"tと同じ場所に舌先をつけますが、喉を震わせて発音します(有声音)。",
+    diagram:{type:"consonant", place:"ridge", voiced:true, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>d</u>og", plain:"dog", meaning:"犬"},
+      {word:"<u>d</u>ay", plain:"day", meaning:"日"},
+      {word:"re<u>d</u>", plain:"red", meaning:"赤"},
+      {word:"goo<u>d</u>", plain:"good", meaning:"良い"},
+      {word:"i<u>d</u>ea", plain:"idea", meaning:"アイデア"},
+      {word:"stu<u>d</u>y", plain:"study", meaning:"勉強する"},
+      {word:"frien<u>d</u>", plain:"friend", meaning:"友達"}
+    ]},
+  { symbol:"k", symbolSound:"kuh", category:"consonant",
+    tip:"舌の奥を喉の奥の柔らかい部分(軟口蓋)につけてから、息を破裂させます。声は震えません。",
+    diagram:{type:"consonant", place:"velum", voiced:false, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>c</u>at", plain:"cat", meaning:"猫"},
+      {word:"<u>k</u>ey", plain:"key", meaning:"鍵"},
+      {word:"boo<u>k</u>", plain:"book", meaning:"本"},
+      {word:"<u>c</u>lass", plain:"class", meaning:"クラス"},
+      {word:"wee<u>k</u>end", plain:"weekend", meaning:"週末"},
+      {word:"<u>c</u>ome", plain:"come", meaning:"来る"},
+      {word:"li<u>k</u>e", plain:"like", meaning:"好き"}
+    ]},
+  { symbol:"g", symbolSound:"guh", category:"consonant",
+    tip:"kと同じ場所ですが、喉を震わせて発音します(有声音)。",
+    diagram:{type:"consonant", place:"velum", voiced:true, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>g</u>o", plain:"go", meaning:"行く"},
+      {word:"<u>g</u>ame", plain:"game", meaning:"ゲーム"},
+      {word:"do<u>g</u>", plain:"dog", meaning:"犬"},
+      {word:"<u>g</u>arden", plain:"garden", meaning:"庭"},
+      {word:"ba<u>g</u>", plain:"bag", meaning:"かばん"},
+      {word:"<u>g</u>irl", plain:"girl", meaning:"女の子"},
+      {word:"be<u>g</u>in", plain:"begin", meaning:"始める"}
+    ]},
+  { symbol:"f", symbolSound:"fff", category:"consonant",
+    tip:"上の前歯を下唇に軽くあてて、すきまから息をこすり出します。声は震えません。",
+    diagram:{type:"consonant", place:"teeth-lip", voiced:false, nasal:false, lips:"teeth-lip"},
+    examples:[
+      {word:"<u>f</u>ish", plain:"fish", meaning:"魚"},
+      {word:"<u>f</u>un", plain:"fun", meaning:"楽しみ"},
+      {word:"lea<u>f</u>", plain:"leaf", meaning:"葉"},
+      {word:"<u>f</u>amily", plain:"family", meaning:"家族"},
+      {word:"hal<u>f</u>", plain:"half", meaning:"半分"},
+      {word:"<u>f</u>ood", plain:"food", meaning:"食べ物"},
+      {word:"of<u>f</u>ice", plain:"office", meaning:"事務所"}
+    ]},
+  { symbol:"v", symbolSound:"vvv", category:"consonant",
+    tip:"fと同じ形ですが、喉を震わせて発音します(有声音)。",
+    diagram:{type:"consonant", place:"teeth-lip", voiced:true, nasal:false, lips:"teeth-lip"},
+    examples:[
+      {word:"<u>v</u>ery", plain:"very", meaning:"とても"},
+      {word:"<u>v</u>oice", plain:"voice", meaning:"声"},
+      {word:"lo<u>v</u>e", plain:"love", meaning:"愛"},
+      {word:"se<u>v</u>en", plain:"seven", meaning:"7"},
+      {word:"tra<u>v</u>el", plain:"travel", meaning:"旅行する"},
+      {word:"gi<u>v</u>e", plain:"give", meaning:"与える"},
+      {word:"mo<u>v</u>ie", plain:"movie", meaning:"映画"}
+    ]},
+  { symbol:"θ", symbolSound:"thin", category:"consonant",
+    tip:"舌先を上下の歯の間から少し出して、すきまから息をこすり出します(thの無声音)。日本語の「ス」にならないよう注意しましょう。",
+    diagram:{type:"consonant", place:"teeth", voiced:false, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>th</u>ink", plain:"think", meaning:"思う"},
+      {word:"<u>th</u>ank", plain:"thank", meaning:"感謝する"},
+      {word:"ba<u>th</u>", plain:"bath", meaning:"お風呂"},
+      {word:"mon<u>th</u>", plain:"month", meaning:"月"},
+      {word:"mou<u>th</u>", plain:"mouth", meaning:"口"},
+      {word:"<u>th</u>ird", plain:"third", meaning:"3番目の"},
+      {word:"heal<u>th</u>y", plain:"healthy", meaning:"健康的な"}
+    ]},
+  { symbol:"ð", symbolSound:"then", category:"consonant",
+    tip:"θと同じ舌の形ですが、喉を震わせます(有声音)。thisやthatで使う音です。",
+    diagram:{type:"consonant", place:"teeth", voiced:true, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>th</u>is", plain:"this", meaning:"これ"},
+      {word:"<u>th</u>at", plain:"that", meaning:"あれ"},
+      {word:"mo<u>th</u>er", plain:"mother", meaning:"母"},
+      {word:"bro<u>th</u>er", plain:"brother", meaning:"兄弟"},
+      {word:"toge<u>th</u>er", plain:"together", meaning:"一緒に"},
+      {word:"<u>th</u>ey", plain:"they", meaning:"彼らは"},
+      {word:"wea<u>th</u>er", plain:"weather", meaning:"天気"}
+    ]},
+  { symbol:"s", symbolSound:"sss", category:"consonant",
+    tip:"舌先を上の歯ぐきに近づけて、狭いすきまから息をこすり出します。声は震えません。",
+    diagram:{type:"consonant", place:"ridge", voiced:false, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>s</u>un", plain:"sun", meaning:"太陽"},
+      {word:"<u>s</u>ee", plain:"see", meaning:"見る"},
+      {word:"bu<u>s</u>", plain:"bus", meaning:"バス"},
+      {word:"hou<u>s</u>e", plain:"house", meaning:"家"},
+      {word:"<u>s</u>ister", plain:"sister", meaning:"姉妹"},
+      {word:"<u>c</u>ity", plain:"city", meaning:"都市"},
+      {word:"cla<u>ss</u>", plain:"class", meaning:"クラス"}
+    ]},
+  { symbol:"z", symbolSound:"zzz", category:"consonant",
+    tip:"sと同じ形ですが、喉を震わせます(有声音)。",
+    diagram:{type:"consonant", place:"ridge", voiced:true, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>z</u>oo", plain:"zoo", meaning:"動物園"},
+      {word:"<u>z</u>ebra", plain:"zebra", meaning:"シマウマ"},
+      {word:"ro<u>s</u>e", plain:"rose", meaning:"バラ"},
+      {word:"mu<u>s</u>ic", plain:"music", meaning:"音楽"},
+      {word:"ea<u>s</u>y", plain:"easy", meaning:"簡単な"},
+      {word:"<u>z</u>ero", plain:"zero", meaning:"ゼロ"},
+      {word:"boy<u>s</u>", plain:"boys", meaning:"男の子たち"}
+    ]},
+  { symbol:"ʃ", symbolSound:"shh", category:"consonant",
+    tip:"唇を少し丸めて前に出し、舌を歯ぐきの少し後ろに近づけて「シュ」のように息をこすり出します。",
+    diagram:{type:"consonant", place:"palate", voiced:false, nasal:false, lips:"rounded"},
+    examples:[
+      {word:"<u>sh</u>e", plain:"she", meaning:"彼女"},
+      {word:"fi<u>sh</u>", plain:"fish", meaning:"魚"},
+      {word:"<u>sh</u>op", plain:"shop", meaning:"店"},
+      {word:"wa<u>sh</u>", plain:"wash", meaning:"洗う"},
+      {word:"fa<u>sh</u>ion", plain:"fashion", meaning:"ファッション"},
+      {word:"<u>sh</u>ort", plain:"short", meaning:"短い"},
+      {word:"Engli<u>sh</u>", plain:"English", meaning:"英語"}
+    ]},
+  { symbol:"ʒ", symbolSound:"genre", category:"consonant",
+    tip:"ʃと同じ形ですが、喉を震わせます(有声音)。televisionのsiの音です。",
+    diagram:{type:"consonant", place:"palate", voiced:true, nasal:false, lips:"rounded"},
+    examples:[
+      {word:"tele<u>vi</u>sion", plain:"television", meaning:"テレビ"},
+      {word:"u<u>s</u>ually", plain:"usually", meaning:"普段"},
+      {word:"trea<u>s</u>ure", plain:"treasure", meaning:"宝物"},
+      {word:"mea<u>s</u>ure", plain:"measure", meaning:"測る"},
+      {word:"vi<u>si</u>on", plain:"vision", meaning:"視力"},
+      {word:"deci<u>si</u>on", plain:"decision", meaning:"決定"},
+      {word:"plea<u>s</u>ure", plain:"pleasure", meaning:"楽しみ"}
+    ]},
+  { symbol:"tʃ", symbolSound:"chuh", category:"consonant",
+    tip:"舌先を歯ぐきに一度つけてから、ʃの形に離して「チュ」のように出します。",
+    diagram:{type:"consonant", place:"palate", voiced:false, nasal:false, lips:"rounded"},
+    examples:[
+      {word:"<u>ch</u>air", plain:"chair", meaning:"椅子"},
+      {word:"<u>ch</u>eese", plain:"cheese", meaning:"チーズ"},
+      {word:"wat<u>ch</u>", plain:"watch", meaning:"時計・見る"},
+      {word:"tea<u>ch</u>er", plain:"teacher", meaning:"先生"},
+      {word:"lun<u>ch</u>", plain:"lunch", meaning:"昼食"},
+      {word:"<u>ch</u>ild", plain:"child", meaning:"子ども"},
+      {word:"kit<u>ch</u>en", plain:"kitchen", meaning:"台所"}
+    ]},
+  { symbol:"dʒ", symbolSound:"juh", category:"consonant",
+    tip:"tʃと同じ動きですが、喉を震わせます(有声音)。",
+    diagram:{type:"consonant", place:"palate", voiced:true, nasal:false, lips:"rounded"},
+    examples:[
+      {word:"<u>j</u>uice", plain:"juice", meaning:"ジュース"},
+      {word:"<u>j</u>ump", plain:"jump", meaning:"跳ぶ"},
+      {word:"bri<u>dg</u>e", plain:"bridge", meaning:"橋"},
+      {word:"oran<u>g</u>e", plain:"orange", meaning:"オレンジ"},
+      {word:"dan<u>g</u>er", plain:"danger", meaning:"危険"},
+      {word:"<u>J</u>apan", plain:"Japan", meaning:"日本"},
+      {word:"ma<u>g</u>ic", plain:"magic", meaning:"魔法"}
+    ]},
+  { symbol:"h", symbolSound:"huh", category:"consonant",
+    tip:"喉から軽く息をはくだけで、舌や唇はあまり使いません。",
+    diagram:{type:"consonant", place:"throat", voiced:false, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>h</u>at", plain:"hat", meaning:"帽子"},
+      {word:"<u>h</u>ouse", plain:"house", meaning:"家"},
+      {word:"<u>h</u>appy", plain:"happy", meaning:"幸せな"},
+      {word:"<u>h</u>and", plain:"hand", meaning:"手"},
+      {word:"<u>h</u>elp", plain:"help", meaning:"助ける"},
+      {word:"<u>h</u>ome", plain:"home", meaning:"家"},
+      {word:"be<u>h</u>ind", plain:"behind", meaning:"後ろに"}
+    ]},
+  { symbol:"m", symbolSound:"mmm", category:"consonant",
+    tip:"上下の唇を閉じて、息を鼻からぬけさせます。喉は震えます(有声音・鼻音)。",
+    diagram:{type:"consonant", place:"lips", voiced:true, nasal:true, lips:"closed"},
+    examples:[
+      {word:"<u>m</u>an", plain:"man", meaning:"男性"},
+      {word:"<u>m</u>usic", plain:"music", meaning:"音楽"},
+      {word:"na<u>m</u>e", plain:"name", meaning:"名前"},
+      {word:"su<u>mm</u>er", plain:"summer", meaning:"夏"},
+      {word:"roo<u>m</u>", plain:"room", meaning:"部屋"},
+      {word:"<u>m</u>orning", plain:"morning", meaning:"朝"},
+      {word:"swi<u>m</u>", plain:"swim", meaning:"泳ぐ"}
+    ]},
+  { symbol:"n", symbolSound:"nnn", category:"consonant",
+    tip:"舌先を歯ぐきにつけて、息を鼻からぬけさせます。喉は震えます(有声音・鼻音)。",
+    diagram:{type:"consonant", place:"ridge", voiced:true, nasal:true, lips:"open"},
+    examples:[
+      {word:"<u>n</u>ice", plain:"nice", meaning:"素敵な"},
+      {word:"<u>n</u>ame", plain:"name", meaning:"名前"},
+      {word:"su<u>n</u>", plain:"sun", meaning:"太陽"},
+      {word:"mor<u>n</u>ing", plain:"morning", meaning:"朝"},
+      {word:"di<u>nn</u>er", plain:"dinner", meaning:"夕食"},
+      {word:"<u>n</u>ever", plain:"never", meaning:"決して〜ない"},
+      {word:"ope<u>n</u>", plain:"open", meaning:"開ける"}
+    ]},
+  { symbol:"ŋ", symbolSound:"sing", category:"consonant",
+    tip:"舌の奥を軟口蓋につけて、息を鼻からぬけさせます。singのように語尾でよく使われます。",
+    diagram:{type:"consonant", place:"velum", voiced:true, nasal:true, lips:"open"},
+    examples:[
+      {word:"si<u>ng</u>", plain:"sing", meaning:"歌う"},
+      {word:"morni<u>ng</u>", plain:"morning", meaning:"朝"},
+      {word:"E<u>ng</u>lish", plain:"English", meaning:"英語"},
+      {word:"you<u>ng</u>", plain:"young", meaning:"若い"},
+      {word:"thi<u>ng</u>", plain:"thing", meaning:"もの"},
+      {word:"lo<u>ng</u>", plain:"long", meaning:"長い"},
+      {word:"bri<u>ng</u>", plain:"bring", meaning:"持ってくる"}
+    ]},
+  { symbol:"l", symbolSound:"luh", category:"consonant",
+    tip:"舌先を上の歯ぐきにしっかりつけて、舌の両わきから息を出します。",
+    diagram:{type:"consonant", place:"ridge", voiced:true, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>l</u>ove", plain:"love", meaning:"愛"},
+      {word:"<u>l</u>ike", plain:"like", meaning:"好き"},
+      {word:"ba<u>ll</u>", plain:"ball", meaning:"ボール"},
+      {word:"co<u>l</u>or", plain:"color", meaning:"色"},
+      {word:"fami<u>l</u>y", plain:"family", meaning:"家族"},
+      {word:"<u>l</u>eave", plain:"leave", meaning:"去る"},
+      {word:"schoo<u>l</u>", plain:"school", meaning:"学校"}
+    ]},
+  { symbol:"r", symbolSound:"ruh", category:"consonant",
+    tip:"舌をどこにもつけずに、少し丸めるようにして唇も軽く丸めます。日本語の「ラ行」と違い、舌が歯ぐきに触れないのがポイントです。",
+    diagram:{type:"consonant", place:"palate", voiced:true, nasal:false, lips:"rounded"},
+    examples:[
+      {word:"<u>r</u>ed", plain:"red", meaning:"赤"},
+      {word:"<u>r</u>ain", plain:"rain", meaning:"雨"},
+      {word:"sto<u>r</u>y", plain:"story", meaning:"物語"},
+      {word:"<u>r</u>iver", plain:"river", meaning:"川"},
+      {word:"so<u>rr</u>y", plain:"sorry", meaning:"ごめんなさい"},
+      {word:"<u>r</u>ight", plain:"right", meaning:"正しい"},
+      {word:"g<u>r</u>een", plain:"green", meaning:"緑"}
+    ]},
+  { symbol:"w", symbolSound:"wuh", category:"consonant",
+    tip:"唇をしっかり丸めて前に突き出してから、次の母音に移ります。",
+    diagram:{type:"consonant", place:"lips", voiced:true, nasal:false, lips:"rounded"},
+    examples:[
+      {word:"<u>w</u>ater", plain:"water", meaning:"水"},
+      {word:"<u>w</u>e", plain:"we", meaning:"私たち"},
+      {word:"<u>w</u>ant", plain:"want", meaning:"欲しい"},
+      {word:"a<u>w</u>ay", plain:"away", meaning:"離れて"},
+      {word:"al<u>w</u>ays", plain:"always", meaning:"いつも"},
+      {word:"<u>w</u>ork", plain:"work", meaning:"働く"},
+      {word:"<u>w</u>orld", plain:"world", meaning:"世界"}
+    ]},
+  { symbol:"j", symbolSound:"yuh", category:"consonant",
+    tip:"舌の前の部分を口の天井(硬口蓋)に近づけてから、すぐ母音に移ります。日本語の「ヤ行」に近い音です。",
+    diagram:{type:"consonant", place:"palate", voiced:true, nasal:false, lips:"open"},
+    examples:[
+      {word:"<u>y</u>es", plain:"yes", meaning:"はい"},
+      {word:"<u>y</u>ear", plain:"year", meaning:"年"},
+      {word:"<u>y</u>ellow", plain:"yellow", meaning:"黄色"},
+      {word:"<u>y</u>esterday", plain:"yesterday", meaning:"昨日"},
+      {word:"<u>u</u>se", plain:"use", meaning:"使う"},
+      {word:"<u>u</u>niform", plain:"uniform", meaning:"制服"},
+      {word:"comp<u>u</u>ter", plain:"computer", meaning:"コンピューター"}
+    ]}
+];
+
+const CAT_LABEL = { vowel:"母音", diphthong:"二重母音", consonant:"子音" };
+const STORAGE_KEY = "pronunciation-app-mastered-v1";
+
+function loadMastered(){
+  try{
+    return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+  }catch(e){ return new Set(); }
+}
+function saveMastered(set){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+}
+
+let mastered = loadMastered();
+let currentCat = "all";
+
+const grid = document.getElementById("grid");
+const progressFill = document.getElementById("progressFill");
+const progressLabel = document.getElementById("progressLabel");
+
+function speak(text){
+  if(!("speechSynthesis" in window)){
+    alert("お使いのブラウザは音声読み上げに対応していません。");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = 0.85;
+  window.speechSynthesis.speak(utter);
+}
+
+// ---------- 発音ポイントの図(SVG)を作る ----------
+
+// 子音: 調音位置ごとのx座標(唇側が右、喉側が左)
+const PLACE_X = {
+  throat: 30,
+  velum: 62,
+  palate: 94,
+  ridge: 124,
+  teeth: 150,
+  "teeth-lip": 150,
+  lips: 178
+};
+const PLACE_LABEL = {
+  throat: "声門",
+  velum: "軟口蓋",
+  palate: "硬口蓋あたり",
+  ridge: "歯ぐき",
+  teeth: "歯",
+  "teeth-lip": "歯と唇",
+  lips: "唇"
+};
+
+function renderVowelDiagram(entry){
+  const d = entry.diagram;
+  return `
+  <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="42,22 152,22 168,132 56,132" fill="#fdf3ff" stroke="#8b7bd8" stroke-width="2"/>
+    <text x="100" y="14" text-anchor="middle" font-size="11" fill="#8b879a">狭い(舌が高い)</text>
+    <text x="100" y="150" text-anchor="middle" font-size="11" fill="#8b879a">広い(舌が低い)</text>
+    <text x="20" y="80" text-anchor="middle" font-size="11" fill="#8b879a" transform="rotate(-90 20 80)">前</text>
+    <text x="185" y="80" text-anchor="middle" font-size="11" fill="#8b879a" transform="rotate(-90 185 80)">後ろ</text>
+    <circle cx="${d.x}" cy="${d.y}" r="9" fill="#ff8a5c" stroke="#fff" stroke-width="2"/>
+    <text x="${d.x}" y="${d.y+4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">${entry.symbol}</text>
+  </svg>`;
+}
+
+function renderDiphthongDiagram(entry){
+  const d = entry.diagram;
+  const dx = d.x2 - d.x1, dy = d.y2 - d.y1;
+  const len = Math.sqrt(dx*dx+dy*dy) || 1;
+  const ux = dx/len, uy = dy/len;
+  const ex = d.x2 - ux*12, ey = d.y2 - uy*12;
+  return `
+  <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="42,22 152,22 168,132 56,132" fill="#f2fbef" stroke="#7bc86c" stroke-width="2"/>
+    <text x="100" y="14" text-anchor="middle" font-size="11" fill="#8b879a">狭い(舌が高い)</text>
+    <text x="100" y="150" text-anchor="middle" font-size="11" fill="#8b879a">広い(舌が低い)</text>
+    <defs>
+      <marker id="arrow-${entry.symbol}" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#4a9dec"/>
+      </marker>
+    </defs>
+    <line x1="${d.x1}" y1="${d.y1}" x2="${ex}" y2="${ey}" stroke="#4a9dec" stroke-width="3" marker-end="url(#arrow-${entry.symbol})"/>
+    <circle cx="${d.x1}" cy="${d.y1}" r="8" fill="#7bc86c" stroke="#fff" stroke-width="2"/>
+    <circle cx="${d.x2}" cy="${d.y2}" r="8" fill="#ff8a5c" stroke="#fff" stroke-width="2"/>
+    <text x="${d.x1}" y="${d.y1-14}" text-anchor="middle" font-size="10" fill="#5b8b57">開始</text>
+    <text x="${d.x2}" y="${d.y2-14}" text-anchor="middle" font-size="10" fill="#b5502f">終わり</text>
+  </svg>`;
+}
+
+function renderConsonantDiagram(entry){
+  const d = entry.diagram;
+  const px = PLACE_X[d.place];
+
+  // 唇の形
+  let lipsShape = "";
+  if(d.lips === "closed"){
+    lipsShape = `<line x1="182" y1="58" x2="182" y2="80" stroke="#c9573f" stroke-width="4" stroke-linecap="round"/>`;
+  } else if(d.lips === "rounded"){
+    lipsShape = `<ellipse cx="186" cy="69" rx="7" ry="11" fill="none" stroke="#c9573f" stroke-width="4"/>`;
+  } else if(d.lips === "teeth-lip"){
+    lipsShape = `<line x1="176" y1="58" x2="184" y2="76" stroke="#c9573f" stroke-width="4" stroke-linecap="round"/>`;
+  } else {
+    lipsShape = `<path d="M178,58 Q188,69 178,80" fill="none" stroke="#c9573f" stroke-width="4" stroke-linecap="round"/>`;
+  }
+
+  // 舌(調音位置付近を膨らませる)
+  const tongue = `<path d="M40,95 Q${px},${d.place==='throat'?95: 78} ${px+14},92 Q140,100 100,105 Q60,108 40,95 Z" fill="#ffb3c6" stroke="#e88ba3" stroke-width="1.5" opacity="0.9"/>`;
+
+  // 声帯(有声/無声)
+  const larynx = d.voiced
+    ? `<polyline points="22,128 27,120 32,136 37,120 42,128" fill="none" stroke="#ff8a5c" stroke-width="3" stroke-linecap="round"/>`
+    : `<line x1="22" y1="128" x2="42" y2="128" stroke="#8b879a" stroke-width="3" stroke-linecap="round"/>`;
+
+  // 鼻音マーク
+  const nasal = d.nasal
+    ? `<path d="M150,20 L150,8" stroke="#4a9dec" stroke-width="3" marker-end="url(#nasalArrow)"/>
+       <defs><marker id="nasalArrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#4a9dec"/></marker></defs>
+       <text x="150" y="6" text-anchor="middle" font-size="9" fill="#4a9dec">鼻へ</text>`
+    : "";
+
+  return `
+  <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+    <rect x="20" y="45" width="165" height="45" rx="22" fill="#fbe8d6" stroke="#5b4636" stroke-width="2"/>
+    ${tongue}
+    <line x1="150" y1="47" x2="150" y2="38" stroke="#5b4636" stroke-width="2"/>
+    <line x1="150" y1="88" x2="150" y2="97" stroke="#5b4636" stroke-width="2"/>
+    ${lipsShape}
+    <circle cx="${px}" cy="45" r="7" fill="#ff4d4d" stroke="#fff" stroke-width="2"/>
+    <text x="${px}" y="112" text-anchor="middle" font-size="10" fill="#5b4636">${PLACE_LABEL[d.place]}</text>
+    ${nasal}
+    ${larynx}
+    <text x="32" y="142" text-anchor="middle" font-size="9" fill="#8b879a">${d.voiced ? "有声(のど振動)" : "無声(のど静か)"}</text>
+  </svg>`;
+}
+
+function renderDiagram(entry){
+  if(entry.diagram.type === "vowel") return renderVowelDiagram(entry);
+  if(entry.diagram.type === "diphthong") return renderDiphthongDiagram(entry);
+  return renderConsonantDiagram(entry);
+}
+
+// ---------- モーダル ----------
+const modalOverlay = document.getElementById("modalOverlay");
+const modalSymbol = document.getElementById("modalSymbol");
+const modalCatLabel = document.getElementById("modalCatLabel");
+const modalDiagram = document.getElementById("modalDiagram");
+const modalTip = document.getElementById("modalTip");
+const modalLegend = document.getElementById("modalLegend");
+
+function openModal(entry){
+  modalSymbol.textContent = `/${entry.symbol}/`;
+  modalCatLabel.innerHTML = `<span class="cat-label">${CAT_LABEL[entry.category]}</span>`;
+  modalDiagram.innerHTML = renderDiagram(entry);
+  modalTip.textContent = entry.tip;
+  if(entry.category === "consonant"){
+    modalLegend.innerHTML = `<span>赤丸=音を出す場所</span><span>${entry.diagram.voiced ? "有声音" : "無声音"}</span>${entry.diagram.nasal ? "<span>鼻音</span>" : ""}`;
+  } else {
+    modalLegend.innerHTML = `<span>図は舌の高さと前後の位置を表しています</span>`;
+  }
+  modalOverlay.classList.add("open");
+}
+function closeModal(){
+  modalOverlay.classList.remove("open");
+}
+document.getElementById("modalClose").addEventListener("click", closeModal);
+modalOverlay.addEventListener("click", (e) => {
+  if(e.target === modalOverlay) closeModal();
+});
+
+// ---------- テストモード ----------
+const quizOverlay = document.getElementById("quizOverlay");
+const quizContent = document.getElementById("quizContent");
+
+let quiz = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickExample(entry){
+  return entry.examples[Math.floor(Math.random() * entry.examples.length)];
+}
+
+// 似ている・間違えやすい発音記号のペア(日本人英語学習者がよく混同する音)
+const CONFUSABLE = {
+  "iː": ["ɪ"], "ɪ": ["iː", "e"], "e": ["æ", "ɪ"], "æ": ["e", "ʌ", "ɑː"],
+  "ɑː": ["ʌ", "ɔː", "æ"], "ʌ": ["ɑː", "æ", "ə"], "ɔː": ["ɑː", "oʊ"],
+  "ʊ": ["uː"], "uː": ["ʊ"], "ɜːr": ["ə", "ʌ"], "ə": ["ʌ", "ɜːr"],
+  "eɪ": ["e", "aɪ"], "aɪ": ["aʊ", "eɪ"], "ɔɪ": ["oʊ", "aɪ"],
+  "aʊ": ["aɪ", "oʊ"], "oʊ": ["ɔː", "aʊ"],
+  "p": ["b", "f"], "b": ["v", "p"], "t": ["d", "k"], "d": ["t", "g"],
+  "k": ["g", "t"], "g": ["k", "d"],
+  "f": ["h", "v", "p"], "v": ["b", "f"],
+  "θ": ["s", "f"], "ð": ["z", "d"],
+  "s": ["θ", "ʃ", "z"], "z": ["s", "ð", "dʒ"],
+  "ʃ": ["s", "tʃ"], "ʒ": ["dʒ", "z"],
+  "tʃ": ["ʃ", "dʒ"], "dʒ": ["tʃ", "ʒ", "z"],
+  "h": ["f"],
+  "m": ["n"], "n": ["m", "ŋ", "l"], "ŋ": ["n"],
+  "l": ["r", "n"], "r": ["l", "w"],
+  "w": ["r"], "j": ["w"]
+};
+
+function getDistractors(pool, correctEntry, count){
+  const confusableSymbols = CONFUSABLE[correctEntry.symbol] || [];
+  const confusableEntries = shuffle(pool.filter(e => e !== correctEntry && confusableSymbols.includes(e.symbol)));
+  const distractors = confusableEntries.slice(0, count);
+
+  if(distractors.length < count){
+    const usedSymbols = new Set([correctEntry.symbol, ...distractors.map(e => e.symbol)]);
+    const remaining = shuffle(pool.filter(e => e !== correctEntry && !usedSymbols.has(e.symbol)));
+    for(const e of remaining){
+      if(distractors.length >= count) break;
+      distractors.push(e);
+    }
+  }
+  return distractors;
+}
+
+// 出題パターンを3種類でランダムに出題する
+function buildQuestion(pool, correctEntry){
+  const types = ["sym2word", "word2sym", "audio2symbol"];
+  const type = types[Math.floor(Math.random() * types.length)];
+  const others = getDistractors(pool, correctEntry, 3);
+
+  if(type === "sym2word"){
+    const choiceEntries = shuffle([correctEntry, ...others]);
+    const options = choiceEntries.map(e => {
+      const ex = pickExample(e);
+      return { label: ex.word, meaning: ex.meaning, symbol: e.symbol, isCorrect: e === correctEntry };
+    });
+    return { type, qLabel: "この発音記号の音を含む単語はどれ？", qMain: `/${correctEntry.symbol}/`, options, entry: correctEntry };
+  }
+
+  if(type === "word2sym"){
+    const ex = pickExample(correctEntry);
+    const choiceEntries = shuffle([correctEntry, ...others]);
+    const options = choiceEntries.map(e => ({
+      label: `/${e.symbol}/`,
+      meaning: "",
+      symbol: e.symbol,
+      isCorrect: e === correctEntry
+    }));
+    return { type, qLabel: "下線部の発音記号はどれ？", qMain: ex.word, options, entry: correctEntry };
+  }
+
+  // audio2symbol: 単語の音声を聞いて、含まれる発音記号を選ぶ
+  const ex = pickExample(correctEntry);
+  const choiceEntries = shuffle([correctEntry, ...others]);
+  const options = choiceEntries.map(e => ({
+    label: `/${e.symbol}/`,
+    meaning: "",
+    symbol: e.symbol,
+    isCorrect: e === correctEntry
+  }));
+  return { type, qLabel: "音声を聞いて、含まれる発音記号を選ぼう", qMain: "", options, entry: correctEntry, audioWord: ex.plain, audioWordMarked: ex.word, audioWordMeaning: ex.meaning };
+}
+
+function startQuiz(cat, reviewEntries){
+  const basePool = cat === "all" ? DATA : DATA.filter(d => d.category === cat);
+  const hasReview = !!(reviewEntries && reviewEntries.length);
+  const sequencePool = hasReview ? reviewEntries : basePool;
+  const numQuestions = sequencePool.length;
+  const correctSequence = shuffle(sequencePool).slice(0, numQuestions);
+  const questions = correctSequence.map(entry => buildQuestion(basePool, entry));
+
+  quiz = {
+    cat,
+    questions,
+    index: 0,
+    score: 0,
+    answered: false,
+    wrongEntries: [],
+    isReview: hasReview,
+    reviewPool: hasReview ? reviewEntries : null
+  };
+  quizOverlay.classList.add("open");
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion(){
+  const q = quiz.questions[quiz.index];
+  quiz.answered = false;
+  const catLabelText = quiz.isReview ? `🔁 復習(${CAT_LABEL[quiz.cat] || "すべて"})` : (CAT_LABEL[quiz.cat] || "すべて");
+  quizContent.innerHTML = `
+    <div class="quiz-progress">第${quiz.index + 1}問 / ${quiz.questions.length}問（${catLabelText}）</div>
+    <div class="quiz-score">現在のスコア: ${quiz.score} / ${quiz.index}</div>
+    <div class="quiz-question">
+      <div class="q-label">${q.qLabel}</div>
+      ${q.type === "audio2symbol"
+        ? `<button class="audio-play-btn" id="audioPlayBtn" type="button">🔊 タップして再生</button>
+           <div class="audio-reveal" id="audioReveal"></div>`
+        : `<div class="q-main">${q.qMain}</div>`
+      }
+    </div>
+    <div class="quiz-options" id="quizOptions"></div>
+  `;
+  if(q.type === "audio2symbol"){
+    const playBtn = document.getElementById("audioPlayBtn");
+    playBtn.addEventListener("click", () => speak(q.audioWord));
+    speak(q.audioWord);
+  }
+  const optionsWrap = document.getElementById("quizOptions");
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "quiz-option";
+    btn.innerHTML = opt.meaning
+      ? `${opt.label}<span class="opt-meaning">${opt.meaning}</span>`
+      : opt.label;
+    btn.addEventListener("click", () => selectQuizOption(i));
+    optionsWrap.appendChild(btn);
+  });
+}
+
+function selectQuizOption(i){
+  if(quiz.answered) return;
+  quiz.answered = true;
+  const q = quiz.questions[quiz.index];
+  const buttons = document.querySelectorAll("#quizOptions .quiz-option");
+  buttons.forEach((btn, idx) => {
+    btn.disabled = true;
+    const opt = q.options[idx];
+    if(opt.isCorrect) btn.classList.add("correct");
+    else if(idx === i) btn.classList.add("wrong");
+
+    if(q.type === "sym2word"){
+      btn.innerHTML = `${opt.label}<span class="opt-meaning">${opt.meaning}</span><span class="opt-symbol">/${opt.symbol}/</span>`;
+    } else {
+      btn.innerHTML = `${opt.label}`;
+    }
+  });
+  if(q.options[i].isCorrect){
+    quiz.score++;
+  } else if(!quiz.wrongEntries.includes(q.entry)){
+    quiz.wrongEntries.push(q.entry);
+  }
+
+  if(q.type === "audio2symbol"){
+    const reveal = document.getElementById("audioReveal");
+    if(reveal){
+      reveal.innerHTML = `${q.audioWordMarked}<span class="reveal-meaning">${q.audioWordMeaning}</span>`;
+      reveal.classList.add("show");
+    }
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "quiz-next-btn";
+  nextBtn.textContent = (quiz.index === quiz.questions.length - 1) ? "結果を見る" : "次の問題へ";
+  nextBtn.addEventListener("click", () => {
+    quiz.index++;
+    if(quiz.index >= quiz.questions.length) showQuizResult();
+    else renderQuizQuestion();
+  });
+  quizContent.appendChild(nextBtn);
+}
+
+function showQuizResult(){
+  const total = quiz.questions.length;
+  const score = quiz.score;
+  const pct = Math.round((score / total) * 100);
+  let msg = "";
+  if(pct === 100) msg = "パーフェクト！よく覚えられているね！";
+  else if(pct >= 70) msg = "とてもよくできました！あと少しで完璧です。";
+  else if(pct >= 40) msg = "よくがんばりました。もう一度復習してみよう。";
+  else msg = "カード学習に戻って、もう一度確認してみよう。";
+
+  const catLabelText = quiz.isReview ? `🔁 復習(${CAT_LABEL[quiz.cat] || "すべて"})` : (CAT_LABEL[quiz.cat] || "すべて");
+
+  quizContent.innerHTML = `
+    <div class="quiz-result">
+      <div class="q-label">${catLabelText}のテスト結果</div>
+      <div class="result-score">${score} / ${total}</div>
+      <div class="result-msg">${msg}</div>
+      <div class="quiz-result-buttons">
+        <button class="retry-btn" id="quizRetry">もう一度挑戦</button>
+        ${quiz.wrongEntries.length > 0 ? `<button class="review-btn" id="quizReview">🔁 間違えた${quiz.wrongEntries.length}問を復習</button>` : ""}
+        <button class="close-btn2" id="quizBackClose">閉じる</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("quizRetry").addEventListener("click", () => startQuiz(quiz.cat, quiz.isReview ? quiz.reviewPool : null));
+  if(quiz.wrongEntries.length > 0){
+    document.getElementById("quizReview").addEventListener("click", () => startQuiz(quiz.cat, quiz.wrongEntries));
+  }
+  document.getElementById("quizBackClose").addEventListener("click", closeQuiz);
+}
+
+function closeQuiz(){
+  quizOverlay.classList.remove("open");
+  quiz = null;
+}
+
+document.querySelectorAll(".quiz-start-btn").forEach(btn => {
+  btn.addEventListener("click", () => startQuiz(btn.dataset.cat));
+});
+document.getElementById("quizClose").addEventListener("click", closeQuiz);
+quizOverlay.addEventListener("click", (e) => {
+  if(e.target === quizOverlay) closeQuiz();
+});
+
+function render(){
+  grid.innerHTML = "";
+  const list = DATA.filter(d => currentCat === "all" || d.category === currentCat);
+
+  list.forEach((item) => {
+    const id = item.category + "-" + item.symbol;
+    const isMastered = mastered.has(id);
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.cat = item.category;
+
+    const inner = document.createElement("div");
+    inner.className = "card-inner";
+
+    // front
+    const front = document.createElement("div");
+    front.className = "card-face card-front";
+    front.innerHTML = `
+      ${isMastered ? '<div class="mastered-badge">⭐</div>' : ''}
+      <div class="symbol">/${item.symbol}/</div>
+      <div class="cat-label">${CAT_LABEL[item.category]}</div>
+      <div class="front-buttons">
+        <button class="point-btn" data-id="${id}">👄 発音のポイント</button>
+      </div>
+    `;
+
+    // back
+    const back = document.createElement("div");
+    back.className = "card-face card-back";
+    const examplesHTML = item.examples.map(ex => `
+      <div class="example">
+        <div>
+          <div class="word">${ex.word}</div>
+          <div class="meaning">${ex.meaning}</div>
+        </div>
+        <button class="play-btn" data-word="${ex.plain}" title="発音を聞く">▶</button>
+      </div>
+    `).join("");
+    back.innerHTML = `
+      ${examplesHTML}
+      <div class="back-controls">
+        <button class="mark-btn mark-know" data-id="${id}">覚えた ⭐</button>
+        <button class="mark-btn mark-again" data-id="${id}">もう一度</button>
+      </div>
+    `;
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+    grid.appendChild(card);
+
+    card.addEventListener("click", (e) => {
+      if(e.target.closest(".play-btn") || e.target.closest(".mark-btn") || e.target.closest(".point-btn")) return;
+      card.classList.toggle("flipped");
+    });
+
+    front.querySelectorAll(".point-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openModal(item);
+      });
+    });
+
+    back.querySelectorAll(".play-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        speak(btn.dataset.word);
+      });
+    });
+
+    back.querySelectorAll(".mark-know").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        mastered.add(btn.dataset.id);
+        saveMastered(mastered);
+        render();
+      });
+    });
+    back.querySelectorAll(".mark-again").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        mastered.delete(btn.dataset.id);
+        saveMastered(mastered);
+        render();
+      });
+    });
+  });
+
+  updateProgress(list);
+}
+
+function updateProgress(list){
+  const total = list.length;
+  const done = list.filter(d => mastered.has(d.category + "-" + d.symbol)).length;
+  const pct = total === 0 ? 0 : Math.round((done/total) * 100);
+  progressFill.style.width = pct + "%";
+  progressLabel.textContent = `覚えた記号: ${done} / ${total}`;
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentCat = btn.dataset.cat;
+    render();
+  });
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if(confirm("すべての進捗をリセットしますか？")){
+    mastered = new Set();
+    saveMastered(mastered);
+    render();
+  }
+});
+
+render();
+</script>
+
+</body>
+</html>
