@@ -218,6 +218,14 @@
   .ov-summary-final-label { font-weight: 800; font-size: .88rem; }
   .ov-summary-final-status { font-size: .8rem; font-weight: 700; color: var(--ink-soft); }
   .ov-summary-final-status.cleared { color: var(--good); }
+  .ov-weak-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 2px; border-top: 1px solid var(--border); gap: 10px; }
+  .ov-weak-row:first-child { border-top: none; }
+  .ov-weak-main { min-width: 0; }
+  .ov-weak-en { font-family: var(--font-mono); font-weight: 700; font-size: .88rem; }
+  .ov-weak-ja { font-size: .72rem; color: var(--ink-soft); margin-top: 1px; }
+  .ov-weak-meta { text-align: right; flex-shrink: 0; }
+  .ov-weak-unit { font-size: .62rem; color: var(--indigo); font-weight: 700; }
+  .ov-weak-stat { font-size: .68rem; color: var(--bad); font-weight: 700; margin-top: 1px; font-variant-numeric: tabular-nums; }
 
   /* ── MODE GRID ── */
   .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
@@ -647,8 +655,56 @@
     <div class="ov-summary-final-status" id="ov-summary-final-status">未挑戦</div>
   </div>
 
+  <div class="panel" id="ov-weak-panel">
+    <div class="sec-title" style="margin-bottom:10px;">🩹 苦手な単語</div>
+    <div id="ov-weak-empty" style="display:none; text-align:center; color:var(--ink-soft); font-size:.85rem; padding:8px 0 4px;">まだ間違えた単語はありません。素晴らしい！🎉</div>
+    <div id="ov-weak-list"></div>
+    <button class="btn btn-primary btn-block" id="ov-weak-practice-btn" style="margin-top:12px; margin-bottom:0;" onclick="startWeakWordsPractice()">🩹 苦手な単語を練習する</button>
+  </div>
+
   <div class="sec-title" style="margin-top:4px;">Unitごとの記録</div>
   <div id="ov-unit-list"></div>
+</div>
+
+
+<!-- ═══════════ WEAK WORDS PRACTICE (cross-Unit mistake review) ═══════════ -->
+<div id="screen-weak" class="screen">
+  <button class="back-btn" onclick="go('overview')">← 学習状況に戻る</button>
+
+  <div id="ww-quiz-area">
+    <div class="prog-row">
+      <span id="ww-cnt">1 / 10</span>
+      <div class="prog-bar"><div class="prog-fill" id="ww-prog" style="width:0%"></div></div>
+    </div>
+    <div style="text-align:center; margin-bottom:6px;">
+      <span class="wl-badge" id="ww-unit-tag" style="background:var(--indigo-soft); color:var(--indigo);">Unit 1</span>
+    </div>
+    <div class="quiz-q">
+      <span class="quiz-dir" id="ww-dir">ENGLISH → 日本語</span>
+      <span id="ww-q">---</span>
+    </div>
+    <div style="text-align:center; margin-bottom:14px;">
+      <button class="speak-btn" onclick="speak(event)">🔊 発音を聞く</button>
+    </div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" id="wwo0" onclick="wwAns(0)">---</button>
+      <button class="quiz-opt" id="wwo1" onclick="wwAns(1)">---</button>
+      <button class="quiz-opt" id="wwo2" onclick="wwAns(2)">---</button>
+      <button class="quiz-opt" id="wwo3" onclick="wwAns(3)">---</button>
+    </div>
+    <div class="quiz-fb" id="ww-fb"></div>
+  </div>
+
+  <div id="ww-complete" class="panel" style="display:none; text-align:center;">
+    <div style="font-size:2.2rem; margin-bottom:6px;">🩹</div>
+    <div class="mode-name" style="font-size:1.05rem; margin-bottom:10px;">練習おつかれさま！</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-num" id="ww-ok" style="color:var(--good);">0</div><div class="stat-label">正解</div></div>
+      <div class="stat-card"><div class="stat-num" id="ww-ng" style="color:var(--bad);">0</div><div class="stat-label">不正解</div></div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="startWeakWordsPractice()">🔄 もう一度練習する</button>
+    <button class="btn btn-ghost btn-block" style="margin-bottom:0;" onclick="go('overview')">📊 学習状況に戻る</button>
+  </div>
 </div>
 
 
@@ -1825,6 +1881,8 @@ function renderOverview() {
     el.classList.toggle('cleared', cleared);
   }
 
+  renderWeakWordsPanel();
+
   document.getElementById('ov-unit-list').innerHTML = stats.map(({ unit, s }) => {
     const bossMedal = s.bossCleared ? (BOSS_RANKS.find(r => r.rank === s.bossBestRank) || BOSS_RANKS[BOSS_RANKS.length-1]).medal : '👹';
     return '<div class="panel ov-unit-panel">' +
@@ -1843,6 +1901,165 @@ function renderOverview() {
       '</div>' +
     '</div>';
   }).join('');
+}
+
+// ══════════════════════════════════════════
+//  WEAK WORDS PRACTICE (cross-Unit mistake review)
+// ══════════════════════════════════════════
+// Finds words the student has actually gotten wrong (in Quiz, Typing, or
+// Sentence — combined, since a mistake in any mode is a sign the word
+// needs review) across every real Unit, worst first, and lets the student
+// drill just those in a short multiple-choice review. Progress from this
+// review is written back into each word's OWN Unit (not whichever Unit
+// happens to be selected right now), so it genuinely improves that word's
+// real Quiz mastery.
+let currentWeakWords = [];
+let wwQueue = [], wwIdx = 0, wwOk = 0, wwNg = 0, wwAnswered = false, wwDir = 'e2j', wwCorrectIdx = 0;
+
+function collectWeakWords(limit) {
+  limit = limit || 10;
+  const out = [];
+  realUnits().forEach(u => {
+    let qzp = {}, typ = {}, stp = {};
+    try { qzp = JSON.parse(localStorage.getItem(lsFor(u.id, 'qzp'))) || {}; } catch(e) {}
+    try { typ = JSON.parse(localStorage.getItem(lsFor(u.id, 'typ'))) || {}; } catch(e) {}
+    try { stp = JSON.parse(localStorage.getItem(lsFor(u.id, 'stp'))) || {}; } catch(e) {}
+    u.words.forEach(w => {
+      const q = qzp[w.en] || { correct:0, wrong:0 };
+      const t = typ[w.en] || { correct:0, wrong:0 };
+      const s = stp[w.en] || { correct:0, wrong:0 };
+      const wrong = q.wrong + t.wrong + s.wrong;
+      const correct = q.correct + t.correct + s.correct;
+      const accuracy = (correct + wrong) ? Math.round(correct/(correct+wrong)*100) : 0;
+      // Only surface words still below the app's own "mastered" bar (80%,
+      // same threshold as the trophy/mastery bars elsewhere) — once enough
+      // correct practice brings a word's accuracy back up, it naturally
+      // drops off this list instead of staying flagged forever just
+      // because it was missed once, long ago.
+      if (wrong > 0 && accuracy < 80) {
+        out.push({ word: w, unitId: u.id, unitTitle: u.title, wrong, correct, accuracy });
+      }
+    });
+  });
+  // Most mistakes first; among ties, the lower accuracy is the shakier word.
+  out.sort((a,b) => b.wrong - a.wrong || a.accuracy - b.accuracy);
+  return out.slice(0, limit);
+}
+
+function renderWeakWordsPanel() {
+  currentWeakWords = collectWeakWords(10);
+  const listEl = document.getElementById('ov-weak-list');
+  const emptyEl = document.getElementById('ov-weak-empty');
+  const btnEl = document.getElementById('ov-weak-practice-btn');
+  if (currentWeakWords.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    btnEl.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  btnEl.style.display = 'flex';
+  listEl.innerHTML = currentWeakWords.map(x =>
+    '<div class="ov-weak-row">' +
+      '<div class="ov-weak-main">' +
+        '<div class="ov-weak-en">' + x.word.en + '</div>' +
+        '<div class="ov-weak-ja">' + x.word.ja + '</div>' +
+      '</div>' +
+      '<div class="ov-weak-meta">' +
+        '<div class="ov-weak-unit">' + x.unitTitle + '</div>' +
+        '<div class="ov-weak-stat">❌' + x.wrong + '回　正答率' + x.accuracy + '%</div>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function recordWWProgress(unitId, en, ok) {
+  const key = lsFor(unitId, 'qzp');
+  let dict = {};
+  try { dict = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) {}
+  if (!dict[en]) dict[en] = { correct: 0, wrong: 0 };
+  if (ok) dict[en].correct++; else dict[en].wrong++;
+  localStorage.setItem(key, JSON.stringify(dict));
+  // Keep the in-memory quizProgress in sync too when the word's own Unit
+  // happens to also be the one currently selected, so that Unit's own home
+  // screen reflects this practice immediately without needing a reload.
+  if (UNITS[currentUnitIndex] && UNITS[currentUnitIndex].id === unitId) quizProgress = dict;
+}
+
+function startWeakWordsPractice() {
+  if (!currentWeakWords || currentWeakWords.length === 0) { notif('練習できる苦手な単語がまだありません', 'err'); return; }
+  wwQueue = currentWeakWords.slice().sort(() => Math.random()-.5);
+  wwIdx = 0; wwOk = 0; wwNg = 0;
+  document.getElementById('ww-quiz-area').style.display = '';
+  document.getElementById('ww-complete').style.display = 'none';
+  go('weak');
+  loadWW();
+}
+
+function loadWW() {
+  // Guard against a stray setTimeout firing after the student has already
+  // navigated away from this screen.
+  if (document.querySelector('.screen.active').id !== 'screen-weak') return;
+  if (wwIdx >= wwQueue.length) { finishWW(); return; }
+  wwAnswered = false;
+  const item = wwQueue[wwIdx];
+  const w = item.word;
+  wwDir = Math.random() < 0.5 ? 'e2j' : 'j2e';
+  document.getElementById('ww-dir').textContent = wwDir === 'e2j' ? 'ENGLISH → 日本語' : '日本語 → ENGLISH';
+  document.getElementById('ww-q').textContent = wwDir === 'e2j' ? w.en : w.ja;
+  document.getElementById('ww-q').style.fontFamily = wwDir === 'e2j' ? 'var(--font-mono)' : 'var(--font-body)';
+  document.getElementById('ww-fb').textContent = '';
+  document.getElementById('ww-unit-tag').textContent = item.unitTitle;
+
+  const unit = UNITS.find(u => u.id === item.unitId);
+  const key = wwDir === 'e2j' ? 'ja' : 'en';
+  const pool = (unit ? unit.words : []).filter(o => o.en !== w.en).sort(() => Math.random()-.5);
+  const choices = [w[key]];
+  for (let i=0; i<Math.min(3, pool.length); i++) choices.push(pool[i][key]);
+  const opts = choices.sort(() => Math.random()-.5);
+  wwCorrectIdx = opts.indexOf(w[key]);
+
+  [0,1,2,3].forEach(i => {
+    const btn = document.getElementById('wwo'+i);
+    btn.textContent = opts[i] !== undefined ? opts[i] : '---';
+    btn.className = 'quiz-opt';
+    btn.disabled = opts[i] === undefined;
+  });
+  document.getElementById('ww-prog').style.width = Math.round(wwIdx/wwQueue.length*100) + '%';
+  document.getElementById('ww-cnt').textContent = (wwIdx+1) + ' / ' + wwQueue.length;
+}
+
+function wwAns(i) {
+  if (wwAnswered) return;
+  wwAnswered = true;
+  const item = wwQueue[wwIdx];
+  const w = item.word;
+  const ok = (i === wwCorrectIdx);
+  [0,1,2,3].forEach(j => {
+    const btn = document.getElementById('wwo'+j);
+    btn.disabled = true;
+    if (j === wwCorrectIdx) btn.classList.add('correct');
+  });
+  recordWWProgress(item.unitId, w.en, ok);
+  const fb = document.getElementById('ww-fb');
+  if (ok) {
+    wwOk++;
+    fb.textContent = '✓ 正解！'; fb.style.color = 'var(--good)';
+    wwIdx++; setTimeout(loadWW, 700);
+  } else {
+    wwNg++;
+    document.getElementById('wwo'+i).classList.add('wrong');
+    const correctText = wwDir === 'e2j' ? w.ja : w.en;
+    fb.textContent = '✗ 正解は「' + correctText + '」でした'; fb.style.color = 'var(--bad)';
+    wwIdx++; setTimeout(loadWW, 1700);
+  }
+}
+
+function finishWW() {
+  document.getElementById('ww-quiz-area').style.display = 'none';
+  document.getElementById('ww-complete').style.display = 'block';
+  document.getElementById('ww-ok').textContent = wwOk;
+  document.getElementById('ww-ng').textContent = wwNg;
 }
 
 function record(w, ok) {
@@ -3339,7 +3556,9 @@ function finishBoss(won) {
 function speak(e) {
   if (e) e.stopPropagation();
   let w = null;
-  if (currentMode === 'quiz' || currentMode === 'sentence') w = queue[idx];
+  const activeScreen = document.querySelector('.screen.active');
+  if (activeScreen && activeScreen.id === 'screen-weak') w = wwQueue[wwIdx] ? wwQueue[wwIdx].word : null;
+  else if (currentMode === 'quiz' || currentMode === 'sentence') w = queue[idx];
   else w = words[lcIdx];
   if (!w || !window.speechSynthesis) { notif('お使いのブラウザは発音機能に対応していません', 'err'); return; }
   window.speechSynthesis.cancel();
