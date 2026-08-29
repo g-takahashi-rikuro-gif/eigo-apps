@@ -197,6 +197,28 @@
   .trophy-slot .t-name { font-size: .74rem; font-weight: 800; margin-top: 4px; color: var(--ink-soft); }
   .trophy-slot .t-cond { font-size: .63rem; color: var(--ink-soft); margin-top: 2px; }
 
+  /* ── OVERVIEW (all-Units learning status) ── */
+  .ov-open-btn {
+    padding: 8px 12px; border-radius: 10px; border: 2px solid var(--border-strong);
+    background: var(--surface); color: var(--ink); font-weight: 800; font-size: .74rem;
+    cursor: pointer; font-family: var(--font-body); white-space: nowrap; box-shadow: var(--shadow-sm);
+  }
+  .ov-open-btn:active { transform: translate(2px,2px); box-shadow: none; }
+  .ov-summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 4px; }
+  .ov-summary-tile { text-align: center; padding: 12px 6px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); }
+  .ov-summary-num { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; color: var(--seal); font-variant-numeric: tabular-nums; }
+  .ov-summary-label { font-size: .64rem; color: var(--ink-soft); margin-top: 2px; font-weight: 700; }
+  .ov-unit-panel { padding: 14px; }
+  .ov-unit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+  .ov-unit-title { font-family: var(--font-display); font-weight: 800; font-size: .95rem; }
+  .ov-unit-badges { display: flex; gap: 6px; flex-shrink: 0; }
+  .ov-badge { font-size: 1.15rem; opacity: .3; filter: grayscale(1); transition: all .3s; }
+  .ov-badge.earned { opacity: 1; filter: none; }
+  .ov-summary-final { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+  .ov-summary-final-label { font-weight: 800; font-size: .88rem; }
+  .ov-summary-final-status { font-size: .8rem; font-weight: 700; color: var(--ink-soft); }
+  .ov-summary-final-status.cleared { color: var(--good); }
+
   /* ── MODE GRID ── */
   .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
   .mode-card {
@@ -472,6 +494,7 @@
         <div class="logo">Vocabulary Trainer</div>
       </div>
     </div>
+    <button class="ov-open-btn" onclick="go('overview')">📊 学習状況</button>
   </div>
 
   <div id="unit-selector" class="unit-selector"></div>
@@ -577,6 +600,55 @@
   <div class="foot-link"><button onclick="resetProgress()">🔄 このUnitの学習記録をリセットする</button></div>
   <div class="foot-link"><button onclick="showDebugPasscodeModal()">🔓 (動作確認用) このUnitのPlay/Bossをすべて解放する</button></div>
   <div class="foot-link"><button onclick="debugRelockAll()">🔒 (動作確認用) このUnitのPlay/Bossを再びロックする</button></div>
+</div>
+
+
+<!-- ═══════════ OVERVIEW (all-Units learning status) ═══════════ -->
+<div id="screen-overview" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="sec-title">📊 全Unitの学習状況</div>
+
+  <div class="panel">
+    <div class="ov-summary-grid">
+      <div class="ov-summary-tile">
+        <div class="ov-summary-num" id="ov-silver-count">0/10</div>
+        <div class="ov-summary-label">🥈 銀トロフィー</div>
+      </div>
+      <div class="ov-summary-tile">
+        <div class="ov-summary-num" id="ov-gold-count">0/10</div>
+        <div class="ov-summary-label">🥇 金トロフィー</div>
+      </div>
+      <div class="ov-summary-tile">
+        <div class="ov-summary-num" id="ov-boss-count">0/10</div>
+        <div class="ov-summary-label">👹 Boss撃破</div>
+      </div>
+    </div>
+    <div class="trophy-progress" style="margin-top:12px; margin-bottom:0;">
+      <div>
+        <div class="tp-label">🎯 Quiz（全Unit合計）</div>
+        <div class="tp-bar"><div class="tp-fill" id="ov-qz-fill" style="width:0%;background:var(--seal);"></div></div>
+        <div class="tp-txt" id="ov-qz-txt">0/0</div>
+      </div>
+      <div>
+        <div class="tp-label">⌨️ Typing（全Unit合計）</div>
+        <div class="tp-bar"><div class="tp-fill" id="ov-ty-fill" style="width:0%;background:var(--indigo);"></div></div>
+        <div class="tp-txt" id="ov-ty-txt">0/0</div>
+      </div>
+      <div>
+        <div class="tp-label">📝 Sentence（全Unit合計）</div>
+        <div class="tp-bar"><div class="tp-fill" id="ov-st-fill" style="width:0%;background:var(--good);"></div></div>
+        <div class="tp-txt" id="ov-st-txt">0/0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel ov-summary-final">
+    <div class="ov-summary-final-label">🏁 まとめ Final Boss</div>
+    <div class="ov-summary-final-status" id="ov-summary-final-status">未挑戦</div>
+  </div>
+
+  <div class="sec-title" style="margin-top:4px;">Unitごとの記録</div>
+  <div id="ov-unit-list"></div>
 </div>
 
 
@@ -1603,8 +1675,9 @@ function go(name) {
     if (bsFWTickId) { clearInterval(bsFWTickId); bsFWTickId = null; }
     bsActive = false;
   }
-  if (name === 'home')  updateHome();
-  if (name === 'learn') { learnTab('card'); }
+  if (name === 'home')     updateHome();
+  if (name === 'learn')    { learnTab('card'); }
+  if (name === 'overview') renderOverview();
 }
 
 // ══════════════════════════════════════════
@@ -1692,6 +1765,85 @@ function memOf(dict, w) {
 function memQuiz(w)     { return memOf(quizProgress, w); }
 function memTyping(w)   { return memOf(typingProgress, w); }
 function memSentence(w) { return memOf(sentenceProgress, w); }
+
+// ══════════════════════════════════════════
+//  OVERVIEW (all-Units learning status)
+// ══════════════════════════════════════════
+// Reads a real Unit's stats straight from localStorage (not the live
+// quizProgress/typingProgress/sentenceProgress/silverTrophyEarned globals,
+// which only reflect whichever Unit is currently selected) so this can
+// summarize every Unit at once regardless of which one the student is on.
+function computeUnitStats(u) {
+  let qzp = {}, typ = {}, stp = {};
+  try { qzp = JSON.parse(localStorage.getItem(lsFor(u.id, 'qzp'))) || {}; } catch(e) {}
+  try { typ = JSON.parse(localStorage.getItem(lsFor(u.id, 'typ'))) || {}; } catch(e) {}
+  try { stp = JSON.parse(localStorage.getItem(lsFor(u.id, 'stp'))) || {}; } catch(e) {}
+  const typingWords = u.words.filter(w => w.productive);
+  const qzMastered = u.words.filter(w => memOf(qzp, w) >= 80).length;
+  const tyMastered = typingWords.filter(w => memOf(typ, w) >= 80).length;
+  const stMastered = u.words.filter(w => memOf(stp, w) >= 80).length;
+  return {
+    qzMastered, qzTotal: u.words.length,
+    tyMastered, tyTotal: typingWords.length,
+    stMastered, stTotal: u.words.length,
+    silver: localStorage.getItem(lsFor(u.id, 'trophy_silver')) === '1',
+    gold: localStorage.getItem(lsFor(u.id, 'trophy_gold')) === '1',
+    bossCleared: localStorage.getItem(lsFor(u.id, 'boss_cleared')) === '1',
+    bossBestRank: localStorage.getItem(lsFor(u.id, 'boss_best_rank')),
+  };
+}
+function renderOverview() {
+  const unitsReal = realUnits();
+  const summaryUnit = UNITS.find(u => u.isSummary);
+  const stats = unitsReal.map(u => ({ unit: u, s: computeUnitStats(u) }));
+
+  const silverCount = stats.filter(x => x.s.silver).length;
+  const goldCount = stats.filter(x => x.s.gold).length;
+  const bossCount = stats.filter(x => x.s.bossCleared).length;
+  document.getElementById('ov-silver-count').textContent = silverCount + '/' + unitsReal.length;
+  document.getElementById('ov-gold-count').textContent = goldCount + '/' + unitsReal.length;
+  document.getElementById('ov-boss-count').textContent = bossCount + '/' + unitsReal.length;
+
+  const totals = stats.reduce((acc, x) => {
+    acc.qzMastered += x.s.qzMastered; acc.qzTotal += x.s.qzTotal;
+    acc.tyMastered += x.s.tyMastered; acc.tyTotal += x.s.tyTotal;
+    acc.stMastered += x.s.stMastered; acc.stTotal += x.s.stTotal;
+    return acc;
+  }, { qzMastered:0, qzTotal:0, tyMastered:0, tyTotal:0, stMastered:0, stTotal:0 });
+  const pct = (m, t) => t ? Math.round(m/t*100) : 0;
+  document.getElementById('ov-qz-fill').style.width = pct(totals.qzMastered, totals.qzTotal) + '%';
+  document.getElementById('ov-ty-fill').style.width = pct(totals.tyMastered, totals.tyTotal) + '%';
+  document.getElementById('ov-st-fill').style.width = pct(totals.stMastered, totals.stTotal) + '%';
+  document.getElementById('ov-qz-txt').textContent = totals.qzMastered + '/' + totals.qzTotal;
+  document.getElementById('ov-ty-txt').textContent = totals.tyMastered + '/' + totals.tyTotal;
+  document.getElementById('ov-st-txt').textContent = totals.stMastered + '/' + totals.stTotal;
+
+  if (summaryUnit) {
+    const cleared = localStorage.getItem(lsFor(summaryUnit.id, 'boss_cleared')) === '1';
+    const el = document.getElementById('ov-summary-final-status');
+    el.textContent = cleared ? '🏆 撃破済み！' : '未挑戦';
+    el.classList.toggle('cleared', cleared);
+  }
+
+  document.getElementById('ov-unit-list').innerHTML = stats.map(({ unit, s }) => {
+    const bossMedal = s.bossCleared ? (BOSS_RANKS.find(r => r.rank === s.bossBestRank) || BOSS_RANKS[BOSS_RANKS.length-1]).medal : '👹';
+    return '<div class="panel ov-unit-panel">' +
+      '<div class="ov-unit-header">' +
+        '<div class="ov-unit-title">' + unit.title + '</div>' +
+        '<div class="ov-unit-badges">' +
+          '<span class="ov-badge' + (s.silver ? ' earned' : '') + '" title="銀トロフィー">🥈</span>' +
+          '<span class="ov-badge' + (s.gold ? ' earned' : '') + '" title="金トロフィー">🥇</span>' +
+          '<span class="ov-badge' + (s.bossCleared ? ' earned' : '') + '" title="Final Boss">' + bossMedal + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="trophy-progress" style="margin-bottom:0;">' +
+        '<div><div class="tp-label">🎯 Quiz</div><div class="tp-bar"><div class="tp-fill" style="width:' + pct(s.qzMastered, s.qzTotal) + '%;background:var(--seal);"></div></div><div class="tp-txt">' + s.qzMastered + '/' + s.qzTotal + '</div></div>' +
+        '<div><div class="tp-label">⌨️ Typing</div><div class="tp-bar"><div class="tp-fill" style="width:' + pct(s.tyMastered, s.tyTotal) + '%;background:var(--indigo);"></div></div><div class="tp-txt">' + s.tyMastered + '/' + s.tyTotal + '</div></div>' +
+        '<div><div class="tp-label">📝 Sentence</div><div class="tp-bar"><div class="tp-fill" style="width:' + pct(s.stMastered, s.stTotal) + '%;background:var(--good);"></div></div><div class="tp-txt">' + s.stMastered + '/' + s.stTotal + '</div></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
 
 function record(w, ok) {
   let dict = currentMode === 'quiz' ? quizProgress : currentMode === 'typing' ? typingProgress : sentenceProgress;
@@ -1796,6 +1948,13 @@ function debugUnlockAll() {
   localStorage.setItem(ls('wh_best_mistakes'), '0');
   localStorage.setItem(ls('tr_best_correct'), '10');
   localStorage.setItem(ls('fw_best_score'), '10');
+  if (isSummaryUnit()) {
+    // まとめ's Final Boss unlocks once every real Unit's own Final Boss is
+    // cleared (any rank) rather than from PLAY records — mark them all
+    // cleared here too, so this button still fully unlocks まとめ for
+    // quick testing instead of only unlocking its (already-unlocked) PLAY.
+    realUnits().forEach(u => localStorage.setItem(lsFor(u.id, 'boss_cleared'), '1'));
+  }
   updateHome();
   notif('🔓 このUnitのPlay/Bossをすべて解放しました（動作確認用）', 'ok');
 }
@@ -2752,7 +2911,20 @@ const BOSS_REQS = [
   { label: 'Time Race',     reqText: '10問以上正解',       bestKey: 'tr_best_correct',  cmp: v => v >= 10 },
   { label: 'Falling Words', reqText: '10問以上キャッチ',    bestKey: 'fw_best_score',    cmp: v => v >= 10 },
 ];
+// "まとめ"'s Final Boss doesn't use the usual PLAY-record requirements
+// (PLAY is always unlocked there with nothing to gate on) — instead it
+// unlocks once every real Unit's own Final Boss has been cleared, any
+// rank. realUnits() excludes "まとめ" itself so this keeps working as
+// more Units get added later.
+function realUnits() {
+  return UNITS.filter(u => !u.isSummary);
+}
+function lsFor(unitId, key) { return 'wscroll_' + unitId + '_' + key; }
+function allUnitsBossCleared() {
+  return realUnits().every(u => localStorage.getItem(lsFor(u.id, 'boss_cleared')) === '1');
+}
 function bossRequirementsMet() {
+  if (isSummaryUnit()) return allUnitsBossCleared();
   return BOSS_REQS.every(r => {
     const v = parseInt(localStorage.getItem(ls(r.bestKey)));
     return Number.isInteger(v) && r.cmp(v);
@@ -2781,13 +2953,18 @@ function renderBossCard() {
     badge.style.display = 'none';
   }
   document.getElementById('boss-desc').textContent = !unlocked
-    ? '🔒 下の条件をすべて満たすと挑戦できます'
-    : (cleared ? clearedLine : '⚔️ 挑戦できます！4つのゲームの力を試そう');
-  document.getElementById('boss-reqs').innerHTML = BOSS_REQS.map(r => {
-    const v = parseInt(localStorage.getItem(ls(r.bestKey)));
-    const met = Number.isInteger(v) && r.cmp(v);
-    return '<div>' + (met ? '✅' : '⬜') + ' ' + r.label + '：' + r.reqText + '</div>';
-  }).join('');
+    ? (isSummaryUnit() ? '🔒 すべてのUnitのファイナルチャレンジをクリアすると挑戦できます' : '🔒 下の条件をすべて満たすと挑戦できます')
+    : (cleared ? clearedLine : (isSummaryUnit() ? '⚔️ 挑戦できます！全Unitの実力を試そう' : '⚔️ 挑戦できます！4つのゲームの力を試そう'));
+  document.getElementById('boss-reqs').innerHTML = isSummaryUnit()
+    ? realUnits().map(u => {
+        const met = localStorage.getItem(lsFor(u.id, 'boss_cleared')) === '1';
+        return '<div>' + (met ? '✅' : '⬜') + ' ' + u.title + '：ファイナルチャレンジをクリア</div>';
+      }).join('')
+    : BOSS_REQS.map(r => {
+        const v = parseInt(localStorage.getItem(ls(r.bestKey)));
+        const met = Number.isInteger(v) && r.cmp(v);
+        return '<div>' + (met ? '✅' : '⬜') + ' ' + r.label + '：' + r.reqText + '</div>';
+      }).join('');
 
   // Once unlocked, the requirement checklist has done its job — swap it for
   // the rank/clear-time reference table instead.
@@ -2804,7 +2981,10 @@ function renderBossCard() {
   }
 }
 function tryEnterBoss() {
-  if (!bossRequirementsMet()) { notif('🔒 4つの条件をすべて満たすと挑戦できます', 'err'); return; }
+  if (!bossRequirementsMet()) {
+    notif(isSummaryUnit() ? '🔒 すべてのUnitのファイナルチャレンジをクリアすると挑戦できます' : '🔒 4つの条件をすべて満たすと挑戦できます', 'err');
+    return;
+  }
   startBoss();
 }
 
