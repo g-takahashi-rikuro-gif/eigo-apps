@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検2級 文法・語法トレーニング</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  /* ===== ページ管理 ===== */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-red     { background: linear-gradient(135deg,#ff416c,#ff4b2b); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .mode-box {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .mode-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .mode-options { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .mode-opt {
+    flex: 1; min-width: 90px;
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-opt.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-opt .n { font-size: 1.3em; font-weight: 900; color: #333; }
+  .mode-opt .l { font-size: 0.75em; color: #888; margin-top: 2px; }
+
+  /* ===== 出題ページ ===== */
+  .progress-wrap { margin-bottom: 18px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:14px;
+  }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  .question-card {
+    background: #f8f9ff; border-radius: 16px; padding: 24px 20px; margin-bottom: 18px;
+  }
+  .question-en { font-size: 1.15em; font-weight: 700; color: #222; line-height: 1.6; }
+  .question-en .blank { color: #5B6CF5; font-weight: 900; border-bottom: 2px solid #5B6CF5; padding: 0 4px; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 14px 18px; text-align: left; font-size: 1em; font-weight: 700; color:#333;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #b9c0f0; background: #f8f9ff; }
+  .choice-btn.correct { border-color: #43e97b; background: #eafff3; color: #1a9e5a; }
+  .choice-btn.wrong { border-color: #ff4b2b; background: #fff0ee; color: #d13a1f; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    margin-top: 16px; padding: 16px 18px; border-radius: 14px; display: none;
+  }
+  .feedback-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .feedback-box.correct { background: #eafff3; border: 2px solid #43e97b; }
+  .feedback-box.wrong { background: #fff0ee; border: 2px solid #ff4b2b; }
+  .feedback-title { font-weight: 900; font-size: 0.95em; margin-bottom: 6px; }
+  .feedback-box.correct .feedback-title { color: #1a9e5a; }
+  .feedback-box.wrong .feedback-title { color: #d13a1f; }
+  .feedback-answer { font-size: 0.9em; color: #444; margin-bottom: 4px; }
+  .feedback-explain { font-size: 0.85em; color: #666; line-height: 1.5; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .score-circle {
+    width: 150px; height: 150px; border-radius: 50%;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .score-circle .num { font-size: 2.2em; font-weight: 900; }
+  .score-circle .den { font-size: 0.85em; opacity: 0.85; }
+  .score-msg { font-size: 1.05em; font-weight: 800; color: #333; margin-bottom: 24px; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item {
+    background: #fff0ee; border: 2px solid #ffd6cf; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .review-item .rq { font-weight: 700; color: #333; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.88em; color: #1a9e5a; font-weight: 700; margin-bottom: 4px; }
+  .review-item .rya { font-size: 0.85em; color: #d13a1f; margin-bottom: 4px; }
+  .review-item .re { font-size: 0.83em; color: #777; line-height: 1.5; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  @media (max-width: 480px) {
+    .mode-opt { min-width: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検2級 文法・語法トレーニング</div>
+      <div class="hd-sub">1次試験対策｜空所補充形式</div>
+    </div>
+    <a class="hd-home-link" href="英検2級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">📘</div>
+    <div class="title-main">文法・語法クイズ</div>
+    <div class="title-sub">英検2級レベルの文法問題に挑戦しよう</div>
+    <div class="title-tagline">全36問｜4択形式</div>
+
+    <div class="mode-box">
+      <h3>出題数を選ぼう</h3>
+      <div class="mode-options">
+        <div class="mode-opt selected" data-count="20"><div class="n">20問</div><div class="l">標準</div></div>
+        <div class="mode-opt" data-count="36"><div class="n">全問</div><div class="l">じっくり</div></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">スタート！</button>
+  </div>
+
+  <!-- ===== 出題ページ ===== -->
+  <div id="page-quiz" class="page">
+    <button class="back-link" id="btn-back-to-title">← 出題設定に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">問題 1 / 20</span>
+        <span id="progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <span class="cat-badge" id="cat-badge">文法</span>
+
+    <div class="question-card">
+      <div class="question-en" id="question-en"></div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="feedback-box" id="feedback-box">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-answer" id="feedback-answer"></div>
+      <div class="feedback-explain" id="feedback-explain"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" id="btn-next" style="display:none;">次の問題へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="score-circle">
+      <div class="num" id="result-score">0</div>
+      <div class="den">/ <span id="result-total">20</span> 問正解</div>
+    </div>
+    <div class="score-msg" id="result-msg"></div>
+
+    <div id="review-wrap">
+      <div class="review-list" id="review-list"></div>
+    </div>
+
+    <div class="result-btns">
+      <button class="btn btn-orange btn-block" id="btn-retry-wrong" style="display:none;">間違えた問題だけもう一度</button>
+      <button class="btn btn-green btn-block" id="btn-retry-all">もう一度挑戦する</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title">タイトルに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 問題データ（英検準2級レベルの文法・語法） =====
+const QUESTION_BANK = [
+  { cat:"仮定法(wish)", en:"I wish I ___ more time to prepare for the exam.", correct:"had", wrongs:["have","has","will have"], explain:"I wish+仮定法過去（had）で「〜だったらいいのに」という現在の事実に反する願望を表します。" },
+  { cat:"仮定法(as if)", en:"He talks as if he ___ everything about the topic.", correct:"knew", wrongs:["knows","has known","know"], explain:"as if+仮定法過去（knew）で「まるで〜であるかのように」という意味になります。" },
+  { cat:"仮定法(without)", en:"___ his help, I couldn't have finished the project.", correct:"Without", wrongs:["Unless","Because of","With"], explain:"Without 〜「〜がなければ」は仮定法の文でよく使われます。" },
+  { cat:"倒置", en:"Never ___ I seen such a beautiful sunset.", correct:"have", wrongs:["had","did","was"], explain:"否定語Neverが文頭に出ると倒置が起こり、疑問文と同じ語順になります。" },
+  { cat:"倒置", en:"Not only ___ the exam, but she also got the highest score.", correct:"did she pass", wrongs:["she passed","she did pass","passed she"], explain:"Not onlyが文頭に来ると、後ろは疑問文の語順（did+主語+動詞の原形）になります。" },
+  { cat:"独立分詞構文", en:"___ being sunny, we decided to go for a walk.", correct:"It", wrongs:["There","This","That"], explain:"独立分詞構文 It being sunny は「天気が良かったので」という意味で、Itが意味上の主語です。" },
+  { cat:"付帯状況", en:"She was reading a book ___ her legs crossed.", correct:"with", wrongs:["by","in","on"], explain:"付帯状況のwith+目的語+分詞で「〜した状態で」という意味になります。" },
+  { cat:"譲歩構文", en:"___ as he was, he managed to finish the marathon.", correct:"Tired", wrongs:["Tiring","To tire","Tire"], explain:"〈形容詞+as+主語+動詞〉で「〜だけれども」という譲歩を表します。" },
+  { cat:"複合関係詞", en:"___ you decide to do, I will support you.", correct:"Whatever", wrongs:["However","Whichever","Whoever"], explain:"whatever「何を〜しても」という複合関係代名詞です。" },
+  { cat:"複合関係詞", en:"___ finishes the race first will receive a prize.", correct:"Whoever", wrongs:["Whatever","Whichever","Whom"], explain:"whoever「〜する人は誰でも」という複合関係代名詞です。" },
+  { cat:"比較の慣用表現", en:"She is the last person ___ tell a lie.", correct:"to", wrongs:["that","who","for"], explain:"the last person to do「決して〜しそうにない人」という慣用表現です。" },
+  { cat:"比較の慣用表現", en:"He has no less ___ ten books on this subject.", correct:"than", wrongs:["as","that","of"], explain:"no less than 〜「〜も（の多さ）」という数量を強調する表現です。" },
+  { cat:"分詞構文の慣用表現", en:"___ from his accent, he must be from Kansai.", correct:"Judging", wrongs:["Judged","To judge","Judge"], explain:"judging from 〜「〜から判断すると」という分詞構文の慣用表現です。" },
+  { cat:"分詞構文の慣用表現", en:"Generally ___, Japanese people are polite and considerate.", correct:"speaking", wrongs:["spoken","speak","to speak"], explain:"generally speaking「一般的に言えば」という分詞構文の慣用表現です。" },
+  { cat:"仮定法の倒置", en:"___ your advice, I would have made a big mistake.", correct:"Had it not been for", wrongs:["Were it not for","If it were not for","Without"], explain:"仮定法過去完了の倒置形。Had it not been for 〜「もし〜がなかったら」（過去の事実に反する仮定）です。" },
+  { cat:"譲歩節", en:"___ you like it or not, you have to do this work.", correct:"Whether", wrongs:["If","Even","Unless"], explain:"whether A or B「AであろうとBであろうと」という譲歩表現です。" },
+  { cat:"名詞構文", en:"The fact ___ he passed the exam surprised everyone.", correct:"that", wrongs:["which","what","who"], explain:"the fact that 〜「〜という事実」という同格のthatです。" },
+  { cat:"関係詞の非制限用法", en:"My brother, ___ lives in Osaka, is coming to visit us.", correct:"who", wrongs:["that","which","whose"], explain:"非制限用法（コンマ+関係代名詞）ではthatは使えず、who/whichを使います。" },
+  { cat:"間接疑問文", en:"The teacher wanted to know ___ we had finished our homework.", correct:"whether", wrongs:["that","what","which"], explain:"間接疑問文でYes/No疑問文を伝えるときはwhether（またはif）を使います。" },
+  { cat:"熟語", en:"The company had to ___ with the loss of its biggest client.", correct:"cope", wrongs:["suffer","overcome","stand"], explain:"cope with 〜「〜に対処する」という熟語です。" },
+  { cat:"熟語", en:"It is important to come to terms ___ your past mistakes.", correct:"with", wrongs:["of","for","to"], explain:"come to terms with 〜「〜を受け入れる」という熟語です。" },
+  { cat:"熟語", en:"The new policy will go a long way ___ reducing pollution.", correct:"toward", wrongs:["to","for","of"], explain:"go a long way toward 〜「〜に大いに役立つ」という熟語です。" },
+  { cat:"独立不定詞", en:"To ___ the truth, I didn't enjoy the movie at all.", correct:"tell", wrongs:["telling","told","tells"], explain:"to tell the truth「実を言うと」という独立不定詞の慣用表現です。" },
+  { cat:"分詞構文の慣用表現", en:"___ that he is still young, he behaves very maturely.", correct:"Considering", wrongs:["Considered","Consider","To consider"], explain:"considering that 〜「〜を考慮すると」という分詞構文の慣用表現です。" },
+  { cat:"強調構文", en:"It was not until she moved abroad ___ she realized how much she missed her family.", correct:"that", wrongs:["when","which","then"], explain:"It is not until 〜 that …「〜して初めて…」という強調構文です。" },
+  { cat:"仮定法(if only)", en:"If only I ___ more careful, this accident wouldn't have happened.", correct:"had been", wrongs:["was","were","have been"], explain:"If only+仮定法過去完了で、過去についての強い後悔を表します。" },
+  { cat:"譲歩", en:"___ the difficulties, the team completed the project on time.", correct:"Despite", wrongs:["Although","Even though","In spite"], explain:"despite+名詞で「〜にもかかわらず」という意味です。in spiteは単独では使えません（in spite ofの形が必要）。" },
+  { cat:"熟語", en:"His opinion is far ___ mine.", correct:"from", wrongs:["of","than","with"], explain:"far from 〜「決して〜ではない」という熟語です。" },
+  { cat:"熟語", en:"The success of the project hinges ___ good teamwork.", correct:"on", wrongs:["with","for","at"], explain:"hinge on 〜「〜にかかっている」という熟語です。" },
+  { cat:"分詞構文", en:"___ with a difficult decision, she asked her mentor for advice.", correct:"Faced", wrongs:["Facing","Face","To face"], explain:"「直面させられて」という受け身の意味の分詞構文には過去分詞を使います。" },
+  { cat:"関係詞+前置詞", en:"She is the colleague ___ whom I discussed the proposal.", correct:"with", wrongs:["to","for","of"], explain:"discuss withという動詞句から、前置詞withを使います。" },
+  { cat:"仮定法の慣用表現", en:"It's high time we ___ a decision about this matter.", correct:"made", wrongs:["make","will make","have made"], explain:"It's (high) time+仮定法過去で「もう〜してもいい頃だ」という意味になります。" },
+  { cat:"譲歩", en:"___ hard you try, you cannot change the past.", correct:"No matter how", wrongs:["No matter what","No matter which","No matter who"], explain:"程度・難易度を表すのでhowを使ったNo matter howが適切です。" },
+  { cat:"熟語", en:"I can't ___ but admire her determination.", correct:"help", wrongs:["help to","avoid","stop"], explain:"can't help but+動詞の原形で「〜せずにはいられない」という意味になります。" },
+  { cat:"熟語", en:"Her latest novel has received widespread ___ from critics.", correct:"acclaim", wrongs:["acclaimed","acclaiming","to acclaim"], explain:"receive widespread acclaim「幅広い称賛を受ける」のacclaimは名詞です。" },
+  { cat:"分詞構文(完了形)", en:"___ nothing more to say, he left the room.", correct:"Having", wrongs:["Have","To have","Had"], explain:"Having+過去分詞的な完了分詞構文で「〜し終えて、〜だったので」という意味になります。" },
+];
+// ===== 状態管理 =====
+let selectedCount = 20;
+let quizQueue = [];    // 今回出題する問題の配列
+let currentIndex = 0;
+let correctCount = 0;
+let wrongQuestions = []; // 間違えた問題を記録（復習用）
+let answered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== タイトルページ：出題数選択 =====
+document.querySelectorAll('.mode-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.mode-opt').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selectedCount = parseInt(opt.dataset.count, 10);
+  });
+});
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  startQuiz(shuffle(QUESTION_BANK).slice(0, selectedCount));
+});
+
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startQuiz(questions) {
+  quizQueue = questions;
+  currentIndex = 0;
+  correctCount = 0;
+  wrongQuestions = [];
+  goPage('page-quiz');
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = quizQueue[currentIndex];
+  document.getElementById('progress-text').textContent = `問題 ${currentIndex + 1} / ${quizQueue.length}`;
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('progress-bar').style.width = `${(currentIndex / quizQueue.length) * 100}%`;
+  document.getElementById('cat-badge').textContent = q.cat;
+  document.getElementById('question-en').innerHTML = q.en.replace('___', '<span class="blank">___</span>');
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectAnswer(btn, opt, q));
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('btn-next').style.display = 'none';
+}
+
+function selectAnswer(btn, opt, q) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = opt === q.correct;
+
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('feedback-explain').textContent = q.explain;
+
+  if (isCorrect) {
+    correctCount++;
+  } else {
+    wrongQuestions.push(q);
+  }
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  currentIndex++;
+  if (currentIndex < quizQueue.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  document.getElementById('progress-bar').style.width = '100%';
+  goPage('page-result');
+  document.getElementById('result-score').textContent = correctCount;
+  document.getElementById('result-total').textContent = quizQueue.length;
+
+  const rate = correctCount / quizQueue.length;
+  let msg = '';
+  if (rate === 1) msg = '🎉 パーフェクト！すばらしい！';
+  else if (rate >= 0.8) msg = '😊 よくできました！この調子！';
+  else if (rate >= 0.6) msg = '👍 もう少し！復習して再挑戦しよう';
+  else msg = '💪 間違えた問題を復習しよう';
+  document.getElementById('result-msg').textContent = msg;
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  if (wrongQuestions.length > 0) {
+    const heading = document.createElement('h3');
+    heading.style.cssText = 'font-size:0.9em;color:#d13a1f;font-weight:800;margin-bottom:10px;';
+    heading.textContent = `間違えた問題（${wrongQuestions.length}問）の復習`;
+    reviewList.appendChild(heading);
+
+    wrongQuestions.forEach(q => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `
+        <div class="rq">${q.en.replace('___', '＿＿＿')}</div>
+        <div class="ra">正解: ${q.correct}</div>
+        <div class="re">${q.explain}</div>
+      `;
+      reviewList.appendChild(div);
+    });
+    document.getElementById('btn-retry-wrong').style.display = 'block';
+  } else {
+    document.getElementById('btn-retry-wrong').style.display = 'none';
+  }
+}
+
+document.getElementById('btn-retry-wrong').addEventListener('click', () => {
+  startQuiz(shuffle(wrongQuestions));
+});
+
+document.getElementById('btn-retry-all').addEventListener('click', () => {
+  startQuiz(shuffle(QUESTION_BANK).slice(0, selectedCount));
+});
+
+document.getElementById('btn-back-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検2級 英作文トレーニング</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  /* ===== ページ管理 ===== */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-red     { background: linear-gradient(135deg,#ff416c,#ff4b2b); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-outline { background: #fff; color: #5B6CF5; border: 2px solid #5B6CF5; padding: 11px 26px; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .type-list {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .type-list h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .type-row { display:flex; align-items:flex-start; gap:10px; padding:6px 0; font-size:0.86em; color:#555; line-height:1.5; }
+  .type-row .dot { width:8px; height:8px; border-radius:50%; background:#5B6CF5; flex-shrink:0; margin-top:6px; }
+  .type-row b { color:#333; }
+
+  .mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .mode-tab {
+    flex: 1; background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-tab.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-tab .mt-title { font-weight: 800; font-size: 0.88em; color: #333; }
+  .mode-tab .mt-sub { font-size: 0.72em; color: #888; margin-top: 3px; }
+
+  /* ===== 出題ページ ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:12px;
+  }
+
+  .prompt-card {
+    background: #f8f9ff; border-radius: 16px; padding: 18px 20px; margin-bottom: 14px;
+  }
+  .prompt-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 8px; }
+  .prompt-text { font-size: 1.05em; font-weight: 700; color: #222; line-height: 1.7; }
+  .prompt-text u { color: #5B6CF5; text-decoration-color: #5B6CF5; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  .tip-box {
+    background: #fffaf0; border: 2px solid #ffe4b8; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px;
+  }
+  .tip-box h4 { font-size: 0.82em; color: #d98c1f; font-weight: 800; margin-bottom: 8px; }
+  .tip-box ul { padding-left: 18px; }
+  .tip-box li { font-size: 0.83em; color: #7a5c25; line-height: 1.6; margin-bottom: 3px; }
+  .phrase-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .phrase-tag {
+    background: #fff; border: 1px solid #ffe4b8; color: #b8791a; font-size: 0.78em; font-weight: 700;
+    padding: 4px 10px; border-radius: 50px;
+  }
+
+  .points-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .points-row .pr-label { font-size: 0.72em; font-weight: 800; color: #888; width: 100%; margin-bottom: 2px; }
+  .point-chip {
+    background: #eef0ff; color: #5B6CF5; font-size: 0.8em; font-weight: 800;
+    padding: 5px 12px; border-radius: 50px;
+  }
+
+  .answer-textarea {
+    width: 100%; min-height: 110px; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 14px 16px; font-size: 0.95em; font-family: inherit; line-height: 1.6; resize: vertical;
+    transition: border-color 0.15s;
+  }
+  .answer-textarea:focus { outline: none; border-color: #5B6CF5; }
+
+  .counter-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; margin-bottom: 16px; }
+  .counter-badge { font-size: 0.82em; font-weight: 800; padding: 4px 12px; border-radius: 50px; }
+  .counter-badge.empty  { background: #f0f0f0; color: #999; }
+  .counter-badge.good   { background: #eafff3; color: #1a9e5a; }
+  .counter-badge.near   { background: #fff6e0; color: #b8791a; }
+  .counter-badge.off    { background: #fff0ee; color: #d13a1f; }
+  .counter-target { font-size: 0.78em; color: #999; }
+
+  .check-box {
+    background: #f8f9ff; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
+  }
+  .check-box h4 { font-size: 0.82em; color: #5B6CF5; font-weight: 800; margin-bottom: 8px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: #555; padding: 4px 0; }
+  .check-item input { width: 16px; height: 16px; accent-color: #5B6CF5; }
+
+  .model-box {
+    background: #eafff3; border: 2px solid #43e97b; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px;
+    display: none;
+  }
+  .model-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .model-box h4 { font-size: 0.85em; color: #1a9e5a; font-weight: 800; margin-bottom: 10px; }
+  .model-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #b9e8cf; }
+  .model-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .model-item .mi-label { font-size: 0.72em; font-weight: 800; color: #1a9e5a; margin-bottom: 3px; }
+  .model-item .mi-text { font-size: 0.92em; color: #333; line-height: 1.6; }
+  .model-item .mi-count { font-size: 0.75em; color: #4caf7d; margin-top: 4px; font-weight: 700; }
+
+  .ai-box {
+    background: #eef0ff; border: 2px solid #5B6CF5; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px;
+    display: none;
+  }
+  .ai-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .ai-box h4 { font-size: 0.85em; color: #5B6CF5; font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px; }
+  .ai-score-badge { display:inline-block; font-weight:900; font-size:0.8em; padding:2px 12px; border-radius:50px; background:#5B6CF5; color:#fff; }
+  .ai-section { margin-bottom: 10px; }
+  .ai-section:last-child { margin-bottom: 0; }
+  .ai-section .as-label { font-size: 0.75em; font-weight: 800; color: #5B6CF5; margin-bottom: 3px; }
+  .ai-section .as-text { font-size: 0.88em; color: #333; line-height: 1.6; }
+  .ai-loading { font-size: 0.85em; color: #666; text-align: center; padding: 10px; }
+  .ai-error { font-size: 0.85em; color: #d13a1f; background: #fff0ee; border-radius: 10px; padding: 10px 12px; }
+
+  .nav-row { margin-top: 20px; display: flex; justify-content: space-between; gap: 10px; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .result-icon { font-size: 4em; margin-bottom: 10px; }
+  .score-msg { font-size: 1.15em; font-weight: 900; color: #333; margin-bottom: 8px; }
+  .score-sub { font-size: 0.88em; color: #888; margin-bottom: 24px; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item {
+    background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .review-item .rp-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.72em; font-weight:700;
+    border-radius:50px; padding:2px 10px; margin-bottom:8px;
+  }
+  .review-item .rp-q { font-weight: 700; color: #333; font-size: 0.9em; margin-bottom: 8px; line-height: 1.5; }
+  .review-item .rp-label { font-size: 0.72em; font-weight: 800; margin-top: 8px; margin-bottom: 3px; }
+  .review-item .rp-mine { font-size: 0.86em; color: #444; background: #fff; border-radius: 8px; padding: 8px 10px; min-height: 20px; }
+  .review-item .rp-mine.empty { color: #bbb; font-style: italic; }
+  .review-item .rp-model { font-size: 0.86em; color: #1a9e5a; background: #eafff3; border-radius: 8px; padding: 8px 10px; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検2級 英作文トレーニング</div>
+      <div class="hd-sub">1次試験対策｜ライティング（意見論述エッセイ）</div>
+    </div>
+    <a class="hd-home-link" href="英検2級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">✏️</div>
+    <div class="title-main">英作文トレーニング</div>
+    <div class="title-sub">TOPICに答えるエッセイを書いて、お手本と見比べよう</div>
+    <div class="title-tagline">意見論述エッセイ｜80～100語</div>
+
+    <div class="type-list">
+      <h3>出題形式</h3>
+      <div class="type-row"><span class="dot"></span><span><b>意見論述エッセイ</b>：TOPICに対する意見を、POINTS（観点）から2つ選んで理由にしながら、序論・本論・結論の構成で80～100語で書く</span></div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">スタート！</button>
+  </div>
+
+  <!-- ===== 出題ページ ===== -->
+  <div id="page-task" class="page">
+    <button class="back-link" id="btn-back-to-title">← 出題設定に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">課題 1 / 8</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <span class="cat-badge" id="cat-badge">意見論述エッセイ</span>
+
+    <div class="prompt-card">
+      <div class="prompt-label">TOPIC</div>
+      <div class="prompt-text" id="prompt-text"></div>
+      <div class="points-row" id="points-row"></div>
+    </div>
+
+    <div class="tip-box">
+      <h4>📝 エッセイの書き方</h4>
+      <ul id="tip-list"></ul>
+      <div class="phrase-tags" id="phrase-tags"></div>
+    </div>
+
+    <textarea class="answer-textarea" id="answer-textarea" placeholder="ここに英文を書いてみよう..."></textarea>
+    <div class="counter-row">
+      <span class="counter-badge empty" id="counter-badge">0 語</span>
+      <span class="counter-target">目安：80～100語</span>
+    </div>
+
+    <div class="check-box">
+      <h4>✅ 書き終わったらセルフチェック</h4>
+      <label class="check-item"><input type="checkbox"> 序論で自分の意見をはっきり示している</label>
+      <label class="check-item"><input type="checkbox"> POINTSから2つ選んで理由を書いている（First, / Second, など）</label>
+      <label class="check-item"><input type="checkbox"> 結論で意見をまとめている</label>
+      <label class="check-item"><input type="checkbox"> 語数が80～100語くらいになっている</label>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <button class="btn btn-outline" style="flex:1;" id="btn-show-model">模範解答を見る</button>
+      <button class="btn btn-primary" style="flex:1;" id="btn-ai-check">🤖 AIに採点してもらう</button>
+    </div>
+
+    <div class="model-box" id="model-box">
+      <h4>💡 模範解答例（考え方は1つではありません）</h4>
+      <div id="model-list"></div>
+    </div>
+
+    <div class="ai-box" id="ai-box"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-gray" id="btn-prev">前の課題</button>
+      <button class="btn btn-primary" id="btn-next">次の課題へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="result-icon">🎉</div>
+    <div class="score-msg">お疲れさまでした！</div>
+    <div class="score-sub" id="result-sub">8個の課題に取り組みました</div>
+
+    <div class="review-list" id="review-list"></div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-retry-all">もう一度挑戦する</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title">タイトルに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 英作文データ（英検2級レベル・エッセイ形式） =====
+const OPINION_PHRASES = ["I think ~", "I don't think ~", "In my opinion, ~", "First, ~", "Second, ~", "For example, ~", "For these reasons, ~", "In conclusion, ~"];
+
+const OPINION_TASKS = [
+  { q:"Some people say that social media has a positive impact on society. Do you agree with this opinion?", points:["Communication","Business","Mental health","Information"], models:[
+    "I agree that social media has a positive impact on society. First, social media allows people to stay connected with friends and family regardless of distance, strengthening relationships that might otherwise fade. Second, businesses can reach customers more effectively through social media marketing, which helps small companies compete with larger ones. Although some argue that social media harms mental health, I believe the benefits of improved communication and business opportunities outweigh the drawbacks. For these reasons, I think social media benefits society overall." ] },
+  { q:"Do you think that studying abroad is beneficial for university students?", points:["Culture","Career","Cost","Language"], models:[
+    "I think studying abroad is beneficial for university students. First, living in another country allows students to experience different cultures firsthand, which broadens their perspective in ways textbooks cannot. Second, employers increasingly value international experience, so studying abroad can improve a graduate's career prospects in a competitive job market. Of course, the cost of studying abroad can be a burden for some families. However, considering the cultural and career benefits, I believe studying abroad is a valuable investment for most students who have the opportunity." ] },
+  { q:"Some people believe that governments should invest more in public transportation. What is your opinion?", points:["Environment","Traffic","Cost","Convenience"], models:[
+    "I believe governments should invest more in public transportation. First, expanding public transportation would reduce the number of cars on the road, which would lower traffic congestion in major cities. Second, fewer cars would also mean lower carbon emissions, helping governments meet their environmental goals. Although building new transportation systems requires a large initial investment, the long-term benefits for both traffic and the environment make this spending worthwhile. For these reasons, I support greater investment in public transportation." ] },
+  { q:"Do you think artificial intelligence will create more jobs than it eliminates?", points:["Technology","Employment","Economy","Education"], models:[
+    "I think artificial intelligence will ultimately create more jobs than it eliminates. First, while AI may replace certain repetitive tasks, it also creates entirely new industries, such as AI development and data analysis, that did not exist before. Second, as companies become more efficient with AI, they often expand their operations, which requires hiring more employees in other roles. Naturally, workers will need new skills to adapt, making education systems more important than ever. Overall, I believe AI will bring more opportunities than it takes away." ] },
+  { q:"Some people say that it is important for children to learn a second language from a young age. Do you agree?", points:["Communication","Brain development","Culture","Career"], models:[
+    "I agree that it is important for children to learn a second language from a young age. First, young children's brains are especially good at absorbing new languages naturally, making it easier for them to become fluent compared to adults. Second, learning another language exposes children to different cultures, helping them become more open-minded global citizens. While some worry that early language learning might be confusing, research suggests children can handle multiple languages without difficulty. For these reasons, I strongly support early second language education." ] },
+  { q:"Do you think that working remotely is more effective than working in an office?", points:["Productivity","Communication","Work-life balance","Cost"], models:[
+    "I think working remotely can be more effective than working in an office for many employees. First, remote work eliminates long commutes, giving employees more time and energy to focus on their tasks, which often improves productivity. Second, remote work allows for a better work-life balance, as employees can more easily manage personal responsibilities alongside their jobs. However, remote work can make communication and teamwork more difficult in some cases. Overall, I believe the benefits of remote work outweigh its challenges for most people." ] }
+];
+
+// ===== AI採点の設定 =====
+// Google Apps ScriptでデプロイしたウェブアプリのURL（.../exec）をここに貼り付けてください。
+// 設定方法は「英作文AI採点_GASコード.gs」を参照してください。
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxhCBU9aZ5eymIXqsAhtQoUvgaGJwEEt67UAN_ysTeZGGSLc1gXvWP-tSZHvDopKITJmg/exec';
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ===== 状態管理 =====
+let taskQueue = []; // {type, data}
+let currentIndex = 0;
+let userAnswers = [];
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function countWords(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).filter(Boolean).length;
+}
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  startPractice();
+});
+
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startPractice() {
+  const list = shuffle(OPINION_TASKS.map(t => ({ type: '意見論述エッセイ', data: t })));
+
+  taskQueue = list;
+  currentIndex = 0;
+  userAnswers = new Array(list.length).fill('');
+  goPage('page-task');
+  showTask();
+}
+
+function showTask() {
+  const item = taskQueue[currentIndex];
+  document.getElementById('progress-text').textContent = `課題 ${currentIndex + 1} / ${taskQueue.length}`;
+  document.getElementById('progress-bar').style.width = `${(currentIndex / taskQueue.length) * 100}%`;
+
+  document.getElementById('prompt-text').textContent = item.data.q;
+  const pointsRow = document.getElementById('points-row');
+  pointsRow.innerHTML = '<span class="pr-label">POINTS</span>' +
+    item.data.points.map(p => `<span class="point-chip">${p}</span>`).join('');
+
+  const tipList = document.getElementById('tip-list');
+  tipList.innerHTML = '';
+  const tips = [
+    "序論：まず自分の意見をはっきり書く（I think ~ / I agree that ~）",
+    "本論：POINTSから2つ選び、First, / Second, を使って理由を書く",
+    "結論：In conclusion, ~ などで意見をもう一度まとめる",
+    "全体で80～100語を目安にする"
+  ];
+  tips.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    tipList.appendChild(li);
+  });
+
+  const phraseTags = document.getElementById('phrase-tags');
+  phraseTags.innerHTML = '';
+  OPINION_PHRASES.forEach(p => {
+    const span = document.createElement('span');
+    span.className = 'phrase-tag';
+    span.textContent = p;
+    phraseTags.appendChild(span);
+  });
+
+  const textarea = document.getElementById('answer-textarea');
+  textarea.value = userAnswers[currentIndex] || '';
+  updateCounter();
+
+  document.querySelectorAll('.check-item input').forEach(cb => cb.checked = false);
+  document.getElementById('model-box').classList.remove('show');
+  const modelList = document.getElementById('model-list');
+  modelList.innerHTML = '';
+  item.data.models.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'model-item';
+    div.innerHTML = `<div class="mi-label">例${i + 1}</div><div class="mi-text">${m}</div><div class="mi-count">（${countWords(m)}語）</div>`;
+    modelList.appendChild(div);
+  });
+
+  const aiBox = document.getElementById('ai-box');
+  aiBox.classList.remove('show');
+  aiBox.innerHTML = '';
+
+  document.getElementById('btn-prev').disabled = currentIndex === 0;
+  document.getElementById('btn-next').textContent = currentIndex === taskQueue.length - 1 ? '練習を終える' : '次の課題へ';
+}
+
+function updateCounter() {
+  const text = document.getElementById('answer-textarea').value;
+  const count = countWords(text);
+  const badge = document.getElementById('counter-badge');
+  badge.textContent = `${count} 語`;
+  badge.className = 'counter-badge';
+  if (count === 0) badge.classList.add('empty');
+  else if (count >= 80 && count <= 100) badge.classList.add('good');
+  else if (count >= 65 && count <= 115) badge.classList.add('near');
+  else badge.classList.add('off');
+}
+
+document.getElementById('answer-textarea').addEventListener('input', () => {
+  userAnswers[currentIndex] = document.getElementById('answer-textarea').value;
+  updateCounter();
+});
+
+document.getElementById('btn-show-model').addEventListener('click', () => {
+  document.getElementById('model-box').classList.toggle('show');
+});
+
+document.getElementById('btn-ai-check').addEventListener('click', async () => {
+  const aiBox = document.getElementById('ai-box');
+  const item = taskQueue[currentIndex];
+  const answer = document.getElementById('answer-textarea').value.trim();
+
+  if (!GAS_WEB_APP_URL) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">AI採点機能はまだ設定されていません。「英作文AI採点_GASコード.gs」の手順に沿ってGASウェブアプリをデプロイし、HTML内のGAS_WEB_APP_URLにURLを設定してください。</div>';
+    return;
+  }
+  if (!answer) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">先に英文を入力してください。</div>';
+    return;
+  }
+
+  aiBox.classList.add('show');
+  aiBox.innerHTML = '<div class="ai-loading">🤖 AIが採点しています...（数秒かかります）</div>';
+
+  const promptText = item.data.q + ' (POINTS: ' + item.data.points.join(', ') + ')';
+
+  try {
+    const res = await fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({ type: item.type, prompt: promptText, answer: answer, wordTarget: '80〜100語程度', level: '2級' })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      aiBox.innerHTML = `<div class="ai-error">エラー: ${escapeHtml(data.error)}</div>`;
+      return;
+    }
+
+    aiBox.innerHTML = `
+      <h4>🤖 AIによる採点 <span class="ai-score-badge">評価: ${escapeHtml(data.score || '-')}</span></h4>
+      <div class="ai-section"><div class="as-label">👍 よくできている点</div><div class="as-text">${escapeHtml(data.good_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">✏️ 改善するとよい点</div><div class="as-text">${escapeHtml(data.improve_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">💡 自然な英語の例</div><div class="as-text">${escapeHtml(data.corrected_example || '')}</div></div>
+    `;
+  } catch (err) {
+    aiBox.innerHTML = '<div class="ai-error">AIとの通信に失敗しました。インターネット接続、またはGASウェブアプリのURL設定を確認してください。</div>';
+  }
+});
+
+document.getElementById('btn-prev').addEventListener('click', () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showTask();
+  }
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  if (currentIndex < taskQueue.length - 1) {
+    currentIndex++;
+    showTask();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  goPage('page-result');
+  document.getElementById('result-sub').textContent = `${taskQueue.length}個の課題に取り組みました`;
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  taskQueue.forEach((item, i) => {
+    const mine = userAnswers[i] || '';
+    const modelsHtml = item.data.models.map((m, i) =>
+      `<div class="rp-model" style="${i > 0 ? 'margin-top:6px;' : ''}"><b>例${i + 1}：</b>${m}</div>`
+    ).join('');
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="rp-badge">${item.type}</div>
+      <div class="rp-q">${item.data.q}</div>
+      <div class="rp-label" style="color:#5B6CF5;">あなたの解答（${countWords(mine)}語）</div>
+      <div class="rp-mine ${mine ? '' : 'empty'}">${mine ? mine.replace(/</g,'&lt;') : '（未記入）'}</div>
+      <div class="rp-label" style="color:#1a9e5a;">模範解答例</div>
+      ${modelsHtml}
+    `;
+    reviewList.appendChild(div);
+  });
+}
+
+document.getElementById('btn-retry-all').addEventListener('click', () => {
+  startPractice();
+});
+
+document.getElementById('btn-back-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+</script>
+
+</body>
+</html>

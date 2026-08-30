@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検3級 英作文トレーニング</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  /* ===== ページ管理 ===== */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-red     { background: linear-gradient(135deg,#ff416c,#ff4b2b); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-outline { background: #fff; color: #5B6CF5; border: 2px solid #5B6CF5; padding: 11px 26px; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .type-list {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .type-list h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .type-row { display:flex; align-items:flex-start; gap:10px; padding:6px 0; font-size:0.86em; color:#555; line-height:1.5; }
+  .type-row .dot { width:8px; height:8px; border-radius:50%; background:#5B6CF5; flex-shrink:0; margin-top:6px; }
+  .type-row b { color:#333; }
+
+  .mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .mode-tab {
+    flex: 1; background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-tab.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-tab .mt-title { font-weight: 800; font-size: 0.88em; color: #333; }
+  .mode-tab .mt-sub { font-size: 0.72em; color: #888; margin-top: 3px; }
+
+  /* ===== 出題ページ ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:12px;
+  }
+
+  .prompt-card {
+    background: #f8f9ff; border-radius: 16px; padding: 18px 20px; margin-bottom: 14px;
+  }
+  .prompt-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 8px; }
+  .prompt-text { font-size: 1.05em; font-weight: 700; color: #222; line-height: 1.7; }
+  .prompt-text u { color: #5B6CF5; text-decoration-color: #5B6CF5; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  .tip-box {
+    background: #fffaf0; border: 2px solid #ffe4b8; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px;
+  }
+  .tip-box h4 { font-size: 0.82em; color: #d98c1f; font-weight: 800; margin-bottom: 8px; }
+  .tip-box ul { padding-left: 18px; }
+  .tip-box li { font-size: 0.83em; color: #7a5c25; line-height: 1.6; margin-bottom: 3px; }
+  .phrase-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .phrase-tag {
+    background: #fff; border: 1px solid #ffe4b8; color: #b8791a; font-size: 0.78em; font-weight: 700;
+    padding: 4px 10px; border-radius: 50px;
+  }
+
+  .answer-textarea {
+    width: 100%; min-height: 110px; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 14px 16px; font-size: 0.95em; font-family: inherit; line-height: 1.6; resize: vertical;
+    transition: border-color 0.15s;
+  }
+  .answer-textarea:focus { outline: none; border-color: #5B6CF5; }
+
+  .counter-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; margin-bottom: 16px; }
+  .counter-badge { font-size: 0.82em; font-weight: 800; padding: 4px 12px; border-radius: 50px; }
+  .counter-badge.empty  { background: #f0f0f0; color: #999; }
+  .counter-badge.good   { background: #eafff3; color: #1a9e5a; }
+  .counter-badge.near   { background: #fff6e0; color: #b8791a; }
+  .counter-badge.off    { background: #fff0ee; color: #d13a1f; }
+  .counter-target { font-size: 0.78em; color: #999; }
+
+  .check-box {
+    background: #f8f9ff; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
+  }
+  .check-box h4 { font-size: 0.82em; color: #5B6CF5; font-weight: 800; margin-bottom: 8px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: #555; padding: 4px 0; }
+  .check-item input { width: 16px; height: 16px; accent-color: #5B6CF5; }
+
+  .model-box {
+    background: #eafff3; border: 2px solid #43e97b; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px;
+    display: none;
+  }
+  .model-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .model-box h4 { font-size: 0.85em; color: #1a9e5a; font-weight: 800; margin-bottom: 10px; }
+  .model-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #b9e8cf; }
+  .model-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .model-item .mi-label { font-size: 0.72em; font-weight: 800; color: #1a9e5a; margin-bottom: 3px; }
+  .model-item .mi-text { font-size: 0.92em; color: #333; line-height: 1.6; }
+  .model-item .mi-count { font-size: 0.75em; color: #4caf7d; margin-top: 4px; font-weight: 700; }
+
+  .ai-box {
+    background: #eef0ff; border: 2px solid #5B6CF5; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px;
+    display: none;
+  }
+  .ai-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .ai-box h4 { font-size: 0.85em; color: #5B6CF5; font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px; }
+  .ai-score-badge { display:inline-block; font-weight:900; font-size:0.8em; padding:2px 12px; border-radius:50px; background:#5B6CF5; color:#fff; }
+  .ai-section { margin-bottom: 10px; }
+  .ai-section:last-child { margin-bottom: 0; }
+  .ai-section .as-label { font-size: 0.75em; font-weight: 800; color: #5B6CF5; margin-bottom: 3px; }
+  .ai-section .as-text { font-size: 0.88em; color: #333; line-height: 1.6; }
+  .ai-loading { font-size: 0.85em; color: #666; text-align: center; padding: 10px; }
+  .ai-error { font-size: 0.85em; color: #d13a1f; background: #fff0ee; border-radius: 10px; padding: 10px 12px; }
+
+  .nav-row { margin-top: 20px; display: flex; justify-content: space-between; gap: 10px; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .result-icon { font-size: 4em; margin-bottom: 10px; }
+  .score-msg { font-size: 1.15em; font-weight: 900; color: #333; margin-bottom: 8px; }
+  .score-sub { font-size: 0.88em; color: #888; margin-bottom: 24px; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item {
+    background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .review-item .rp-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.72em; font-weight:700;
+    border-radius:50px; padding:2px 10px; margin-bottom:8px;
+  }
+  .review-item .rp-q { font-weight: 700; color: #333; font-size: 0.9em; margin-bottom: 8px; line-height: 1.5; }
+  .review-item .rp-label { font-size: 0.72em; font-weight: 800; margin-top: 8px; margin-bottom: 3px; }
+  .review-item .rp-mine { font-size: 0.86em; color: #444; background: #fff; border-radius: 8px; padding: 8px 10px; min-height: 20px; }
+  .review-item .rp-mine.empty { color: #bbb; font-style: italic; }
+  .review-item .rp-model { font-size: 0.86em; color: #1a9e5a; background: #eafff3; border-radius: 8px; padding: 8px 10px; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検3級 英作文トレーニング</div>
+      <div class="hd-sub">1次試験対策｜ライティング（意見英作文・Eメール返信）</div>
+    </div>
+    <a class="hd-home-link" href="英検3級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">✏️</div>
+    <div class="title-main">英作文トレーニング</div>
+    <div class="title-sub">お題に答える練習をして、お手本と見比べよう</div>
+    <div class="title-tagline">意見英作文｜Eメール返信</div>
+
+    <div class="type-list">
+      <h3>2つの出題タイプ</h3>
+      <div class="type-row"><span class="dot"></span><span><b>意見英作文</b>：QUESTIONに対する自分の意見を、理由を2つ添えて25～35語で書く</span></div>
+      <div class="type-row"><span class="dot"></span><span><b>Eメール返信</b>：友達からのメール中の2つの質問に、25～35語で答える</span></div>
+    </div>
+
+    <div class="mode-tabs">
+      <div class="mode-tab selected" data-mode="opinion">
+        <div class="mt-title">意見英作文</div>
+        <div class="mt-sub">QUESTION形式で練習</div>
+      </div>
+      <div class="mode-tab" data-mode="email">
+        <div class="mt-title">Eメール返信</div>
+        <div class="mt-sub">メール形式で練習</div>
+      </div>
+      <div class="mode-tab" data-mode="mix">
+        <div class="mt-title">両方まとめて</div>
+        <div class="mt-sub">ランダムに出題</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">スタート！</button>
+  </div>
+
+  <!-- ===== 出題ページ ===== -->
+  <div id="page-task" class="page">
+    <button class="back-link" id="btn-back-to-title">← 出題設定に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">課題 1 / 8</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <span class="cat-badge" id="cat-badge">意見英作文</span>
+
+    <div class="prompt-card">
+      <div class="prompt-label" id="prompt-label">QUESTION</div>
+      <div class="prompt-text" id="prompt-text"></div>
+    </div>
+
+    <div class="tip-box">
+      <h4 id="tip-title">📝 書き方のヒント</h4>
+      <ul id="tip-list"></ul>
+      <div class="phrase-tags" id="phrase-tags"></div>
+    </div>
+
+    <textarea class="answer-textarea" id="answer-textarea" placeholder="ここに英文を書いてみよう..."></textarea>
+    <div class="counter-row">
+      <span class="counter-badge empty" id="counter-badge">0 語</span>
+      <span class="counter-target">目安：25～35語</span>
+    </div>
+
+    <div class="check-box">
+      <h4>✅ 書き終わったらセルフチェック</h4>
+      <label class="check-item"><input type="checkbox"> 質問（QUESTIONまたはメール中の2つの質問）にきちんと答えている</label>
+      <label class="check-item"><input type="checkbox"> 理由や説明を書き加えている（First, / Second, など）</label>
+      <label class="check-item"><input type="checkbox"> 語数が25～35語くらいになっている</label>
+      <label class="check-item"><input type="checkbox"> つづり・大文字・ピリオドを見直した</label>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <button class="btn btn-outline" style="flex:1;" id="btn-show-model">模範解答を見る</button>
+      <button class="btn btn-primary" style="flex:1;" id="btn-ai-check">🤖 AIに採点してもらう</button>
+    </div>
+
+    <div class="model-box" id="model-box">
+      <h4>💡 模範解答例（考え方は1つではありません）</h4>
+      <div id="model-list"></div>
+    </div>
+
+    <div class="ai-box" id="ai-box"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-gray" id="btn-prev">前の課題</button>
+      <button class="btn btn-primary" id="btn-next">次の課題へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="result-icon">🎉</div>
+    <div class="score-msg">お疲れさまでした！</div>
+    <div class="score-sub" id="result-sub">8個の課題に取り組みました</div>
+
+    <div class="review-list" id="review-list"></div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-retry-all">もう一度挑戦する</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title">タイトルに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 英作文データ（英検3級レベル） =====
+const OPINION_PHRASES = ["I think ~", "I want to ~", "I like ~ better than ~", "I have two reasons.", "First, ~", "Second, ~", "For example, ~"];
+const EMAIL_PHRASES = ["Yes, I can / do ~", "No, I can't / don't ~", "I think ~", "I want to ~ because ~", "It is because ~"];
+
+const OPINION_TASKS = [
+  {
+    q: "What do you want to do during the next summer vacation?",
+    models: [
+      "I want to go to the beach during summer vacation. I have two reasons. First, I can swim in the sea with my friends. Second, I can eat delicious ice cream there.",
+      "I want to visit my grandmother's house during summer vacation. I have two reasons. First, I can play with my cousins there. Second, her cooking is always delicious.",
+      "I want to study English during summer vacation. I have two reasons. First, I want to get better scores on tests. Second, I hope to talk with people from other countries someday."
+    ]
+  },
+  {
+    q: "Which do you like better, studying at school or studying at home?",
+    models: [
+      "I like studying at school better than studying at home. I have two reasons. First, I can ask my teacher questions easily. Second, I can study together with my friends.",
+      "I like studying at home better than studying at school. I have two reasons. First, I can study at my own pace. Second, it is quiet, so I can concentrate well.",
+      "I like studying at school better than studying at home. I have two reasons. First, I can use the library for research. Second, I don't get distracted by my phone or TV."
+    ]
+  },
+  {
+    q: "What sport do you want to try in the future?",
+    models: [
+      "I want to try tennis in the future. I have two reasons. First, tennis looks very exciting to watch. Second, I can play it with my family on weekends.",
+      "I want to try skiing in the future. I have two reasons. First, I have never seen snow mountains before. Second, my friends often talk about how fun it is.",
+      "I want to try swimming in the future. I have two reasons. First, it is good exercise for the whole body. Second, I can enjoy it even in summer."
+    ]
+  },
+  {
+    q: "Where do you want to go on your next trip?",
+    models: [
+      "I want to go to Okinawa on my next trip. I have two reasons. First, the sea there is very beautiful. Second, I want to eat delicious local food.",
+      "I want to go to Kyoto on my next trip. I have two reasons. First, I can visit many old temples there. Second, I want to eat traditional Japanese sweets.",
+      "I want to go to Hokkaido on my next trip. I have two reasons. First, I want to see beautiful snow scenery. Second, the seafood there is very famous."
+    ]
+  },
+  {
+    q: "What do you usually do on weekends?",
+    models: [
+      "I usually play soccer with my friends on weekends. I have two reasons. First, it is a lot of fun. Second, I can get good exercise every week.",
+      "I usually read books at the library on weekends. I have two reasons. First, it is quiet and comfortable there. Second, I can find many interesting stories.",
+      "I usually help my mother with cooking on weekends. I have two reasons. First, I can learn new recipes. Second, we can spend time together."
+    ]
+  },
+  {
+    q: "Which season do you like the best?",
+    models: [
+      "I like summer the best. I have two reasons. First, I can swim in the sea during summer. Second, I can enjoy delicious shaved ice with my family.",
+      "I like winter the best. I have two reasons. First, I can enjoy skiing with my family. Second, I love eating hot nabe dishes.",
+      "I like spring the best. I have two reasons. First, the cherry blossoms are very beautiful. Second, it is not too hot or too cold."
+    ]
+  },
+  {
+    q: "What kind of food do you want to eat for your birthday?",
+    models: [
+      "I want to eat pizza for my birthday. I have two reasons. First, pizza is my favorite food. Second, I can share it with my family and friends.",
+      "I want to eat sushi for my birthday. I have two reasons. First, sushi is a special treat for my family. Second, I love the taste of fresh fish.",
+      "I want to eat my mother's curry for my birthday. I have two reasons. First, it is my favorite dish. Second, it always makes me feel happy."
+    ]
+  },
+  {
+    q: "What do you want to be in the future?",
+    models: [
+      "I want to be an English teacher in the future. I have two reasons. First, I like talking with foreign people. Second, I want to help students learn English.",
+      "I want to be a nurse in the future. I have two reasons. First, I want to help sick people. Second, my mother is a nurse, and I respect her job.",
+      "I want to be a game designer in the future. I have two reasons. First, I love playing video games. Second, I want to create games that make people happy."
+    ]
+  }
+];
+
+const EMAIL_TASKS = [
+  {
+    email: "Hi! I'm going to have a small party at my house next Saturday. <u>Can you come?</u> Also, <u>what food should I bring for the party?</u>",
+    models: [
+      "Yes, I can come to your party. I'm looking forward to it. I think you should bring some snacks like chips and cookies. Everyone will enjoy them.",
+      "Yes, I would love to come to your party. Thank you for inviting me. I think bringing a cake would be nice, so I will buy one on the way.",
+      "I'm sorry, I can't come to your party because I have a family event that day. For the food, maybe some fruit or juice would be good for everyone."
+    ]
+  },
+  {
+    email: "Hi! Our school trip is coming soon. <u>Which do you want to visit, the museum or the zoo?</u> And <u>what do you want to do there?</u>",
+    models: [
+      "I want to visit the zoo. I have never seen a panda before, so I really want to see one. I also want to take a lot of pictures with my friends there.",
+      "I want to visit the museum. I am interested in history, so I want to see the old paintings there. I also want to buy a small gift at the museum shop.",
+      "I want to visit the zoo. I really like animals, especially lions. I also want to buy a stuffed animal as a souvenir for my little sister."
+    ]
+  },
+  {
+    email: "Hi! I heard you started a new hobby. <u>What is it?</u> And <u>why do you like it?</u>",
+    models: [
+      "I started playing the guitar last month. I like it because I can play many songs by my favorite singers. It also helps me relax after studying.",
+      "I started drawing pictures last month. I like it because I can express my feelings through art. It also makes me feel calm after a busy day.",
+      "I started running every morning. I like it because it makes me feel healthy and energetic. It also helps me sleep better at night."
+    ]
+  },
+  {
+    email: "Hi! I'm thinking about getting a pet. <u>Do you have any pets?</u> <u>What is good about having a pet?</u>",
+    models: [
+      "Yes, I have a dog at home. Having a pet is good because it makes our family happy every day. My dog also helps me feel less lonely when I'm sad.",
+      "No, I don't have any pets right now. Having a pet is good because it can be a good friend for you. It also teaches you how to take care of other living things.",
+      "Yes, I have two cats at home. Having a pet is good because they always make me smile when I feel sad. They also teach me to be responsible."
+    ]
+  }
+];
+
+// ===== AI採点の設定 =====
+// Google Apps ScriptでデプロイしたウェブアプリのURL（.../exec）をここに貼り付けてください。
+// 設定方法は「英作文AI採点_GASコード.gs」を参照してください。
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxhCBU9aZ5eymIXqsAhtQoUvgaGJwEEt67UAN_ysTeZGGSLc1gXvWP-tSZHvDopKITJmg/exec';
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ===== 状態管理 =====
+let selectedMode = 'opinion';
+let taskQueue = []; // {type, data}
+let currentIndex = 0;
+let userAnswers = [];
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function countWords(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).filter(Boolean).length;
+}
+
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('selected'));
+    tab.classList.add('selected');
+    selectedMode = tab.dataset.mode;
+  });
+});
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  startPractice();
+});
+
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startPractice() {
+  let list = [];
+  if (selectedMode === 'opinion') {
+    list = OPINION_TASKS.map(t => ({ type: '意見英作文', data: t }));
+  } else if (selectedMode === 'email') {
+    list = EMAIL_TASKS.map(t => ({ type: 'Eメール返信', data: t }));
+  } else {
+    list = shuffle([
+      ...OPINION_TASKS.map(t => ({ type: '意見英作文', data: t })),
+      ...EMAIL_TASKS.map(t => ({ type: 'Eメール返信', data: t }))
+    ]);
+  }
+  if (selectedMode !== 'mix') list = shuffle(list);
+
+  taskQueue = list;
+  currentIndex = 0;
+  userAnswers = new Array(list.length).fill('');
+  goPage('page-task');
+  showTask();
+}
+
+function showTask() {
+  const item = taskQueue[currentIndex];
+  document.getElementById('progress-text').textContent = `課題 ${currentIndex + 1} / ${taskQueue.length}`;
+  document.getElementById('progress-bar').style.width = `${(currentIndex / taskQueue.length) * 100}%`;
+  document.getElementById('cat-badge').textContent = item.type;
+
+  const isOpinion = item.type === '意見英作文';
+  document.getElementById('prompt-label').textContent = isOpinion ? 'QUESTION' : 'E-MAIL';
+  document.getElementById('prompt-text').innerHTML = isOpinion ? item.data.q : item.data.email;
+
+  document.getElementById('tip-title').textContent = isOpinion ? '📝 書き方のヒント（意見英作文）' : '📝 書き方のヒント（Eメール返信）';
+  const tipList = document.getElementById('tip-list');
+  tipList.innerHTML = '';
+  const tips = isOpinion
+    ? ["まず自分の意見をはっきり書く（I want to ~ / I like ~ better.）", "理由を2つ、First, / Second, を使って書く", "全体で25～35語を目安にする"]
+    : ["下線が引かれた2つの質問、両方に答える", "Yes/Noで答えられる質問には、まずYes/Noをはっきり書く", "全体で25～35語を目安にする"];
+  tips.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    tipList.appendChild(li);
+  });
+
+  const phraseTags = document.getElementById('phrase-tags');
+  phraseTags.innerHTML = '';
+  (isOpinion ? OPINION_PHRASES : EMAIL_PHRASES).forEach(p => {
+    const span = document.createElement('span');
+    span.className = 'phrase-tag';
+    span.textContent = p;
+    phraseTags.appendChild(span);
+  });
+
+  const textarea = document.getElementById('answer-textarea');
+  textarea.value = userAnswers[currentIndex] || '';
+  updateCounter();
+
+  document.querySelectorAll('.check-item input').forEach(cb => cb.checked = false);
+  document.getElementById('model-box').classList.remove('show');
+  const modelList = document.getElementById('model-list');
+  modelList.innerHTML = '';
+  item.data.models.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'model-item';
+    div.innerHTML = `<div class="mi-label">例${i + 1}</div><div class="mi-text">${m}</div><div class="mi-count">（${countWords(m)}語）</div>`;
+    modelList.appendChild(div);
+  });
+
+  const aiBox = document.getElementById('ai-box');
+  aiBox.classList.remove('show');
+  aiBox.innerHTML = '';
+
+  document.getElementById('btn-prev').disabled = currentIndex === 0;
+  document.getElementById('btn-next').textContent = currentIndex === taskQueue.length - 1 ? '練習を終える' : '次の課題へ';
+}
+
+function updateCounter() {
+  const text = document.getElementById('answer-textarea').value;
+  const count = countWords(text);
+  const badge = document.getElementById('counter-badge');
+  badge.textContent = `${count} 語`;
+  badge.className = 'counter-badge';
+  if (count === 0) badge.classList.add('empty');
+  else if (count >= 25 && count <= 35) badge.classList.add('good');
+  else if (count >= 18 && count <= 42) badge.classList.add('near');
+  else badge.classList.add('off');
+}
+
+document.getElementById('answer-textarea').addEventListener('input', () => {
+  userAnswers[currentIndex] = document.getElementById('answer-textarea').value;
+  updateCounter();
+});
+
+document.getElementById('btn-show-model').addEventListener('click', () => {
+  document.getElementById('model-box').classList.toggle('show');
+});
+
+document.getElementById('btn-ai-check').addEventListener('click', async () => {
+  const aiBox = document.getElementById('ai-box');
+  const item = taskQueue[currentIndex];
+  const answer = document.getElementById('answer-textarea').value.trim();
+
+  if (!GAS_WEB_APP_URL) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">AI採点機能はまだ設定されていません。「英作文AI採点_GASコード.gs」の手順に沿ってGASウェブアプリをデプロイし、HTML内のGAS_WEB_APP_URLにURLを設定してください。</div>';
+    return;
+  }
+  if (!answer) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">先に英文を入力してください。</div>';
+    return;
+  }
+
+  aiBox.classList.add('show');
+  aiBox.innerHTML = '<div class="ai-loading">🤖 AIが採点しています...（数秒かかります）</div>';
+
+  const isOpinion = item.type === '意見英作文';
+  const promptText = isOpinion ? item.data.q : item.data.email.replace(/<\/?u>/g, '');
+
+  try {
+    const res = await fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({ type: item.type, prompt: promptText, answer: answer })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      aiBox.innerHTML = `<div class="ai-error">エラー: ${escapeHtml(data.error)}</div>`;
+      return;
+    }
+
+    aiBox.innerHTML = `
+      <h4>🤖 AIによる採点 <span class="ai-score-badge">評価: ${escapeHtml(data.score || '-')}</span></h4>
+      <div class="ai-section"><div class="as-label">👍 よくできている点</div><div class="as-text">${escapeHtml(data.good_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">✏️ 改善するとよい点</div><div class="as-text">${escapeHtml(data.improve_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">💡 自然な英語の例</div><div class="as-text">${escapeHtml(data.corrected_example || '')}</div></div>
+    `;
+  } catch (err) {
+    aiBox.innerHTML = '<div class="ai-error">AIとの通信に失敗しました。インターネット接続、またはGASウェブアプリのURL設定を確認してください。</div>';
+  }
+});
+
+document.getElementById('btn-prev').addEventListener('click', () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showTask();
+  }
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  if (currentIndex < taskQueue.length - 1) {
+    currentIndex++;
+    showTask();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  goPage('page-result');
+  document.getElementById('result-sub').textContent = `${taskQueue.length}個の課題に取り組みました`;
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  taskQueue.forEach((item, i) => {
+    const isOpinion = item.type === '意見英作文';
+    const mine = userAnswers[i] || '';
+    const modelsHtml = item.data.models.map((m, i) =>
+      `<div class="rp-model" style="${i > 0 ? 'margin-top:6px;' : ''}"><b>例${i + 1}：</b>${m}</div>`
+    ).join('');
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="rp-badge">${item.type}</div>
+      <div class="rp-q">${isOpinion ? item.data.q : item.data.email}</div>
+      <div class="rp-label" style="color:#5B6CF5;">あなたの解答（${countWords(mine)}語）</div>
+      <div class="rp-mine ${mine ? '' : 'empty'}">${mine ? mine.replace(/</g,'&lt;') : '（未記入）'}</div>
+      <div class="rp-label" style="color:#1a9e5a;">模範解答例</div>
+      ${modelsHtml}
+    `;
+    reviewList.appendChild(div);
+  });
+}
+
+document.getElementById('btn-retry-all').addEventListener('click', () => {
+  startPractice();
+});
+
+document.getElementById('btn-back-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+</script>
+
+</body>
+</html>

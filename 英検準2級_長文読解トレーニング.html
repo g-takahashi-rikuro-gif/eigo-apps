@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検準2級 長文読解トレーニング</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  /* ===== ページ管理 ===== */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-red     { background: linear-gradient(135deg,#ff416c,#ff4b2b); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .type-list {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .type-list h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .type-row { display:flex; align-items:center; gap:10px; padding:6px 0; font-size:0.88em; color:#555; }
+  .type-row .dot { width:8px; height:8px; border-radius:50%; background:#5B6CF5; flex-shrink:0; }
+
+  .mode-box {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .mode-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .mode-options { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .mode-opt {
+    flex: 1; min-width: 90px;
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-opt.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-opt .n { font-size: 1.3em; font-weight: 900; color: #333; }
+  .mode-opt .l { font-size: 0.75em; color: #888; margin-top: 2px; }
+
+  .mode-tabs { display: flex; gap: 8px; }
+  .mode-tab {
+    flex: 1; background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-tab.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-tab .mt-title { font-weight: 800; font-size: 0.88em; color: #333; }
+  .mode-tab .mt-sub { font-size: 0.72em; color: #888; margin-top: 3px; }
+
+  .category-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .cat-chip {
+    flex: 1; min-width: 130px; background: #fff; border: 2px solid #e2e5f5; border-radius: 50px;
+    padding: 10px 14px; text-align: center; font-size: 0.85em; font-weight: 700; color: #999;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .cat-chip.selected { border-color: #5B6CF5; background: #eef0ff; color: #5B6CF5; }
+
+  /* ===== 出題ページ ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:12px;
+  }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  .passage-card {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 16px;
+    padding: 16px 18px; margin-bottom: 16px; max-height: 260px; overflow-y: auto;
+  }
+  .passage-title { font-weight: 800; color: #5B6CF5; margin-bottom: 8px; font-size: 0.95em; }
+  .passage-text { font-size: 0.9em; line-height: 1.75; color: #333; white-space: pre-line; }
+
+  .question-card {
+    background: #f8f9ff; border-radius: 16px; padding: 20px 20px; margin-bottom: 16px;
+  }
+  .question-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 6px; }
+  .question-en { font-size: 1.05em; font-weight: 700; color: #222; line-height: 1.6; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 14px 18px; text-align: left; font-size: 0.95em; font-weight: 700; color:#333;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #b9c0f0; background: #f8f9ff; }
+  .choice-btn.correct { border-color: #43e97b; background: #eafff3; color: #1a9e5a; }
+  .choice-btn.wrong { border-color: #ff4b2b; background: #fff0ee; color: #d13a1f; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    margin-top: 16px; padding: 16px 18px; border-radius: 14px; display: none;
+  }
+  .feedback-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .feedback-box.correct { background: #eafff3; border: 2px solid #43e97b; }
+  .feedback-box.wrong { background: #fff0ee; border: 2px solid #ff4b2b; }
+  .feedback-title { font-weight: 900; font-size: 0.95em; margin-bottom: 6px; }
+  .feedback-box.correct .feedback-title { color: #1a9e5a; }
+  .feedback-box.wrong .feedback-title { color: #d13a1f; }
+  .feedback-answer { font-size: 0.9em; color: #444; margin-bottom: 4px; }
+  .feedback-explain { font-size: 0.85em; color: #666; line-height: 1.5; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .score-circle {
+    width: 150px; height: 150px; border-radius: 50%;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .score-circle .num { font-size: 2.2em; font-weight: 900; }
+  .score-circle .den { font-size: 0.85em; opacity: 0.85; }
+  .score-msg { font-size: 1.05em; font-weight: 800; color: #333; margin-bottom: 24px; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item {
+    background: #fff0ee; border: 2px solid #ffd6cf; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .review-item .rp { font-size: 0.75em; color: #b06a5f; font-weight: 700; margin-bottom: 4px; }
+  .review-item .rq { font-weight: 700; color: #333; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.88em; color: #1a9e5a; font-weight: 700; margin-bottom: 4px; }
+  .review-item .re { font-size: 0.83em; color: #777; line-height: 1.5; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検準2級 長文読解トレーニング</div>
+      <div class="hd-sub">1次試験対策｜掲示文・Eメール・説明文</div>
+    </div>
+    <a class="hd-home-link" href="英検準2級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">📖</div>
+    <div class="title-main">長文読解クイズ</div>
+    <div class="title-sub">英文を読んで、内容に関する問題に答えよう</div>
+    <div class="title-tagline">文章4種類搭載｜毎回ランダム出題</div>
+
+    <div class="type-list">
+      <h3>出題される文章のタイプ</h3>
+      <div class="type-row"><span class="dot"></span>掲示・案内文（お知らせ・チラシなど）</div>
+      <div class="type-row"><span class="dot"></span>Eメール文</div>
+      <div class="type-row"><span class="dot"></span>説明文</div>
+      <div class="type-row"><span class="dot"></span>物語文</div>
+    </div>
+
+    <div class="mode-box">
+      <h3>練習モードを選ぼう</h3>
+      <div class="mode-tabs">
+        <div class="mode-tab selected" data-mode="all4">
+          <div class="mt-title">全種類を1つずつ</div>
+          <div class="mt-sub">4つの文章をバランスよく</div>
+        </div>
+        <div class="mode-tab" data-mode="custom">
+          <div class="mt-title">自分で種類を選ぶ</div>
+          <div class="mt-sub">好きなタイプだけ練習</div>
+        </div>
+      </div>
+
+      <div id="category-picker" class="category-picker" style="display:none;">
+        <div class="cat-chip selected" data-type="掲示・案内文">掲示・案内文</div>
+        <div class="cat-chip selected" data-type="Eメール文">Eメール文</div>
+        <div class="cat-chip selected" data-type="説明文">説明文</div>
+        <div class="cat-chip selected" data-type="物語文">物語文</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">スタート！</button>
+  </div>
+
+  <!-- ===== 出題ページ ===== -->
+  <div id="page-quiz" class="page">
+    <button class="back-link" id="btn-back-to-title">← 出題設定に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">問題 1 / 13</span>
+        <span id="progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <span class="cat-badge" id="cat-badge">掲示・案内文</span>
+
+    <div class="passage-card">
+      <div class="passage-title" id="passage-title"></div>
+      <div class="passage-text" id="passage-text"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-label" id="question-label">Q1</div>
+      <div class="question-en" id="question-en"></div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="feedback-box" id="feedback-box">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-answer" id="feedback-answer"></div>
+      <div class="feedback-explain" id="feedback-explain"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" id="btn-next" style="display:none;">次の問題へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="score-circle">
+      <div class="num" id="result-score">0</div>
+      <div class="den">/ <span id="result-total">13</span> 問正解</div>
+    </div>
+    <div class="score-msg" id="result-msg"></div>
+
+    <div id="review-wrap">
+      <div class="review-list" id="review-list"></div>
+    </div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-retry-all">もう一度挑戦する</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title">タイトルに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 長文データ（英検準2級レベル） =====
+const PASSAGES = [
+  { type:"掲示・案内文", title:"Community Lecture Series: Understanding Renewable Energy", text:
+`Community Lecture Series: Understanding Renewable Energy
+
+Date: Saturday, September 14
+Time: 2:00 p.m. - 4:00 p.m.
+Place: Green Hills Community Center, Main Hall
+
+As part of our ongoing effort to promote environmental awareness, the city is hosting a free lecture series on renewable energy sources. This month's session will focus on solar and wind power, and how households can reduce their electricity costs by adopting these technologies. The guest speaker, Dr. Sato, has over fifteen years of experience researching sustainable energy solutions.
+
+Seats are limited to 80 people, so early reservation is recommended. Reservations can be made online or by phone until September 10. Light refreshments will be provided after the lecture, giving attendees a chance to ask the speaker questions directly.
+
+For more information, please visit our website or contact the community center office.`,
+    questions: [
+      { q:"What will this month's lecture focus on?", correct:"Solar and wind power", wrongs:["Nuclear energy","Electric vehicles","Water conservation"], explain:"本文に \"This month's session will focus on solar and wind power\" とあります。" },
+      { q:"Why is early reservation recommended?", correct:"Because seats are limited to 80 people", wrongs:["Because the speaker is very popular","Because the lecture is only once a year","Because refreshments are limited"], explain:"本文に \"Seats are limited to 80 people, so early reservation is recommended.\" とあります。" },
+      { q:"What can attendees do after the lecture?", correct:"Ask the speaker questions while having refreshments", wrongs:["Buy solar panels at a discount","Sign up for another lecture","Meet other guest speakers"], explain:"本文に \"Light refreshments will be provided after the lecture, giving attendees a chance to ask the speaker questions directly.\" とあります。" }
+    ] },
+  { type:"Eメール文", title:"Question about the Study Trip", text:
+`Subject: Question about the Study Trip
+
+Hi Mr. Green,
+
+I hope this email finds you well. I'm writing because I have a question about the study trip to Australia next spring. I saw the announcement on the school bulletin board, but I wasn't sure about a few details.
+
+First, I'd like to know whether the program includes homestay accommodation or if we'll be staying in a hotel. I've never stayed with a host family before, and I think it would be a valuable experience, but I want to prepare myself mentally if that's the case.
+
+Also, could you tell me more about the cost? The announcement mentioned that flights are included, but it didn't specify whether meals and activities are covered as well. My parents would like to know the total cost before I apply.
+
+I would really appreciate it if you could answer these questions when you have time. Thank you very much for your help.
+
+Best regards,
+Aya`,
+    questions: [
+      { q:"Why is Aya writing this email?", correct:"Because she has questions about the study trip", wrongs:["Because she wants to cancel her application","Because she found a mistake in the announcement","Because she wants to change the destination"], explain:"本文に \"I'm writing because I have a question about the study trip\" とあります。" },
+      { q:"What does Aya want to know about the accommodation?", correct:"Whether they will stay with a host family or in a hotel", wrongs:["Whether the hotel has WiFi","How many students will share a room","Whether she can choose her roommate"], explain:"本文に \"whether the program includes homestay accommodation or if we'll be staying in a hotel\" とあります。" },
+      { q:"What information does Aya still need about the cost?", correct:"Whether meals and activities are included", wrongs:["Whether flights are included","How to pay the fee","When the payment is due"], explain:"本文に \"it didn't specify whether meals and activities are covered as well\" とあります。" }
+    ] },
+  { type:"説明文", title:"The Rise of Community-Supported Agriculture", text:
+`In recent years, an increasing number of people have become interested in knowing exactly where their food comes from. This growing concern has led to the popularity of Community-Supported Agriculture, or CSA, a system in which consumers pay local farmers directly at the beginning of the growing season. In exchange, they receive a share of the harvest throughout the season, usually delivered weekly in the form of a box of fresh vegetables and fruits.
+
+This system benefits both farmers and consumers. Farmers receive stable income early in the year, before they have to spend money on seeds and equipment, which reduces their financial risk. Consumers, meanwhile, gain access to fresh, seasonal produce while supporting local businesses instead of large corporations. Many CSA members also say that they feel more connected to their community and more conscious about reducing food waste, since they try to use every vegetable they receive.
+
+However, CSA is not without its challenges. Because members receive whatever the farm produces that week, they sometimes end up with vegetables they are unfamiliar with or do not know how to cook. To solve this issue, some farms now provide recipe suggestions along with each delivery, helping members make the most of their share.`,
+    questions: [
+      { q:"What is Community-Supported Agriculture?", correct:"A system in which consumers pay farmers in advance for a share of the harvest", wrongs:["A government program that gives free vegetables to families","A method of growing vegetables without soil","A type of farm that only sells fruit"], explain:"本文に \"consumers pay local farmers directly at the beginning of the growing season. In exchange, they receive a share of the harvest\" とあります。" },
+      { q:"How does CSA benefit farmers?", correct:"They receive stable income before spending money on seeds and equipment", wrongs:["They get to choose which customers they sell to","They receive government tax reductions","They no longer need farm workers"], explain:"本文に \"Farmers receive stable income early in the year, before they have to spend money on seeds and equipment\" とあります。" },
+      { q:"What problem do some CSA members face?", correct:"They sometimes receive vegetables they don't know how to cook", wrongs:["They receive less food than they paid for","They cannot cancel their membership easily","They have to pick up the vegetables themselves"], explain:"本文に \"they sometimes end up with vegetables they are unfamiliar with or do not know how to cook\" とあります。" },
+      { q:"What have some farms started doing to help members?", correct:"Providing recipe suggestions with each delivery", wrongs:["Offering cooking classes for free","Delivering food every day instead of weekly","Allowing members to choose their own vegetables"], explain:"本文に \"some farms now provide recipe suggestions along with each delivery\" とあります。" }
+    ] },
+  { type:"物語文", title:"A Lesson from the Chess Club", text:
+`When Daichi joined the chess club in his first year of high school, he expected to win most of his games. He had been the best player at his junior high school, and he assumed high school would not be much different. However, in his very first match, he lost badly to a quiet second-year student named Ren, who rarely spoke during practice.
+
+At first, Daichi felt embarrassed and even considered quitting the club. He told himself that chess simply wasn't as important to him as he had thought. But one afternoon, he stayed late and watched Ren practice alone, moving pieces slowly and reviewing his mistakes from previous matches. Daichi realized that Ren's skill hadn't come from natural talent but from hours of quiet, patient study.
+
+Inspired by what he saw, Daichi began arriving early to analyze famous chess games and asked Ren for advice after practice. Ren, surprised but pleased that someone wanted to learn from him, began sharing strategies he had developed over the years. Slowly, Daichi's game improved, not because he became naturally gifted, but because he learned to be patient with himself.
+
+By the end of the year, Daichi still hadn't beaten Ren, but he no longer felt embarrassed about it. He had learned that losing wasn't a sign of failure but an opportunity to improve, a lesson that would stay with him long after he left the chess club.`,
+    questions: [
+      { q:"Why was Daichi surprised in his first match?", correct:"He lost badly to a quiet second-year student", wrongs:["He won every game easily","He was asked to become the club leader","He found out Ren was a beginner"], explain:"本文に \"in his very first match, he lost badly to a quiet second-year student named Ren\" とあります。" },
+      { q:"What did Daichi realize after watching Ren practice?", correct:"Ren's skill came from hours of quiet, patient study", wrongs:["Ren had a private chess coach","Ren was naturally talented at chess","Ren practiced only before matches"], explain:"本文に \"Ren's skill hadn't come from natural talent but from hours of quiet, patient study\" とあります。" },
+      { q:"What did Daichi start doing after being inspired by Ren?", correct:"Arriving early to study famous games and asking Ren for advice", wrongs:["Quitting the chess club to focus on other activities","Challenging Ren to a rematch every day","Teaching beginners in the club"], explain:"本文に \"Daichi began arriving early to analyze famous chess games and asked Ren for advice after practice.\" とあります。" },
+      { q:"What lesson did Daichi learn by the end of the year?", correct:"Losing is an opportunity to improve, not a sign of failure", wrongs:["Talent is more important than effort","He should have quit the chess club","Ren was better because of natural talent"], explain:"本文に \"He had learned that losing wasn't a sign of failure but an opportunity to improve\" とあります。" }
+    ] }
+];
+
+// ===== 状態管理 =====
+let selectedMode = 'all4'; // 'all4' or 'custom'
+let selectedCategories = new Set(['掲示・案内文', 'Eメール文', '説明文', '物語文']);
+let flatQuestions = []; // {passageIndex, question}
+let currentIndex = 0;
+let correctCount = 0;
+let wrongQuestions = [];
+let answered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// 文章のタイプが偏らないよう、カテゴリごとに順番に選んでいく
+function pickPassages(n) {
+  const byCategory = {};
+  PASSAGES.forEach((p, i) => {
+    (byCategory[p.type] = byCategory[p.type] || []).push(i);
+  });
+  Object.keys(byCategory).forEach(k => { byCategory[k] = shuffle(byCategory[k]); });
+  const cats = shuffle(Object.keys(byCategory));
+
+  const selected = [];
+  while (selected.length < n) {
+    let addedAny = false;
+    for (const cat of cats) {
+      if (selected.length >= n) break;
+      const arr = byCategory[cat];
+      if (arr.length > 0) {
+        selected.push(arr.shift());
+        addedAny = true;
+      }
+    }
+    if (!addedAny) break;
+  }
+  return selected.map(i => PASSAGES[i]);
+}
+
+function buildFlatQuestions(passages) {
+  const list = [];
+  passages.forEach((p, pi) => {
+    p.questions.forEach((q, qi) => {
+      list.push({ passage: p, qIndexInPassage: qi, question: q });
+    });
+  });
+  return list;
+}
+
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('selected'));
+    tab.classList.add('selected');
+    selectedMode = tab.dataset.mode;
+    document.getElementById('category-picker').style.display = selectedMode === 'custom' ? 'flex' : 'none';
+  });
+});
+
+document.querySelectorAll('.cat-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const type = chip.dataset.type;
+    if (chip.classList.contains('selected')) {
+      if (selectedCategories.size === 1) return; // 最低1つは選択が必要
+      chip.classList.remove('selected');
+      selectedCategories.delete(type);
+    } else {
+      chip.classList.add('selected');
+      selectedCategories.add(type);
+    }
+  });
+});
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  startQuiz();
+});
+
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startQuiz() {
+  const passages = selectedMode === 'custom'
+    ? shuffle(PASSAGES.filter(p => selectedCategories.has(p.type)))
+    : pickPassages(4);
+  flatQuestions = buildFlatQuestions(passages);
+  currentIndex = 0;
+  correctCount = 0;
+  wrongQuestions = [];
+  goPage('page-quiz');
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const item = flatQuestions[currentIndex];
+  const passage = item.passage;
+  const q = item.question;
+
+  document.getElementById('progress-text').textContent = `問題 ${currentIndex + 1} / ${flatQuestions.length}`;
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('progress-bar').style.width = `${(currentIndex / flatQuestions.length) * 100}%`;
+  document.getElementById('cat-badge').textContent = passage.type;
+  document.getElementById('passage-title').textContent = passage.title;
+  document.getElementById('passage-text').textContent = passage.text;
+  document.getElementById('question-label').textContent = `Q${item.qIndexInPassage + 1}`;
+  document.getElementById('question-en').textContent = q.q;
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectAnswer(btn, opt, q, passage));
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('btn-next').style.display = 'none';
+}
+
+function selectAnswer(btn, opt, q, passage) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = opt === q.correct;
+
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('feedback-explain').textContent = q.explain;
+
+  if (isCorrect) {
+    correctCount++;
+  } else {
+    wrongQuestions.push({ passageTitle: passage.title, passageType: passage.type, q: q.q, correct: q.correct, explain: q.explain });
+  }
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  currentIndex++;
+  if (currentIndex < flatQuestions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  document.getElementById('progress-bar').style.width = '100%';
+  goPage('page-result');
+  document.getElementById('result-score').textContent = correctCount;
+  document.getElementById('result-total').textContent = flatQuestions.length;
+
+  const rate = correctCount / flatQuestions.length;
+  let msg = '';
+  if (rate === 1) msg = '🎉 パーフェクト！すばらしい！';
+  else if (rate >= 0.8) msg = '😊 よくできました！この調子！';
+  else if (rate >= 0.6) msg = '👍 もう少し！本文を読み直してみよう';
+  else msg = '💪 本文の内容をもう一度確認しよう';
+  document.getElementById('result-msg').textContent = msg;
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  if (wrongQuestions.length > 0) {
+    const heading = document.createElement('h3');
+    heading.style.cssText = 'font-size:0.9em;color:#d13a1f;font-weight:800;margin-bottom:10px;';
+    heading.textContent = `間違えた問題（${wrongQuestions.length}問）の復習`;
+    reviewList.appendChild(heading);
+
+    wrongQuestions.forEach(w => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `
+        <div class="rp">${w.passageType}「${w.passageTitle}」</div>
+        <div class="rq">${w.q}</div>
+        <div class="ra">正解: ${w.correct}</div>
+        <div class="re">${w.explain}</div>
+      `;
+      reviewList.appendChild(div);
+    });
+  }
+}
+
+document.getElementById('btn-retry-all').addEventListener('click', () => {
+  startQuiz();
+});
+
+document.getElementById('btn-back-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+</script>
+
+</body>
+</html>

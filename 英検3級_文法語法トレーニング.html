@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検3級 文法・語法トレーニング</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  /* ===== ページ管理 ===== */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-red     { background: linear-gradient(135deg,#ff416c,#ff4b2b); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .mode-box {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .mode-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .mode-options { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .mode-opt {
+    flex: 1; min-width: 90px;
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-opt.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-opt .n { font-size: 1.3em; font-weight: 900; color: #333; }
+  .mode-opt .l { font-size: 0.75em; color: #888; margin-top: 2px; }
+
+  /* ===== 出題ページ ===== */
+  .progress-wrap { margin-bottom: 18px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:14px;
+  }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  .question-card {
+    background: #f8f9ff; border-radius: 16px; padding: 24px 20px; margin-bottom: 18px;
+  }
+  .question-en { font-size: 1.15em; font-weight: 700; color: #222; line-height: 1.6; }
+  .question-en .blank { color: #5B6CF5; font-weight: 900; border-bottom: 2px solid #5B6CF5; padding: 0 4px; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 14px 18px; text-align: left; font-size: 1em; font-weight: 700; color:#333;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #b9c0f0; background: #f8f9ff; }
+  .choice-btn.correct { border-color: #43e97b; background: #eafff3; color: #1a9e5a; }
+  .choice-btn.wrong { border-color: #ff4b2b; background: #fff0ee; color: #d13a1f; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    margin-top: 16px; padding: 16px 18px; border-radius: 14px; display: none;
+  }
+  .feedback-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .feedback-box.correct { background: #eafff3; border: 2px solid #43e97b; }
+  .feedback-box.wrong { background: #fff0ee; border: 2px solid #ff4b2b; }
+  .feedback-title { font-weight: 900; font-size: 0.95em; margin-bottom: 6px; }
+  .feedback-box.correct .feedback-title { color: #1a9e5a; }
+  .feedback-box.wrong .feedback-title { color: #d13a1f; }
+  .feedback-answer { font-size: 0.9em; color: #444; margin-bottom: 4px; }
+  .feedback-explain { font-size: 0.85em; color: #666; line-height: 1.5; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .score-circle {
+    width: 150px; height: 150px; border-radius: 50%;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .score-circle .num { font-size: 2.2em; font-weight: 900; }
+  .score-circle .den { font-size: 0.85em; opacity: 0.85; }
+  .score-msg { font-size: 1.05em; font-weight: 800; color: #333; margin-bottom: 24px; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item {
+    background: #fff0ee; border: 2px solid #ffd6cf; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .review-item .rq { font-weight: 700; color: #333; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.88em; color: #1a9e5a; font-weight: 700; margin-bottom: 4px; }
+  .review-item .rya { font-size: 0.85em; color: #d13a1f; margin-bottom: 4px; }
+  .review-item .re { font-size: 0.83em; color: #777; line-height: 1.5; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  @media (max-width: 480px) {
+    .mode-opt { min-width: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検3級 文法・語法トレーニング</div>
+      <div class="hd-sub">1次試験対策｜空所補充形式</div>
+    </div>
+    <a class="hd-home-link" href="英検3級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">📘</div>
+    <div class="title-main">文法・語法クイズ</div>
+    <div class="title-sub">英検3級レベルの文法問題に挑戦しよう</div>
+    <div class="title-tagline">全48問｜4択形式</div>
+
+    <div class="mode-box">
+      <h3>出題数を選ぼう</h3>
+      <div class="mode-options">
+        <div class="mode-opt selected" data-count="20"><div class="n">20問</div><div class="l">標準</div></div>
+        <div class="mode-opt" data-count="48"><div class="n">全問</div><div class="l">じっくり</div></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">スタート！</button>
+  </div>
+
+  <!-- ===== 出題ページ ===== -->
+  <div id="page-quiz" class="page">
+    <button class="back-link" id="btn-back-to-title">← 出題設定に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">問題 1 / 20</span>
+        <span id="progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <span class="cat-badge" id="cat-badge">文法</span>
+
+    <div class="question-card">
+      <div class="question-en" id="question-en"></div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="feedback-box" id="feedback-box">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-answer" id="feedback-answer"></div>
+      <div class="feedback-explain" id="feedback-explain"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" id="btn-next" style="display:none;">次の問題へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="score-circle">
+      <div class="num" id="result-score">0</div>
+      <div class="den">/ <span id="result-total">20</span> 問正解</div>
+    </div>
+    <div class="score-msg" id="result-msg"></div>
+
+    <div id="review-wrap">
+      <div class="review-list" id="review-list"></div>
+    </div>
+
+    <div class="result-btns">
+      <button class="btn btn-orange btn-block" id="btn-retry-wrong" style="display:none;">間違えた問題だけもう一度</button>
+      <button class="btn btn-green btn-block" id="btn-retry-all">もう一度挑戦する</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title">タイトルに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 問題データ（英検3級レベルの文法・語法） =====
+const QUESTION_BANK = [
+  { cat:"動詞の形", en:"I ___ soccer every Saturday.", correct:"play", wrongs:["plays","playing","played"], explain:"主語がIなので動詞は原形のplayを使います。" },
+  { cat:"動詞の形", en:"My sister ___ English very well.", correct:"speaks", wrongs:["speak","speaking","spoken"], explain:"主語が3人称単数（sister）のときは動詞にsをつけます。" },
+  { cat:"進行形", en:"She ___ a letter now.", correct:"is writing", wrongs:["write","writes","wrote"], explain:"nowがあるので現在進行形〈be動詞+動詞のing形〉を使います。" },
+  { cat:"過去形", en:"We ___ to the park yesterday.", correct:"went", wrongs:["go","goes","going"], explain:"yesterdayがあるので過去形にします。goの過去形はwent。" },
+  { cat:"未来形", en:"I ___ visit Kyoto next month.", correct:"will", wrongs:["am","do","was"], explain:"next monthは未来の内容なのでwillを使います。" },
+  { cat:"助動詞", en:"You ___ finish your homework before dinner.", correct:"must", wrongs:["are","do","can"], explain:"「〜しなければならない」はmust+動詞の原形で表します。" },
+  { cat:"助動詞", en:"She can ___ the piano.", correct:"play", wrongs:["plays","playing","played"], explain:"助動詞canの後ろの動詞は必ず原形になります。" },
+  { cat:"比較", en:"This book is ___ than that one.", correct:"more interesting", wrongs:["interesting","most interesting","interestinger"], explain:"つづりの長い形容詞の比較級はmoreを前につけます。" },
+  { cat:"比較", en:"Mt. Fuji is the ___ mountain in Japan.", correct:"highest", wrongs:["high","higher","most high"], explain:"最上級は「the+形容詞+est」の形にします。" },
+  { cat:"比較", en:"He ___ as fast as his brother.", correct:"runs", wrongs:["run","ran","running"], explain:"as〜asの原級比較でも主語が3人称単数ならsをつけます。" },
+  { cat:"現在完了", en:"I have ___ to Okinawa twice.", correct:"been", wrongs:["be","being","was"], explain:"現在完了〈have/has+過去分詞〉の経験用法。beの過去分詞はbeen。" },
+  { cat:"現在完了", en:"She has lived in Nagoya ___ five years.", correct:"for", wrongs:["since","from","at"], explain:"「〜の間」と期間を表すときはforを使います。" },
+  { cat:"現在完了", en:"I have known him ___ I was a child.", correct:"since", wrongs:["for","during","when"], explain:"「〜以来」と過去のある時点を表すときはsinceを使います。" },
+  { cat:"受動態", en:"This room ___ cleaned every day.", correct:"is", wrongs:["was","cleans","cleaning"], explain:"受動態は〈be動詞+過去分詞〉。every dayなので現在形isを使います。" },
+  { cat:"受動態", en:"The window was ___ by Tom.", correct:"broken", wrongs:["break","broke","breaking"], explain:"受動態〈be+過去分詞〉。breakの過去分詞はbroken。" },
+  { cat:"不定詞", en:"I want ___ a doctor in the future.", correct:"to be", wrongs:["be","being","been"], explain:"want to+動詞の原形で「〜したい」という意味になります。" },
+  { cat:"動名詞", en:"My hobby is ___ pictures.", correct:"taking", wrongs:["take","takes","took"], explain:"be動詞の補語には動名詞（-ing形）を使うことができます。" },
+  { cat:"動名詞", en:"Ken finished ___ his homework.", correct:"doing", wrongs:["do","to do","did"], explain:"finishは動名詞（-ing形）を目的語にとる動詞です。" },
+  { cat:"動名詞", en:"We enjoyed ___ the movie.", correct:"watching", wrongs:["watch","to watch","watched"], explain:"enjoyは動名詞（-ing形）のみを目的語にとる動詞です。" },
+  { cat:"熟語", en:"He is good ___ playing soccer.", correct:"at", wrongs:["in","for","with"], explain:"「be good at 〜ing」で「〜が得意だ」という意味の熟語です。" },
+  { cat:"熟語", en:"I'm interested ___ Japanese history.", correct:"in", wrongs:["of","at","with"], explain:"「be interested in 〜」で「〜に興味がある」という意味です。" },
+  { cat:"熟語", en:"She is looking forward ___ seeing you.", correct:"to", wrongs:["for","at","of"], explain:"「look forward to 〜ing」で「〜を楽しみにする」。このtoは前置詞です。" },
+  { cat:"疑問文", en:"___ you like tea or coffee?", correct:"Do", wrongs:["Does","Are","Is"], explain:"一般動詞の疑問文はDo/Doesを使います。主語がyouなのでDo。" },
+  { cat:"疑問文", en:"___ is your birthday?", correct:"When", wrongs:["What","Where","Who"], explain:"日時をたずねるときはWhenを使います。" },
+  { cat:"間接疑問文", en:"I don't know ___ she lives.", correct:"where", wrongs:["what","that","which"], explain:"「彼女がどこに住んでいるか」なのでwhereを使う間接疑問文です。" },
+  { cat:"間接疑問文", en:"Could you tell me ___ time it is?", correct:"what", wrongs:["which","how","who"], explain:"「何時ですか」はWhat time is it?の間接疑問文です。" },
+  { cat:"There is/are", en:"There ___ a lot of books on the desk.", correct:"are", wrongs:["is","has","have"], explain:"a lot of books（複数）が主語なのでareを使います。" },
+  { cat:"There is/are", en:"There ___ an apple in the box.", correct:"is", wrongs:["are","be","being"], explain:"an apple（単数）が主語なのでisを使います。" },
+  { cat:"使役動詞", en:"My mother let me ___ her car.", correct:"use", wrongs:["to use","used","using"], explain:"let+人+動詞の原形で「（人）に〜させる（許可）」という意味です。" },
+  { cat:"使役動詞", en:"My father made me ___ my room.", correct:"clean", wrongs:["to clean","cleaned","cleaning"], explain:"make+人+動詞の原形で「（人）に〜させる（強制）」という意味です。" },
+  { cat:"関係代名詞", en:"This is the book ___ I bought yesterday.", correct:"which", wrongs:["who","whose","what"], explain:"ものを説明する関係代名詞はwhich（またはthat）を使います。" },
+  { cat:"関係代名詞", en:"I have a friend ___ can speak French.", correct:"who", wrongs:["which","whose","what"], explain:"人を説明する関係代名詞はwhoを使います。" },
+  { cat:"関係代名詞", en:"That is the girl ___ mother is a teacher.", correct:"whose", wrongs:["who","whom","which"], explain:"「〜の」と所有を表す関係代名詞はwhoseを使います。" },
+  { cat:"接続詞", en:"He speaks English, ___ his brother doesn't.", correct:"but", wrongs:["so","because","if"], explain:"対比を表す接続詞はbutを使います。" },
+  { cat:"接続詞", en:"I stayed home ___ it was raining.", correct:"because", wrongs:["though","but","or"], explain:"理由を表す接続詞はbecauseを使います。" },
+  { cat:"接続詞", en:"___ you finish your work, call me.", correct:"When", wrongs:["What","Who","Why"], explain:"「〜したら」と時を表す接続詞はwhenを使います。" },
+  { cat:"接続詞", en:"If it ___ tomorrow, we will stay home.", correct:"rains", wrongs:["rain","rained","will rain"], explain:"時・条件を表す副詞節では、未来のことでも現在形を使います。" },
+  { cat:"助動詞", en:"You look tired. You ___ rest.", correct:"should", wrongs:["can","must not","were"], explain:"「〜すべきだ」というアドバイスは助動詞shouldで表します。" },
+  { cat:"助動詞", en:"You ___ run in the hallway.", correct:"mustn't", wrongs:["must","can","will"], explain:"「〜してはいけない」という禁止はmust notで表します。" },
+  { cat:"感嘆文", en:"What a beautiful flower ___!", correct:"it is", wrongs:["is it","it was","does it"], explain:"感嘆文は〈What+a+形容詞+名詞+主語+動詞!〉の語順です。" },
+  { cat:"感嘆文", en:"How ___ this question is!", correct:"difficult", wrongs:["difficultly","more difficult","most difficult"], explain:"感嘆文〈How+形容詞/副詞+主語+動詞!〉では形容詞の原級を使います。" },
+  { cat:"付加疑問文", en:"You are from Canada, ___?", correct:"aren't you", wrongs:["are you","do you","don't you"], explain:"肯定文の付加疑問文は、後ろに否定の短縮形をつけます。" },
+  { cat:"付加疑問文", en:"He can't swim, ___?", correct:"can he", wrongs:["can't he","does he","is he"], explain:"否定文の付加疑問文は、後ろに肯定形をつけます。" },
+  { cat:"不定詞", en:"She asked me ___ close the window.", correct:"to", wrongs:["that","for","of"], explain:"ask+人+to+動詞の原形で「人に〜するよう頼む」という意味です。" },
+  { cat:"不定詞", en:"It is important ___ students to study every day.", correct:"for", wrongs:["of","to","with"], explain:"「It is 形容詞 for 人 to 〜」で「人にとって〜することは…だ」という意味です。" },
+  { cat:"前置詞", en:"Please wait ___ me at the station.", correct:"for", wrongs:["to","at","on"], explain:"「wait for 〜」で「〜を待つ」という意味の熟語です。" },
+  { cat:"前置詞", en:"We arrived ___ the airport at noon.", correct:"at", wrongs:["to","in","on"], explain:"arrive at+狭い場所（空港・駅など）。arrive in+広い場所（国・都市）。" },
+  { cat:"前置詞", en:"I'm afraid ___ dogs.", correct:"of", wrongs:["at","with","to"], explain:"「be afraid of 〜」で「〜を恐れる」という意味の熟語です。" },
+];
+
+// ===== 状態管理 =====
+let selectedCount = 20;
+let quizQueue = [];    // 今回出題する問題の配列
+let currentIndex = 0;
+let correctCount = 0;
+let wrongQuestions = []; // 間違えた問題を記録（復習用）
+let answered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== タイトルページ：出題数選択 =====
+document.querySelectorAll('.mode-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.mode-opt').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selectedCount = parseInt(opt.dataset.count, 10);
+  });
+});
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  startQuiz(shuffle(QUESTION_BANK).slice(0, selectedCount));
+});
+
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startQuiz(questions) {
+  quizQueue = questions;
+  currentIndex = 0;
+  correctCount = 0;
+  wrongQuestions = [];
+  goPage('page-quiz');
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = quizQueue[currentIndex];
+  document.getElementById('progress-text').textContent = `問題 ${currentIndex + 1} / ${quizQueue.length}`;
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('progress-bar').style.width = `${(currentIndex / quizQueue.length) * 100}%`;
+  document.getElementById('cat-badge').textContent = q.cat;
+  document.getElementById('question-en').innerHTML = q.en.replace('___', '<span class="blank">___</span>');
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectAnswer(btn, opt, q));
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('btn-next').style.display = 'none';
+}
+
+function selectAnswer(btn, opt, q) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = opt === q.correct;
+
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('feedback-explain').textContent = q.explain;
+
+  if (isCorrect) {
+    correctCount++;
+  } else {
+    wrongQuestions.push(q);
+  }
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  currentIndex++;
+  if (currentIndex < quizQueue.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  document.getElementById('progress-bar').style.width = '100%';
+  goPage('page-result');
+  document.getElementById('result-score').textContent = correctCount;
+  document.getElementById('result-total').textContent = quizQueue.length;
+
+  const rate = correctCount / quizQueue.length;
+  let msg = '';
+  if (rate === 1) msg = '🎉 パーフェクト！すばらしい！';
+  else if (rate >= 0.8) msg = '😊 よくできました！この調子！';
+  else if (rate >= 0.6) msg = '👍 もう少し！復習して再挑戦しよう';
+  else msg = '💪 間違えた問題を復習しよう';
+  document.getElementById('result-msg').textContent = msg;
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  if (wrongQuestions.length > 0) {
+    const heading = document.createElement('h3');
+    heading.style.cssText = 'font-size:0.9em;color:#d13a1f;font-weight:800;margin-bottom:10px;';
+    heading.textContent = `間違えた問題（${wrongQuestions.length}問）の復習`;
+    reviewList.appendChild(heading);
+
+    wrongQuestions.forEach(q => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `
+        <div class="rq">${q.en.replace('___', '＿＿＿')}</div>
+        <div class="ra">正解: ${q.correct}</div>
+        <div class="re">${q.explain}</div>
+      `;
+      reviewList.appendChild(div);
+    });
+    document.getElementById('btn-retry-wrong').style.display = 'block';
+  } else {
+    document.getElementById('btn-retry-wrong').style.display = 'none';
+  }
+}
+
+document.getElementById('btn-retry-wrong').addEventListener('click', () => {
+  startQuiz(shuffle(wrongQuestions));
+});
+
+document.getElementById('btn-retry-all').addEventListener('click', () => {
+  startQuiz(shuffle(QUESTION_BANK).slice(0, selectedCount));
+});
+
+document.getElementById('btn-back-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+</script>
+
+</body>
+</html>

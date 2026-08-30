@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検準2級対策</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-btn {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border: none; border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s; cursor: pointer;
+    font-family: inherit; display: none;
+  }
+  .hd-home-btn.show { display: inline-block; }
+  .hd-home-btn:hover { background: rgba(255,255,255,0.32); }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  #page-title.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .title-icon { font-size: 4.5em; margin-bottom: 10px; text-align: center; }
+  .title-main { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; text-align: center; }
+  .title-sub  { font-size: 0.92em; color: #888; margin-bottom: 28px; text-align: center; }
+
+  .menu-list { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+
+  .menu-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #f8f9ff;
+    border: 2px solid #e2e5f5;
+    border-radius: 18px;
+    padding: 18px 20px;
+    text-decoration: none;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .menu-card:hover { border-color: #5B6CF5; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(91,108,245,0.15); }
+  .menu-card.mock-card { background: linear-gradient(135deg,#fff8ec,#fff2de); border-color: #ffd98a; }
+  .menu-card.mock-card:hover { border-color: #f7971e; box-shadow: 0 8px 20px rgba(247,151,30,0.18); }
+  .menu-card .mc-icon {
+    font-size: 2.2em; flex-shrink: 0; width: 64px; height: 64px;
+    background: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .menu-card .mc-body { flex: 1; }
+  .menu-card .mc-title { font-size: 1.05em; font-weight: 800; color: #333; margin-bottom: 4px; }
+  .menu-card .mc-desc { font-size: 0.82em; color: #888; line-height: 1.5; }
+  .menu-card .mc-tag {
+    display: inline-block; font-size: 0.7em; font-weight: 700; color: #5B6CF5;
+    background: #eef0ff; border-radius: 50px; padding: 2px 10px; margin-top: 6px;
+  }
+  .menu-card.mock-card .mc-tag { color: #b8791a; background: #ffedcc; }
+  .menu-card .mc-arrow { font-size: 1.3em; color: #5B6CF5; flex-shrink: 0; }
+
+  .footer-note { margin-top: 26px; font-size: 0.78em; color: #aaa; line-height: 1.6; text-align: center; }
+  .mode-divider {
+    font-size: 0.78em; font-weight: 800; color: #aaa; text-align: center; margin: 6px 0 2px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block; padding: 13px 28px; border-radius: 50px; border: none;
+    font-size: 0.95em; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-outline { background: #fff; color: #5B6CF5; border: 2px solid #5B6CF5; padding: 11px 26px; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== 模試イントロ ===== */
+  .mock-steps { background:#f8f9ff; border-radius:16px; padding:18px 20px; margin-bottom:22px; text-align:left; }
+  .mock-steps h3 { font-size:0.9em; color:#5B6CF5; font-weight:800; margin-bottom:12px; }
+  .mock-step-row { display:flex; align-items:center; gap:12px; padding:8px 0; }
+  .mock-step-row .msr-num {
+    width:28px; height:28px; border-radius:50%; background:#5B6CF5; color:#fff; font-weight:800;
+    font-size:0.85em; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .mock-step-row .msr-text { font-size:0.87em; color:#444; }
+  .mock-step-row .msr-text b { color:#222; }
+  .mock-caveat { font-size:0.76em; color:#aaa; line-height:1.6; margin-top:10px; text-align:left; }
+
+  /* ===== 進捗バー ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+  .section-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:800;
+    border-radius:50px; padding:5px 14px; margin-bottom:14px;
+  }
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:12px; margin-left:8px;
+  }
+
+  /* ===== 文法クイズ（4択） ===== */
+  .question-card { background: #f8f9ff; border-radius: 16px; padding: 24px 20px; margin-bottom: 18px; }
+  .question-en { font-size: 1.1em; font-weight: 700; color: #222; line-height: 1.6; }
+  .question-en .blank { color: #5B6CF5; font-weight: 900; border-bottom: 2px solid #5B6CF5; padding: 0 4px; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 14px 18px; text-align: left; font-size: 0.98em; font-weight: 700; color:#333;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #b9c0f0; background: #f8f9ff; }
+  .choice-btn.correct { border-color: #43e97b; background: #eafff3; color: #1a9e5a; }
+  .choice-btn.wrong { border-color: #ff4b2b; background: #fff0ee; color: #d13a1f; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box { margin-top: 16px; padding: 16px 18px; border-radius: 14px; display: none; }
+  .feedback-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .feedback-box.correct { background: #eafff3; border: 2px solid #43e97b; }
+  .feedback-box.wrong { background: #fff0ee; border: 2px solid #ff4b2b; }
+  .feedback-title { font-weight: 900; font-size: 0.95em; margin-bottom: 6px; }
+  .feedback-box.correct .feedback-title { color: #1a9e5a; }
+  .feedback-box.wrong .feedback-title { color: #d13a1f; }
+  .feedback-answer { font-size: 0.9em; color: #444; margin-bottom: 4px; }
+  .feedback-explain { font-size: 0.85em; color: #666; line-height: 1.5; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 長文読解 ===== */
+  .passage-card {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 16px;
+    padding: 16px 18px; margin-bottom: 16px; max-height: 220px; overflow-y: auto;
+  }
+  .passage-title { font-weight: 800; color: #5B6CF5; margin-bottom: 8px; font-size: 0.95em; }
+  .passage-text { font-size: 0.88em; line-height: 1.75; color: #333; white-space: pre-line; }
+  .question-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 6px; }
+
+  /* ===== 英作文 ===== */
+  .prompt-card { background: #f8f9ff; border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; }
+  .prompt-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 8px; }
+  .prompt-text { font-size: 1.02em; font-weight: 700; color: #222; line-height: 1.7; }
+  .prompt-text u { color: #5B6CF5; text-decoration-color: #5B6CF5; }
+
+  .tip-box { background: #fffaf0; border: 2px solid #ffe4b8; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+  .tip-box h4 { font-size: 0.82em; color: #d98c1f; font-weight: 800; margin-bottom: 8px; }
+  .tip-box ul { padding-left: 18px; }
+  .tip-box li { font-size: 0.83em; color: #7a5c25; line-height: 1.6; margin-bottom: 3px; }
+  .phrase-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .phrase-tag {
+    background: #fff; border: 1px solid #ffe4b8; color: #b8791a; font-size: 0.78em; font-weight: 700;
+    padding: 4px 10px; border-radius: 50px;
+  }
+
+  .answer-textarea {
+    width: 100%; min-height: 110px; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 14px 16px; font-size: 0.95em; font-family: inherit; line-height: 1.6; resize: vertical;
+    transition: border-color 0.15s;
+  }
+  .answer-textarea:focus { outline: none; border-color: #5B6CF5; }
+
+  .counter-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; margin-bottom: 16px; }
+  .counter-badge { font-size: 0.82em; font-weight: 800; padding: 4px 12px; border-radius: 50px; }
+  .counter-badge.empty  { background: #f0f0f0; color: #999; }
+  .counter-badge.good   { background: #eafff3; color: #1a9e5a; }
+  .counter-badge.near   { background: #fff6e0; color: #b8791a; }
+  .counter-badge.off    { background: #fff0ee; color: #d13a1f; }
+  .counter-target { font-size: 0.78em; color: #999; }
+
+  .check-box { background: #f8f9ff; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; }
+  .check-box h4 { font-size: 0.82em; color: #5B6CF5; font-weight: 800; margin-bottom: 8px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: #555; padding: 4px 0; }
+  .check-item input { width: 16px; height: 16px; accent-color: #5B6CF5; }
+
+  .model-box { background: #eafff3; border: 2px solid #43e97b; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; display: none; }
+  .model-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .model-box h4 { font-size: 0.85em; color: #1a9e5a; font-weight: 800; margin-bottom: 10px; }
+  .model-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #b9e8cf; }
+  .model-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .model-item .mi-label { font-size: 0.72em; font-weight: 800; color: #1a9e5a; margin-bottom: 3px; }
+  .model-item .mi-text { font-size: 0.9em; color: #333; line-height: 1.6; }
+  .model-item .mi-count { font-size: 0.75em; color: #4caf7d; margin-top: 4px; font-weight: 700; }
+
+  .ai-box { background: #eef0ff; border: 2px solid #5B6CF5; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; display: none; }
+  .ai-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .ai-box h4 { font-size: 0.85em; color: #5B6CF5; font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px; }
+  .ai-score-badge { display:inline-block; font-weight:900; font-size:0.8em; padding:2px 12px; border-radius:50px; background:#5B6CF5; color:#fff; }
+  .ai-section { margin-bottom: 10px; }
+  .ai-section:last-child { margin-bottom: 0; }
+  .ai-section .as-label { font-size: 0.75em; font-weight: 800; color: #5B6CF5; margin-bottom: 3px; }
+  .ai-section .as-text { font-size: 0.88em; color: #333; line-height: 1.6; }
+  .ai-loading { font-size: 0.85em; color: #666; text-align: center; padding: 10px; }
+  .ai-error { font-size: 0.85em; color: #d13a1f; background: #fff0ee; border-radius: 10px; padding: 10px 12px; }
+
+  /* ===== 模試 結果ページ ===== */
+  #page-mock-result { text-align: center; }
+  .verdict-box {
+    border-radius: 20px; padding: 26px 20px; margin-bottom: 22px;
+  }
+  .verdict-box.high { background: linear-gradient(135deg,#43e97b,#38f9d7); }
+  .verdict-box.mid  { background: linear-gradient(135deg,#f7971e,#ffd200); }
+  .verdict-box.low  { background: linear-gradient(135deg,#ff9a8b,#ff6a88); }
+  .verdict-icon { font-size: 2.6em; margin-bottom: 8px; }
+  .verdict-title { font-size: 1.25em; font-weight: 900; color: #fff; margin-bottom: 4px; }
+  .verdict-score { font-size: 0.95em; color: rgba(255,255,255,0.9); font-weight: 700; }
+
+  .section-scores { text-align: left; margin-bottom: 20px; }
+  .section-score-row { margin-bottom: 14px; }
+  .section-score-row .ssr-top { display:flex; justify-content:space-between; font-size:0.85em; font-weight:800; color:#333; margin-bottom:6px; }
+  .section-score-bar-bg { background:#eee; border-radius:8px; height:10px; overflow:hidden; }
+  .section-score-bar-fill { height:100%; border-radius:8px; background: linear-gradient(135deg,#667eea,#764ba2); }
+
+  .mock-caveat-box {
+    background:#f8f9ff; border-radius:14px; padding:14px 16px; margin-bottom:20px; text-align:left;
+    font-size:0.78em; color:#888; line-height:1.7;
+  }
+
+  .review-section-title {
+    font-size: 0.95em; font-weight: 900; color: #5B6CF5; margin: 20px 0 10px; text-align: left;
+    border-bottom: 2px solid #eef0ff; padding-bottom: 6px;
+  }
+  .review-list { text-align: left; margin-bottom: 10px; }
+  .review-item { background: #fff0ee; border: 2px solid #ffd6cf; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
+  .review-item .rp { font-size: 0.75em; color: #b06a5f; font-weight: 700; margin-bottom: 4px; }
+  .review-item .rq { font-weight: 700; color: #333; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.88em; color: #1a9e5a; font-weight: 700; margin-bottom: 4px; }
+  .review-item .re { font-size: 0.83em; color: #777; line-height: 1.5; }
+
+  .writing-review-item { background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; text-align: left; }
+  .writing-review-item .wr-q { font-weight: 700; color: #333; font-size: 0.9em; margin-bottom: 8px; line-height: 1.5; }
+  .writing-review-item .wr-label { font-size: 0.72em; font-weight: 800; margin-top: 8px; margin-bottom: 3px; }
+  .writing-review-item .wr-mine { font-size: 0.86em; color: #444; background: #fff; border-radius: 8px; padding: 8px 10px; min-height: 20px; }
+  .writing-review-item .wr-mine.empty { color: #bbb; font-style: italic; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+
+  /* ===== 模試の記録 ===== */
+  .record-item { background:#f8f9ff; border:2px solid #e2e5f5; border-radius:14px; padding:14px 16px; margin-bottom:10px; text-align:left; }
+  .record-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .record-date { font-size:0.78em; color:#999; font-weight:700; }
+  .record-type-badge { font-size:0.72em; font-weight:800; padding:2px 10px; border-radius:50px; }
+  .record-type-badge.t1 { background:#eef0ff; color:#5B6CF5; }
+  .record-type-badge.t2 { background:#ffedcc; color:#b8791a; }
+  .record-verdict { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .record-verdict-icon { font-size:1.3em; }
+  .record-verdict-text { font-weight:800; font-size:0.95em; }
+  .record-verdict-text.high { color:#1a9e5a; }
+  .record-verdict-text.mid { color:#b8791a; }
+  .record-verdict-text.low { color:#d13a1f; }
+  .record-score { font-size:0.85em; color:#555; font-weight:700; margin-left:auto; }
+  .record-detail { font-size:0.78em; color:#888; margin-top:4px; }
+  .records-empty { text-align:center; color:#aaa; font-size:0.9em; padding:40px 20px; line-height:1.8; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検準2級対策</div>
+      <div class="hd-sub">文法・語法｜長文読解｜英作文｜面接</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <a class="hd-home-link" href="英検対策.html">← 級選択</a>
+      <button class="hd-home-btn" id="btn-header-home">🏠 ホーム</button>
+    </div>
+  </div>
+
+  <!-- ===== メニュー ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">🎯</div>
+    <div class="title-main">英検準2級対策</div>
+    <div class="title-sub">練習したい項目を選んでスタートしよう</div>
+
+    <div class="menu-list">
+      <div class="menu-card" id="btn-go-records">
+        <div class="mc-icon">📊</div>
+        <div class="mc-body">
+          <div class="mc-title">これまでの記録</div>
+          <div class="mc-desc">1次・2次の模試判定を記録として振り返る。</div>
+          <span class="mc-tag">記録を見る</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </div>
+
+      <div class="menu-card mock-card" id="btn-go-mock">
+        <div class="mc-icon">🏆</div>
+        <div class="mc-body">
+          <div class="mc-title">1次試験模試に挑戦</div>
+          <div class="mc-desc">文法・長文・英作文を通しで解いて、最後に合格可能性をチェック。</div>
+          <span class="mc-tag">模試モード</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </div>
+
+      <a class="menu-card" href="英検準2級_文法語法トレーニング.html">
+        <div class="mc-icon">📘</div>
+        <div class="mc-body">
+          <div class="mc-title">文法・語法</div>
+          <div class="mc-desc">空所補充形式の4択クイズ。全44問、出題数も選べる。</div>
+          <span class="mc-tag">クイズ形式</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="英検準2級_長文読解トレーニング.html">
+        <div class="mc-icon">📖</div>
+        <div class="mc-body">
+          <div class="mc-title">長文読解</div>
+          <div class="mc-desc">掲示文・Eメール・説明文・物語文、4種類の文章から出題。</div>
+          <span class="mc-tag">クイズ形式</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="英検準2級_英作文トレーニング.html">
+        <div class="mc-icon">✏️</div>
+        <div class="mc-body">
+          <div class="mc-title">英作文</div>
+          <div class="mc-desc">意見論述・Eメール返信を練習。AI採点で自己添削。</div>
+          <span class="mc-tag">ライティング形式</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+
+      <a class="menu-card mock-card" href="英検準2級_2次試験対策.html?mode=mock">
+        <div class="mc-icon">🎯</div>
+        <div class="mc-body">
+          <div class="mc-title">2次試験の模試に挑戦</div>
+          <div class="mc-desc">面接カードをランダムに1枚出題。AI採点で合格可能性をチェック。</div>
+          <span class="mc-tag">模試モード</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="英検準2級_2次試験対策.html">
+        <div class="mc-icon">🎤</div>
+        <div class="mc-body">
+          <div class="mc-title">2次試験（面接）</div>
+          <div class="mc-desc">絵カード形式で音読・質問応答を練習。音声のお手本つき。</div>
+          <span class="mc-tag">スピーキング形式</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+    </div>
+
+    <div class="footer-note">模試モード以外の各ページには「🏠 メニュー」リンクがあり、いつでもここに戻れます。</div>
+  </div>
+
+  <!-- ===== 模試の記録 ===== -->
+  <div id="page-records" class="page">
+    <div class="title-icon">📊</div>
+    <div class="title-main">これまでの記録</div>
+    <div class="title-sub">模試の判定履歴（この端末のブラウザに保存されています）</div>
+
+    <div id="records-list"></div>
+
+    <div class="result-btns" style="margin-top:20px;">
+      <button class="btn btn-gray btn-block" id="btn-records-back">メニューに戻る</button>
+      <button class="btn btn-outline btn-block" id="btn-records-clear">記録をすべて削除</button>
+    </div>
+  </div>
+
+  <!-- ===== 模試イントロ ===== -->
+  <div id="page-mock-intro" class="page">
+    <div class="title-icon">🏆</div>
+    <div class="title-main">模試モード</div>
+    <div class="title-sub">3つの分野を通しで解いて、最後に合格可能性をチェックしよう</div>
+
+    <div class="mock-steps">
+      <h3>出題内容</h3>
+      <div class="mock-step-row"><div class="msr-num">1</div><div class="msr-text"><b>文法・語法</b>：4択問題を15問</div></div>
+      <div class="mock-step-row"><div class="msr-num">2</div><div class="msr-text"><b>長文読解</b>：文章3つ分の問題（9〜11問程度）</div></div>
+      <div class="mock-step-row"><div class="msr-num">3</div><div class="msr-text"><b>英作文</b>：意見論述＋Eメール返信を1問ずつ</div></div>
+      <div class="mock-caveat">※出題内容は毎回ランダムに変わります。全部終わると「合格可能性」の目安が表示されます。</div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start-mock" style="max-width:280px;margin:0 auto;">模試スタート！</button>
+  </div>
+
+  <!-- ===== 模試：文法 ===== -->
+  <div id="page-mock-grammar" class="page">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="mg-progress-text">文法 問題 1 / 15</span>
+        <span id="mg-progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="mg-progress-bar" style="width:0%"></div></div>
+    </div>
+    <span class="section-badge">STEP 1 / 3：文法・語法</span>
+
+    <div class="question-card"><div class="question-en" id="mg-question-en"></div></div>
+    <div class="choices" id="mg-choices"></div>
+
+    <div class="feedback-box" id="mg-feedback-box">
+      <div class="feedback-title" id="mg-feedback-title"></div>
+      <div class="feedback-answer" id="mg-feedback-answer"></div>
+      <div class="feedback-explain" id="mg-feedback-explain"></div>
+    </div>
+
+    <div class="nav-row"><button class="btn btn-primary" id="mg-btn-next" style="display:none;">次へ</button></div>
+  </div>
+
+  <!-- ===== 模試：長文読解 ===== -->
+  <div id="page-mock-reading" class="page">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="mr-progress-text">長文 問題 1 / 9</span>
+        <span id="mr-progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="mr-progress-bar" style="width:0%"></div></div>
+    </div>
+    <span class="section-badge">STEP 2 / 3：長文読解</span><span class="cat-badge" id="mr-cat-badge"></span>
+
+    <div class="passage-card">
+      <div class="passage-title" id="mr-passage-title"></div>
+      <div class="passage-text" id="mr-passage-text"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-label" id="mr-question-label"></div>
+      <div class="question-en" id="mr-question-en" style="font-size:1em;"></div>
+    </div>
+    <div class="choices" id="mr-choices"></div>
+
+    <div class="feedback-box" id="mr-feedback-box">
+      <div class="feedback-title" id="mr-feedback-title"></div>
+      <div class="feedback-answer" id="mr-feedback-answer"></div>
+      <div class="feedback-explain" id="mr-feedback-explain"></div>
+    </div>
+
+    <div class="nav-row"><button class="btn btn-primary" id="mr-btn-next" style="display:none;">次へ</button></div>
+  </div>
+
+  <!-- ===== 模試：英作文 ===== -->
+  <div id="page-mock-writing" class="page">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="mw-progress-text">英作文 課題 1 / 2</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="mw-progress-bar" style="width:0%"></div></div>
+    </div>
+    <span class="section-badge">STEP 3 / 3：英作文</span>
+
+    <div class="prompt-card">
+      <div class="prompt-label" id="mw-prompt-label"></div>
+      <div class="prompt-text" id="mw-prompt-text"></div>
+    </div>
+
+    <div class="tip-box">
+      <h4 id="mw-tip-title">📝 書き方のヒント</h4>
+      <ul id="mw-tip-list"></ul>
+      <div class="phrase-tags" id="mw-phrase-tags"></div>
+    </div>
+
+    <textarea class="answer-textarea" id="mw-answer-textarea" placeholder="ここに英文を書いてみよう..."></textarea>
+    <div class="counter-row">
+      <span class="counter-badge empty" id="mw-counter-badge">0 語</span>
+      <span class="counter-target" id="mw-counter-target">目安：50～60語</span>
+    </div>
+
+    <div class="check-box">
+      <h4>✅ 書き終わったらセルフチェック</h4>
+      <label class="check-item"><input type="checkbox"> 質問にきちんと答えている</label>
+      <label class="check-item"><input type="checkbox"> 理由や説明を書き加えている</label>
+      <label class="check-item"><input type="checkbox"> <span id="mw-check-wordcount-text">語数が目安に近い</span></label>
+      <label class="check-item"><input type="checkbox"> つづり・大文字・ピリオドを見直した</label>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <button class="btn btn-outline" style="flex:1;" id="mw-btn-show-model">模範解答を見る</button>
+      <button class="btn btn-primary" style="flex:1;" id="mw-btn-ai-check">🤖 AIに採点してもらう</button>
+    </div>
+
+    <div class="model-box" id="mw-model-box">
+      <h4>💡 模範解答例</h4>
+      <div id="mw-model-list"></div>
+    </div>
+
+    <div class="ai-box" id="mw-ai-box"></div>
+
+    <div class="nav-row"><button class="btn btn-primary" id="mw-btn-next">次へ</button></div>
+  </div>
+
+  <!-- ===== 模試：結果 ===== -->
+  <div id="page-mock-result" class="page">
+    <div class="verdict-box" id="verdict-box">
+      <div class="verdict-icon" id="verdict-icon">🎉</div>
+      <div class="verdict-title" id="verdict-title">合格の可能性は高いです！</div>
+      <div class="verdict-score" id="verdict-score">総合スコア目安：80%</div>
+    </div>
+
+    <div class="section-scores">
+      <div class="section-score-row">
+        <div class="ssr-top"><span>📘 文法・語法</span><span id="score-grammar-text">0 / 15</span></div>
+        <div class="section-score-bar-bg"><div class="section-score-bar-fill" id="score-grammar-bar" style="width:0%"></div></div>
+      </div>
+      <div class="section-score-row">
+        <div class="ssr-top"><span>📖 長文読解</span><span id="score-reading-text">0 / 9</span></div>
+        <div class="section-score-bar-bg"><div class="section-score-bar-fill" id="score-reading-bar" style="width:0%"></div></div>
+      </div>
+      <div class="section-score-row">
+        <div class="ssr-top"><span>✏️ 英作文（自己評価の目安）</span><span id="score-writing-text">-</span></div>
+        <div class="section-score-bar-bg"><div class="section-score-bar-fill" id="score-writing-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="mock-caveat-box">
+      ※このスコアは、選択式問題の正答率と英作文の目安をもとにした<b>簡易的な推定</b>です。実際の英検のスコア（CSE）算出方法とは異なり、リスニングや2次試験（面接）は含まれていません。参考の一つとしてご利用ください。
+    </div>
+
+    <div id="mock-review-wrap"></div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-mock-retry">もう一度模試に挑戦</button>
+      <button class="btn btn-gray btn-block" id="btn-mock-back-title">メニューに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// 共有データ（英検準2級_文法語法トレーニング.html / 長文読解トレーニング.html / 英作文トレーニング.html と同じ内容）
+// ================================================================
+const GRAMMAR_BANK = [
+  { cat:"仮定法過去", en:"If I ___ you, I would apologize to her.", correct:"were", wrongs:["was","am","be"], explain:"仮定法過去では、主語が何であってもbe動詞はwereを使うのが基本です。" },
+  { cat:"仮定法過去", en:"If she had more time, she ___ join the club.", correct:"would", wrongs:["will","does","is"], explain:"仮定法過去の帰結節は〈would/could/might+動詞の原形〉です。" },
+  { cat:"仮定法過去完了", en:"If I had studied harder, I ___ passed the exam.", correct:"would have", wrongs:["would","will have","had"], explain:"仮定法過去完了は〈If+主語+had+過去分詞, 主語+would have+過去分詞〉の形です。" },
+  { cat:"分詞構文", en:"___ tired, she went to bed early.", correct:"Being", wrongs:["Be","Been","To be"], explain:"分詞構文は動詞をing形にします。Being tiredは「疲れていたので」という意味です。" },
+  { cat:"分詞構文", en:"___ by many people, this festival has a long history.", correct:"Loved", wrongs:["Loving","Love","To love"], explain:"「愛されている」という受け身の意味の分詞構文は過去分詞を使います。" },
+  { cat:"関係副詞", en:"This is the town ___ I was born.", correct:"where", wrongs:["which","when","that"], explain:"場所を表す先行詞（town）には関係副詞whereを使います。" },
+  { cat:"関係副詞", en:"I remember the day ___ we first met.", correct:"when", wrongs:["where","which","who"], explain:"時を表す先行詞（the day）には関係副詞whenを使います。" },
+  { cat:"関係副詞", en:"Tell me the reason ___ you were late.", correct:"why", wrongs:["how","where","which"], explain:"理由を表す先行詞（the reason）には関係副詞whyを使います。" },
+  { cat:"現在完了進行形", en:"I ___ studying English for three hours.", correct:"have been", wrongs:["have","am","was"], explain:"動作が今も続いていることを強調する現在完了進行形は〈have been+動詞のing形〉です。" },
+  { cat:"過去完了", en:"When I arrived, the train ___ already left.", correct:"had", wrongs:["has","was","have"], explain:"過去のある時点よりさらに前のことは過去完了〈had+過去分詞〉で表します。" },
+  { cat:"使役・知覚", en:"I had my bag ___ by someone at the station.", correct:"stolen", wrongs:["steal","stealing","to steal"], explain:"have+目的語+過去分詞で「〜される（被害）」という意味を表します。" },
+  { cat:"使役・知覚", en:"She got her brother ___ the door.", correct:"to open", wrongs:["open","opening","opened"], explain:"get+人+to doで「（人）に〜させる、してもらう」という意味になります。" },
+  { cat:"話法", en:"He said that he ___ tired.", correct:"was", wrongs:["is","be","been"], explain:"間接話法では時制の一致が起こり、isはwasに変わります。" },
+  { cat:"比較", en:"This bridge is twice ___ long as that one.", correct:"as", wrongs:["so","than","more"], explain:"「〜の2倍…」は〈twice as+原級+as〉で表します。" },
+  { cat:"比較", en:"He is not so much a teacher ___ a friend to us.", correct:"as", wrongs:["than","that","so"], explain:"not so much A as B「AというよりむしろB」という表現です。" },
+  { cat:"比較", en:"The more you practice, ___ you will become.", correct:"the better", wrongs:["better","the best","best"], explain:"〈The+比較級 ~, the+比較級 …〉で「〜すればするほど…」という意味になります。" },
+  { cat:"強調構文", en:"It was Ken ___ broke the window.", correct:"who", wrongs:["which","what","whom"], explain:"It is/was ~ that(who) …の強調構文で、人を強調する場合はwhoも使えます。" },
+  { cat:"不定詞構文", en:"This question is too difficult ___ solve.", correct:"to", wrongs:["for","that","so"], explain:"too ~ to …で「…するには〜すぎる」という意味です。" },
+  { cat:"接続詞構文", en:"She was so tired ___ she couldn't walk anymore.", correct:"that", wrongs:["as","so","to"], explain:"so ~ that …で「とても〜なので…」という意味を表します。" },
+  { cat:"不定詞構文", en:"He is old enough ___ drive a car.", correct:"to", wrongs:["for","that","of"], explain:"〈形容詞+enough to〉で「〜するのに十分…」という意味になります。" },
+  { cat:"付帯状況", en:"He was standing there ___ his arms folded.", correct:"with", wrongs:["by","at","in"], explain:"付帯状況を表すwithは「〜した状態で」という意味です。" },
+  { cat:"部分否定", en:"I don't always ___ breakfast.", correct:"eat", wrongs:["eats","ate","eating"], explain:"not always「いつも〜とは限らない」という部分否定。don'tの後ろの動詞は原形です。" },
+  { cat:"助動詞+完了形", en:"He is not here. He ___ have forgotten our appointment.", correct:"must", wrongs:["can","should","need"], explain:"must have+過去分詞で「〜したに違いない」という強い推量を表します。" },
+  { cat:"助動詞+完了形", en:"You ___ have told me earlier. I didn't know at all.", correct:"should", wrongs:["must","can","would"], explain:"should have+過去分詞で「〜すべきだったのに（しなかった）」という後悔を表します。" },
+  { cat:"熟語", en:"He worked hard to make up ___ lost time.", correct:"for", wrongs:["to","with","of"], explain:"make up for 〜で「〜を埋め合わせる」という意味の熟語です。" },
+  { cat:"熟語", en:"You should take advantage ___ this good opportunity.", correct:"of", wrongs:["for","at","with"], explain:"take advantage of 〜で「〜を利用する」という意味の熟語です。" },
+  { cat:"熟語", en:"___ the rain, they went out to play soccer.", correct:"In spite of", wrongs:["Despite of","Even if","Although"], explain:"in spite of+名詞で「〜にもかかわらず」という意味です。despite ofという形はありません。" },
+  { cat:"熟語", en:"She is capable ___ solving the difficult problem.", correct:"of", wrongs:["to","for","with"], explain:"be capable of 〜ingで「〜する能力がある」という意味です。" },
+  { cat:"動名詞", en:"He gave up ___ smoking last year.", correct:"smoking", wrongs:["smoke","to smoke","smoked"], explain:"give upは動名詞（-ing形）のみを目的語にとる動詞です。" },
+  { cat:"不定詞", en:"She decided ___ abroad to study nursing.", correct:"to go", wrongs:["going","go","went"], explain:"decideは不定詞（to+動詞の原形）のみを目的語にとる動詞です。" },
+  { cat:"感情形容詞", en:"The movie was so ___ that everyone in the theater cried.", correct:"moving", wrongs:["moved","move","to move"], explain:"「（人を）感動させるような」という意味では、物事が主語のとき-ing形を使います。" },
+  { cat:"感情形容詞", en:"I was ___ to hear the surprising news.", correct:"surprised", wrongs:["surprising","surprise","surprises"], explain:"人が主語で「〜させられた（驚かされた）」という受け身的な意味は-ed形を使います。" },
+  { cat:"前置詞+関係代名詞", en:"This is the house ___ which I used to live.", correct:"in", wrongs:["at","on","to"], explain:"live in a houseという関係から、前置詞inを使います。" },
+  { cat:"譲歩", en:"Child ___ she was, she behaved very bravely.", correct:"as", wrongs:["though","that","so"], explain:"〈名詞/形容詞+as+主語+動詞〉で「〜だけれども」という譲歩を表します。" },
+  { cat:"疑問詞+to不定詞", en:"I don't know ___ to solve this difficult problem.", correct:"how", wrongs:["what","which","that"], explain:"how to 〜で「〜する方法」という意味になります。" },
+  { cat:"不定詞の意味上の主語", en:"It is important ___ us to protect the environment.", correct:"for", wrongs:["of","to","with"], explain:"It is 形容詞 for 人 to 〜「（人）が〜することは…だ」の形です。" },
+  { cat:"不定詞の意味上の主語", en:"It was very kind ___ you to help me with my homework.", correct:"of", wrongs:["for","to","with"], explain:"kindのように人の性質を表す形容詞のときは、意味上の主語にofを使います。" },
+  { cat:"使役動詞の受動態", en:"I was made ___ wait for an hour at the hospital.", correct:"to wait", wrongs:["wait","waiting","waited"], explain:"使役動詞makeを受動態にすると、後ろの動詞の原形にtoがつきます。" },
+  { cat:"接続詞", en:"___ he is young, he is very wise and mature.", correct:"Although", wrongs:["Despite","Because","So"], explain:"althoughは接続詞で後ろに〈主語+動詞〉が続きます。despiteは前置詞なので名詞が続きます。" },
+  { cat:"関係代名詞what", en:"___ he said at the meeting surprised everyone.", correct:"What", wrongs:["That","Which","Who"], explain:"「〜すること、もの」という意味を持つ関係代名詞whatを使います。" },
+  { cat:"副詞", en:"Have you finished your homework ___?", correct:"yet", wrongs:["already","just","still"], explain:"疑問文で「もう〜しましたか」とたずねるときはyetを使います。" },
+  { cat:"譲歩", en:"___ how hard it is, I will never give up.", correct:"No matter", wrongs:["However","Whatever","Even"], explain:"no matter how ~で「どんなに〜でも」という譲歩を表します。" },
+  { cat:"熟語", en:"The accident resulted ___ his death.", correct:"in", wrongs:["from","to","with"], explain:"result in 〜で「〜という結果になる」という意味です。" },
+  { cat:"熟語", en:"His great success resulted ___ years of hard work.", correct:"from", wrongs:["in","to","with"], explain:"result from 〜で「〜から生じる」という意味です。resultの前後でin/fromの向きが逆になる点に注意しましょう。" },
+];
+
+const READING_PASSAGES = [
+  { type:"掲示・案内文", title:"Community Lecture Series: Understanding Renewable Energy", text:
+`Community Lecture Series: Understanding Renewable Energy
+
+Date: Saturday, September 14
+Time: 2:00 p.m. - 4:00 p.m.
+Place: Green Hills Community Center, Main Hall
+
+As part of our ongoing effort to promote environmental awareness, the city is hosting a free lecture series on renewable energy sources. This month's session will focus on solar and wind power, and how households can reduce their electricity costs by adopting these technologies. The guest speaker, Dr. Sato, has over fifteen years of experience researching sustainable energy solutions.
+
+Seats are limited to 80 people, so early reservation is recommended. Reservations can be made online or by phone until September 10. Light refreshments will be provided after the lecture, giving attendees a chance to ask the speaker questions directly.
+
+For more information, please visit our website or contact the community center office.`,
+    questions: [
+      { q:"What will this month's lecture focus on?", correct:"Solar and wind power", wrongs:["Nuclear energy","Electric vehicles","Water conservation"], explain:"本文に \"This month's session will focus on solar and wind power\" とあります。" },
+      { q:"Why is early reservation recommended?", correct:"Because seats are limited to 80 people", wrongs:["Because the speaker is very popular","Because the lecture is only once a year","Because refreshments are limited"], explain:"本文に \"Seats are limited to 80 people, so early reservation is recommended.\" とあります。" },
+      { q:"What can attendees do after the lecture?", correct:"Ask the speaker questions while having refreshments", wrongs:["Buy solar panels at a discount","Sign up for another lecture","Meet other guest speakers"], explain:"本文に \"Light refreshments will be provided after the lecture, giving attendees a chance to ask the speaker questions directly.\" とあります。" }
+    ] },
+  { type:"Eメール文", title:"Question about the Study Trip", text:
+`Subject: Question about the Study Trip
+
+Hi Mr. Green,
+
+I hope this email finds you well. I'm writing because I have a question about the study trip to Australia next spring. I saw the announcement on the school bulletin board, but I wasn't sure about a few details.
+
+First, I'd like to know whether the program includes homestay accommodation or if we'll be staying in a hotel. I've never stayed with a host family before, and I think it would be a valuable experience, but I want to prepare myself mentally if that's the case.
+
+Also, could you tell me more about the cost? The announcement mentioned that flights are included, but it didn't specify whether meals and activities are covered as well. My parents would like to know the total cost before I apply.
+
+I would really appreciate it if you could answer these questions when you have time. Thank you very much for your help.
+
+Best regards,
+Aya`,
+    questions: [
+      { q:"Why is Aya writing this email?", correct:"Because she has questions about the study trip", wrongs:["Because she wants to cancel her application","Because she found a mistake in the announcement","Because she wants to change the destination"], explain:"本文に \"I'm writing because I have a question about the study trip\" とあります。" },
+      { q:"What does Aya want to know about the accommodation?", correct:"Whether they will stay with a host family or in a hotel", wrongs:["Whether the hotel has WiFi","How many students will share a room","Whether she can choose her roommate"], explain:"本文に \"whether the program includes homestay accommodation or if we'll be staying in a hotel\" とあります。" },
+      { q:"What information does Aya still need about the cost?", correct:"Whether meals and activities are included", wrongs:["Whether flights are included","How to pay the fee","When the payment is due"], explain:"本文に \"it didn't specify whether meals and activities are covered as well\" とあります。" }
+    ] },
+  { type:"説明文", title:"The Rise of Community-Supported Agriculture", text:
+`In recent years, an increasing number of people have become interested in knowing exactly where their food comes from. This growing concern has led to the popularity of Community-Supported Agriculture, or CSA, a system in which consumers pay local farmers directly at the beginning of the growing season. In exchange, they receive a share of the harvest throughout the season, usually delivered weekly in the form of a box of fresh vegetables and fruits.
+
+This system benefits both farmers and consumers. Farmers receive stable income early in the year, before they have to spend money on seeds and equipment, which reduces their financial risk. Consumers, meanwhile, gain access to fresh, seasonal produce while supporting local businesses instead of large corporations. Many CSA members also say that they feel more connected to their community and more conscious about reducing food waste, since they try to use every vegetable they receive.
+
+However, CSA is not without its challenges. Because members receive whatever the farm produces that week, they sometimes end up with vegetables they are unfamiliar with or do not know how to cook. To solve this issue, some farms now provide recipe suggestions along with each delivery, helping members make the most of their share.`,
+    questions: [
+      { q:"What is Community-Supported Agriculture?", correct:"A system in which consumers pay farmers in advance for a share of the harvest", wrongs:["A government program that gives free vegetables to families","A method of growing vegetables without soil","A type of farm that only sells fruit"], explain:"本文に \"consumers pay local farmers directly at the beginning of the growing season. In exchange, they receive a share of the harvest\" とあります。" },
+      { q:"How does CSA benefit farmers?", correct:"They receive stable income before spending money on seeds and equipment", wrongs:["They get to choose which customers they sell to","They receive government tax reductions","They no longer need farm workers"], explain:"本文に \"Farmers receive stable income early in the year, before they have to spend money on seeds and equipment\" とあります。" },
+      { q:"What problem do some CSA members face?", correct:"They sometimes receive vegetables they don't know how to cook", wrongs:["They receive less food than they paid for","They cannot cancel their membership easily","They have to pick up the vegetables themselves"], explain:"本文に \"they sometimes end up with vegetables they are unfamiliar with or do not know how to cook\" とあります。" },
+      { q:"What have some farms started doing to help members?", correct:"Providing recipe suggestions with each delivery", wrongs:["Offering cooking classes for free","Delivering food every day instead of weekly","Allowing members to choose their own vegetables"], explain:"本文に \"some farms now provide recipe suggestions along with each delivery\" とあります。" }
+    ] },
+  { type:"物語文", title:"A Lesson from the Chess Club", text:
+`When Daichi joined the chess club in his first year of high school, he expected to win most of his games. He had been the best player at his junior high school, and he assumed high school would not be much different. However, in his very first match, he lost badly to a quiet second-year student named Ren, who rarely spoke during practice.
+
+At first, Daichi felt embarrassed and even considered quitting the club. He told himself that chess simply wasn't as important to him as he had thought. But one afternoon, he stayed late and watched Ren practice alone, moving pieces slowly and reviewing his mistakes from previous matches. Daichi realized that Ren's skill hadn't come from natural talent but from hours of quiet, patient study.
+
+Inspired by what he saw, Daichi began arriving early to analyze famous chess games and asked Ren for advice after practice. Ren, surprised but pleased that someone wanted to learn from him, began sharing strategies he had developed over the years. Slowly, Daichi's game improved, not because he became naturally gifted, but because he learned to be patient with himself.
+
+By the end of the year, Daichi still hadn't beaten Ren, but he no longer felt embarrassed about it. He had learned that losing wasn't a sign of failure but an opportunity to improve, a lesson that would stay with him long after he left the chess club.`,
+    questions: [
+      { q:"Why was Daichi surprised in his first match?", correct:"He lost badly to a quiet second-year student", wrongs:["He won every game easily","He was asked to become the club leader","He found out Ren was a beginner"], explain:"本文に \"in his very first match, he lost badly to a quiet second-year student named Ren\" とあります。" },
+      { q:"What did Daichi realize after watching Ren practice?", correct:"Ren's skill came from hours of quiet, patient study", wrongs:["Ren had a private chess coach","Ren was naturally talented at chess","Ren practiced only before matches"], explain:"本文に \"Ren's skill hadn't come from natural talent but from hours of quiet, patient study\" とあります。" },
+      { q:"What did Daichi start doing after being inspired by Ren?", correct:"Arriving early to study famous games and asking Ren for advice", wrongs:["Quitting the chess club to focus on other activities","Challenging Ren to a rematch every day","Teaching beginners in the club"], explain:"本文に \"Daichi began arriving early to analyze famous chess games and asked Ren for advice after practice.\" とあります。" },
+      { q:"What lesson did Daichi learn by the end of the year?", correct:"Losing is an opportunity to improve, not a sign of failure", wrongs:["Talent is more important than effort","He should have quit the chess club","Ren was better because of natural talent"], explain:"本文に \"He had learned that losing wasn't a sign of failure but an opportunity to improve\" とあります。" }
+    ] }
+];
+
+const OPINION_PHRASES = ["I think ~", "I don't think ~", "I have two reasons.", "First, ~", "Second, ~", "For these reasons, ~", "For example, ~"];
+const EMAIL_PHRASES = ["Yes, I can / do ~", "No, I can't / don't ~", "I think ~", "I want to ~ because ~", "It is because ~"];
+
+const OPINION_TASKS = [
+  { q:"Some people say that it is important for young people to travel abroad. What do you think about this?", models:[
+    "I think it is important for young people to travel abroad. I have two reasons. First, they can learn about different cultures and ways of thinking. Second, traveling abroad helps them improve their language skills through real communication. For these reasons, I believe traveling abroad is a valuable experience for young people." ] },
+  { q:"Do you think students should be allowed to use smartphones during school hours?", models:[
+    "I don't think students should be allowed to use smartphones during school hours. I have two reasons. First, smartphones can easily distract students from their studies. Second, students may use them to cheat during tests. For these reasons, I believe smartphones should not be used during school hours." ] },
+  { q:"Some people say that working from home is better than working at an office. What do you think about this?", models:[
+    "I think working from home is better than working at an office. I have two reasons. First, employees can save time and money by not commuting every day. Second, they can balance their work and family life more easily. For these reasons, I believe working from home has more advantages." ] },
+  { q:"Do you think it is a good idea for schools to reduce the amount of homework?", models:[
+    "I think it is a good idea for schools to reduce the amount of homework. I have two reasons. First, students would have more time to pursue their own interests, such as sports or reading. Second, less homework could reduce stress and help students sleep better at night." ] },
+  { q:"Some people say that it is better to live in a big city than in the countryside. What do you think about this?", models:[
+    "I think it is better to live in a big city than in the countryside. I have two reasons. First, cities offer more job opportunities and higher salaries. Second, public transportation and other services are usually more convenient in cities. For these reasons, I prefer living in a big city." ] },
+  { q:"Do you think it is important for companies to protect the environment?", models:[
+    "Yes, I think it is very important for companies to protect the environment. I have two reasons. First, companies use a large amount of natural resources, so they have a responsibility to reduce waste. Second, protecting the environment can also improve a company's reputation among customers." ] }
+];
+
+const EMAIL_TASKS = [
+  { email:"Hi! I heard you started a part-time job. <u>What kind of job is it?</u> <u>How many hours a week do you work?</u> <u>Do you like the job so far?</u>", models:[
+    "I'm working at a bookstore near my house. I work about ten hours a week, usually on weekends. I like the job so far because I can talk with customers who love books just like me." ] },
+  { email:"Hi! Our school festival is coming up next month. <u>What event do you want to join?</u> <u>Who do you want to join it with?</u> <u>What are you looking forward to the most?</u>", models:[
+    "I want to join the dance performance with my classmates. I want to join it with my best friend, Mika, because we both love dancing. I'm looking forward to performing in front of many people the most." ] },
+  { email:"Hi! I heard your family is moving to a new city next spring. <u>How do you feel about moving?</u> <u>What will you miss the most about your current town?</u> <u>What are you excited about in your new town?</u>", models:[
+    "Honestly, I feel a little nervous about moving to a new place. I will miss my close friends the most, since we've known each other since elementary school. However, I'm excited to explore a new town and make new friends there." ] }
+];
+
+// AI採点用（英作文アプリと同じGASウェブアプリURL）
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxhCBU9aZ5eymIXqsAhtQoUvgaGJwEEt67UAN_ysTeZGGSLc1gXvWP-tSZHvDopKITJmg/exec';
+
+// ================================================================
+// 模試の記録（1次はこのファイル、2次は英検準2級_2次試験対策.htmlから
+// 同じキーに書き込むため、同一端末・同一ブラウザで両方の記録が合流する）
+// ================================================================
+const RECORDS_KEY = 'eiken_records_jun2kyu';
+const RECORDS_MAX = 50;
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; } catch(e) { return []; }
+}
+function addRecord(rec) {
+  try {
+    const list = loadRecords();
+    list.unshift(rec);
+    if (list.length > RECORDS_MAX) list.length = RECORDS_MAX;
+    localStorage.setItem(RECORDS_KEY, JSON.stringify(list));
+  } catch(e) {}
+}
+function formatRecordDate(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function verdictIcon(v) { return v === 'high' ? '🎉' : v === 'mid' ? '💪' : '📚'; }
+function renderRecords() {
+  const list = loadRecords();
+  const wrap = document.getElementById('records-list');
+  if (list.length === 0) {
+    wrap.innerHTML = '<div class="records-empty">まだ模試の記録がありません。<br>1次・2次の模試に挑戦してみましょう！</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(r => `
+    <div class="record-item">
+      <div class="record-top">
+        <span class="record-date">${escapeHtml(r.date)}</span>
+        <span class="record-type-badge ${r.examType === '1次' ? 't1' : 't2'}">${escapeHtml(r.examType)}試験模試</span>
+      </div>
+      <div class="record-verdict">
+        <span class="record-verdict-icon">${verdictIcon(r.verdict)}</span>
+        <span class="record-verdict-text ${r.verdict}">${escapeHtml(r.verdictLabel)}</span>
+        <span class="record-score">${r.scorePct}%</span>
+      </div>
+      <div class="record-detail">${escapeHtml(r.detail || '')}</div>
+    </div>
+  `).join('');
+}
+document.getElementById('btn-go-records').addEventListener('click', () => { renderRecords(); goPage('page-records'); });
+document.getElementById('btn-records-back').addEventListener('click', () => goPage('page-title'));
+document.getElementById('btn-records-clear').addEventListener('click', () => {
+  if (confirm('記録をすべて削除しますか？この操作は取り消せません。')) {
+    localStorage.removeItem(RECORDS_KEY);
+    renderRecords();
+  }
+});
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('btn-header-home').classList.toggle('show', id !== 'page-title');
+}
+
+const MOCK_QUIZ_PAGES = ['page-mock-grammar', 'page-mock-reading', 'page-mock-writing'];
+document.getElementById('btn-header-home').addEventListener('click', () => {
+  const currentPage = document.querySelector('.page.active');
+  const inProgress = currentPage && MOCK_QUIZ_PAGES.includes(currentPage.id);
+  if (inProgress && !confirm('模試を中断してホームに戻りますか？\nここまでの回答は保存されません。')) {
+    return;
+  }
+  goPage('page-title');
+});
+function countWords(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).filter(Boolean).length;
+}
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ================================================================
+// メニュー：カードクリック
+// ================================================================
+document.getElementById('btn-go-mock').addEventListener('click', () => goPage('page-mock-intro'));
+document.getElementById('btn-mock-back-title').addEventListener('click', () => goPage('page-title'));
+
+// ================================================================
+// 模試モード：状態
+// ================================================================
+const mock = {
+  grammarQueue: [], grammarIndex: 0, grammarCorrect: 0, grammarWrong: [], grammarAnswered: false,
+  readingQueue: [], readingIndex: 0, readingCorrect: 0, readingWrong: [], readingAnswered: false,
+  writingQueue: [], writingIndex: 0, writingAnswers: [], writingAIScores: []
+};
+
+function pickReadingPassages(n) {
+  const byCategory = {};
+  READING_PASSAGES.forEach((p, i) => { (byCategory[p.type] = byCategory[p.type] || []).push(i); });
+  Object.keys(byCategory).forEach(k => { byCategory[k] = shuffle(byCategory[k]); });
+  const cats = shuffle(Object.keys(byCategory));
+  const selected = [];
+  while (selected.length < n) {
+    let addedAny = false;
+    for (const cat of cats) {
+      if (selected.length >= n) break;
+      const arr = byCategory[cat];
+      if (arr.length > 0) { selected.push(arr.shift()); addedAny = true; }
+    }
+    if (!addedAny) break;
+  }
+  return selected.map(i => READING_PASSAGES[i]);
+}
+
+document.getElementById('btn-start-mock').addEventListener('click', () => {
+  // 文法 15問
+  mock.grammarQueue = shuffle(GRAMMAR_BANK).slice(0, 15);
+  mock.grammarIndex = 0; mock.grammarCorrect = 0; mock.grammarWrong = [];
+
+  // 長文 3文章分
+  const passages = pickReadingPassages(3);
+  mock.readingQueue = [];
+  passages.forEach(p => { p.questions.forEach((q, qi) => mock.readingQueue.push({ passage: p, qIndexInPassage: qi, question: q })); });
+  mock.readingIndex = 0; mock.readingCorrect = 0; mock.readingWrong = [];
+
+  // 英作文 意見1つ＋Eメール1つ
+  const opinion = shuffle(OPINION_TASKS)[0];
+  const email = shuffle(EMAIL_TASKS)[0];
+  mock.writingQueue = [{ type: '意見論述', data: opinion }, { type: 'Eメール返信', data: email }];
+  mock.writingIndex = 0;
+  mock.writingAnswers = ['', ''];
+  mock.writingAIScores = [null, null];
+
+  goPage('page-mock-grammar');
+  showMockGrammar();
+});
+
+// ---------------- 文法パート ----------------
+function showMockGrammar() {
+  mock.grammarAnswered = false;
+  const q = mock.grammarQueue[mock.grammarIndex];
+  document.getElementById('mg-progress-text').textContent = `文法 問題 ${mock.grammarIndex + 1} / ${mock.grammarQueue.length}`;
+  document.getElementById('mg-progress-score').textContent = `正解 ${mock.grammarCorrect}`;
+  document.getElementById('mg-progress-bar').style.width = `${(mock.grammarIndex / mock.grammarQueue.length) * 100}%`;
+  document.getElementById('mg-question-en').innerHTML = q.en.replace('___', '<span class="blank">___</span>');
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('mg-choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectMockGrammar(btn, opt, q));
+    choicesEl.appendChild(btn);
+  });
+  document.getElementById('mg-feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('mg-btn-next').style.display = 'none';
+}
+function selectMockGrammar(btn, opt, q) {
+  if (mock.grammarAnswered) return;
+  mock.grammarAnswered = true;
+  const isCorrect = opt === q.correct;
+  document.querySelectorAll('#mg-choices .choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('mg-feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('mg-feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('mg-feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('mg-feedback-explain').textContent = q.explain;
+  if (isCorrect) mock.grammarCorrect++; else mock.grammarWrong.push(q);
+  document.getElementById('mg-progress-score').textContent = `正解 ${mock.grammarCorrect}`;
+  document.getElementById('mg-btn-next').style.display = 'inline-block';
+}
+document.getElementById('mg-btn-next').addEventListener('click', () => {
+  mock.grammarIndex++;
+  if (mock.grammarIndex < mock.grammarQueue.length) {
+    showMockGrammar();
+  } else {
+    goPage('page-mock-reading');
+    showMockReading();
+  }
+});
+
+// ---------------- 長文パート ----------------
+function showMockReading() {
+  mock.readingAnswered = false;
+  const item = mock.readingQueue[mock.readingIndex];
+  const passage = item.passage;
+  const q = item.question;
+  document.getElementById('mr-progress-text').textContent = `長文 問題 ${mock.readingIndex + 1} / ${mock.readingQueue.length}`;
+  document.getElementById('mr-progress-score').textContent = `正解 ${mock.readingCorrect}`;
+  document.getElementById('mr-progress-bar').style.width = `${(mock.readingIndex / mock.readingQueue.length) * 100}%`;
+  document.getElementById('mr-cat-badge').textContent = passage.type;
+  document.getElementById('mr-passage-title').textContent = passage.title;
+  document.getElementById('mr-passage-text').textContent = passage.text;
+  document.getElementById('mr-question-label').textContent = `Q${item.qIndexInPassage + 1}`;
+  document.getElementById('mr-question-en').textContent = q.q;
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('mr-choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectMockReading(btn, opt, q, passage));
+    choicesEl.appendChild(btn);
+  });
+  document.getElementById('mr-feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('mr-btn-next').style.display = 'none';
+}
+function selectMockReading(btn, opt, q, passage) {
+  if (mock.readingAnswered) return;
+  mock.readingAnswered = true;
+  const isCorrect = opt === q.correct;
+  document.querySelectorAll('#mr-choices .choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('mr-feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('mr-feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('mr-feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('mr-feedback-explain').textContent = q.explain;
+  if (isCorrect) mock.readingCorrect++;
+  else mock.readingWrong.push({ passageTitle: passage.title, passageType: passage.type, q: q.q, correct: q.correct, explain: q.explain });
+  document.getElementById('mr-progress-score').textContent = `正解 ${mock.readingCorrect}`;
+  document.getElementById('mr-btn-next').style.display = 'inline-block';
+}
+document.getElementById('mr-btn-next').addEventListener('click', () => {
+  mock.readingIndex++;
+  if (mock.readingIndex < mock.readingQueue.length) {
+    showMockReading();
+  } else {
+    goPage('page-mock-writing');
+    showMockWriting();
+  }
+});
+
+// ---------------- 英作文パート ----------------
+function showMockWriting() {
+  const item = mock.writingQueue[mock.writingIndex];
+  const isOpinion = item.type === '意見論述';
+  document.getElementById('mw-progress-text').textContent = `英作文 課題 ${mock.writingIndex + 1} / ${mock.writingQueue.length}`;
+  document.getElementById('mw-progress-bar').style.width = `${(mock.writingIndex / mock.writingQueue.length) * 100}%`;
+  document.getElementById('mw-prompt-label').textContent = isOpinion ? 'QUESTION' : 'E-MAIL';
+  document.getElementById('mw-prompt-text').innerHTML = isOpinion ? item.data.q : item.data.email;
+
+  document.getElementById('mw-tip-title').textContent = isOpinion ? '📝 書き方のヒント（意見論述）' : '📝 書き方のヒント（Eメール返信）';
+  const tipList = document.getElementById('mw-tip-list');
+  tipList.innerHTML = '';
+  const tips = isOpinion
+    ? ["まず自分の意見をはっきり書く（I think ~ / I don't think ~）", "理由を2つ、First, / Second, を使って書く", "全体で50～60語を目安にする"]
+    : ["下線が引かれた3つの質問、すべてに答える", "Yes/Noで答えられる質問には、まずYes/Noをはっきり書く", "全体で40語程度を目安にする"];
+  const mockTarget = isOpinion ? { good:[50,60], near:[40,70] } : { good:[35,45], near:[25,55] };
+  document.getElementById('mw-counter-target').textContent = isOpinion ? '目安：50～60語' : '目安：40語程度';
+  document.getElementById('mw-check-wordcount-text').textContent = isOpinion ? '語数が50～60語くらいになっている' : '語数が40語程度になっている';
+  window.__mockWordTargetRange = mockTarget;
+  tips.forEach(t => { const li = document.createElement('li'); li.textContent = t; tipList.appendChild(li); });
+
+  const phraseTags = document.getElementById('mw-phrase-tags');
+  phraseTags.innerHTML = '';
+  (isOpinion ? OPINION_PHRASES : EMAIL_PHRASES).forEach(p => {
+    const span = document.createElement('span'); span.className = 'phrase-tag'; span.textContent = p; phraseTags.appendChild(span);
+  });
+
+  const textarea = document.getElementById('mw-answer-textarea');
+  textarea.value = mock.writingAnswers[mock.writingIndex] || '';
+  updateMockCounter();
+
+  document.querySelectorAll('#page-mock-writing .check-item input').forEach(cb => cb.checked = false);
+  document.getElementById('mw-model-box').classList.remove('show');
+  const modelList = document.getElementById('mw-model-list');
+  modelList.innerHTML = '';
+  item.data.models.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'model-item';
+    div.innerHTML = `<div class="mi-label">例${i + 1}</div><div class="mi-text">${m}</div><div class="mi-count">（${countWords(m)}語）</div>`;
+    modelList.appendChild(div);
+  });
+
+  const aiBox = document.getElementById('mw-ai-box');
+  aiBox.classList.remove('show');
+  aiBox.innerHTML = '';
+
+  document.getElementById('mw-btn-next').textContent = mock.writingIndex === mock.writingQueue.length - 1 ? '結果を見る' : '次へ';
+}
+function updateMockCounter() {
+  const text = document.getElementById('mw-answer-textarea').value;
+  const count = countWords(text);
+  const badge = document.getElementById('mw-counter-badge');
+  const range = window.__mockWordTargetRange || { good:[25,35], near:[18,42] };
+  badge.textContent = `${count} 語`;
+  badge.className = 'counter-badge';
+  if (count === 0) badge.classList.add('empty');
+  else if (count >= range.good[0] && count <= range.good[1]) badge.classList.add('good');
+  else if (count >= range.near[0] && count <= range.near[1]) badge.classList.add('near');
+  else badge.classList.add('off');
+}
+document.getElementById('mw-answer-textarea').addEventListener('input', () => {
+  mock.writingAnswers[mock.writingIndex] = document.getElementById('mw-answer-textarea').value;
+  updateMockCounter();
+});
+document.getElementById('mw-btn-show-model').addEventListener('click', () => {
+  document.getElementById('mw-model-box').classList.toggle('show');
+});
+document.getElementById('mw-btn-ai-check').addEventListener('click', async () => {
+  const aiBox = document.getElementById('mw-ai-box');
+  const item = mock.writingQueue[mock.writingIndex];
+  const answer = document.getElementById('mw-answer-textarea').value.trim();
+
+  if (!GAS_WEB_APP_URL) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">AI採点機能が設定されていません。</div>';
+    return;
+  }
+  if (!answer) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">先に英文を入力してください。</div>';
+    return;
+  }
+  aiBox.classList.add('show');
+  aiBox.innerHTML = '<div class="ai-loading">🤖 AIが採点しています...（数秒かかります）</div>';
+
+  const isOpinion = item.type === '意見論述';
+  const promptText = isOpinion ? item.data.q : item.data.email.replace(/<\/?u>/g, '');
+  const wordTarget = isOpinion ? '50〜60語程度' : '40語程度';
+
+  try {
+    const res = await fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({ type: item.type, prompt: promptText, answer: answer, wordTarget: wordTarget, level: '準2級' })
+    });
+    const data = await res.json();
+    if (data.error) {
+      aiBox.innerHTML = `<div class="ai-error">エラー: ${escapeHtml(data.error)}</div>`;
+      return;
+    }
+    mock.writingAIScores[mock.writingIndex] = data.score || null;
+    aiBox.innerHTML = `
+      <h4>🤖 AIによる採点 <span class="ai-score-badge">評価: ${escapeHtml(data.score || '-')}</span></h4>
+      <div class="ai-section"><div class="as-label">👍 よくできている点</div><div class="as-text">${escapeHtml(data.good_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">✏️ 改善するとよい点</div><div class="as-text">${escapeHtml(data.improve_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">💡 自然な英語の例</div><div class="as-text">${escapeHtml(data.corrected_example || '')}</div></div>
+    `;
+  } catch (err) {
+    aiBox.innerHTML = '<div class="ai-error">AIとの通信に失敗しました。</div>';
+  }
+});
+document.getElementById('mw-btn-next').addEventListener('click', () => {
+  mock.writingIndex++;
+  if (mock.writingIndex < mock.writingQueue.length) {
+    showMockWriting();
+  } else {
+    showMockResult();
+  }
+});
+
+// ---------------- 結果・合格可能性判定 ----------------
+function computeWritingScore(index) {
+  const aiScore = mock.writingAIScores[index];
+  if (aiScore === 'A') return 100;
+  if (aiScore === 'B') return 75;
+  if (aiScore === 'C') return 50;
+  // AI未使用の場合は語数とセルフチェックからの簡易推定
+  const text = mock.writingAnswers[index] || '';
+  const count = countWords(text);
+  if (count === 0) return 0;
+  let score = 40; // 書いたこと自体の基礎点
+  if (count >= 25 && count <= 35) score += 40;
+  else if (count >= 18 && count <= 42) score += 20;
+  return Math.min(score, 90); // セルフチェックのみでは上限90
+}
+
+function showMockResult() {
+  goPage('page-mock-result');
+
+  const grammarTotal = mock.grammarQueue.length;
+  const readingTotal = mock.readingQueue.length;
+  const grammarPct = Math.round((mock.grammarCorrect / grammarTotal) * 100);
+  const readingPct = Math.round((mock.readingCorrect / readingTotal) * 100);
+
+  document.getElementById('score-grammar-text').textContent = `${mock.grammarCorrect} / ${grammarTotal}`;
+  document.getElementById('score-grammar-bar').style.width = `${grammarPct}%`;
+  document.getElementById('score-reading-text').textContent = `${mock.readingCorrect} / ${readingTotal}`;
+  document.getElementById('score-reading-bar').style.width = `${readingPct}%`;
+
+  const w0 = computeWritingScore(0);
+  const w1 = computeWritingScore(1);
+  const writingPct = Math.round((w0 + w1) / 2);
+  const usedAI = mock.writingAIScores[0] !== null || mock.writingAIScores[1] !== null;
+  document.getElementById('score-writing-text').textContent = usedAI ? `目安 ${writingPct}%` : `目安 ${writingPct}%（自己評価）`;
+  document.getElementById('score-writing-bar').style.width = `${writingPct}%`;
+
+  const mcAccuracy = ((mock.grammarCorrect + mock.readingCorrect) / (grammarTotal + readingTotal)) * 100;
+  const overall = Math.round(mcAccuracy * 0.65 + writingPct * 0.35);
+
+  const verdictBox = document.getElementById('verdict-box');
+  const verdictIcon = document.getElementById('verdict-icon');
+  const verdictTitle = document.getElementById('verdict-title');
+  verdictBox.className = 'verdict-box';
+  if (overall >= 75) {
+    verdictBox.classList.add('high');
+    verdictIcon.textContent = '🎉';
+    verdictTitle.textContent = '合格の可能性は高いです！';
+  } else if (overall >= 60) {
+    verdictBox.classList.add('mid');
+    verdictIcon.textContent = '💪';
+    verdictTitle.textContent = '合格ラインに近づいています！';
+  } else {
+    verdictBox.classList.add('low');
+    verdictIcon.textContent = '📚';
+    verdictTitle.textContent = 'もう少し対策を続けましょう';
+  }
+  document.getElementById('verdict-score').textContent = `総合スコア目安：${overall}%`;
+
+  addRecord({
+    ts: Date.now(),
+    date: formatRecordDate(Date.now()),
+    examType: '1次',
+    verdict: overall >= 75 ? 'high' : overall >= 60 ? 'mid' : 'low',
+    verdictLabel: verdictTitle.textContent,
+    scorePct: overall,
+    detail: `文法 ${mock.grammarCorrect}/${grammarTotal}・長文 ${mock.readingCorrect}/${readingTotal}・英作文 目安${writingPct}%`
+  });
+
+  // 復習リスト
+  const reviewWrap = document.getElementById('mock-review-wrap');
+  reviewWrap.innerHTML = '';
+
+  if (mock.grammarWrong.length > 0) {
+    const h = document.createElement('div');
+    h.className = 'review-section-title';
+    h.textContent = `📘 文法・語法の復習（${mock.grammarWrong.length}問）`;
+    reviewWrap.appendChild(h);
+    const list = document.createElement('div');
+    list.className = 'review-list';
+    mock.grammarWrong.forEach(q => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="rq">${q.en.replace('___', '＿＿＿')}</div><div class="ra">正解: ${q.correct}</div><div class="re">${q.explain}</div>`;
+      list.appendChild(div);
+    });
+    reviewWrap.appendChild(list);
+  }
+
+  if (mock.readingWrong.length > 0) {
+    const h = document.createElement('div');
+    h.className = 'review-section-title';
+    h.textContent = `📖 長文読解の復習（${mock.readingWrong.length}問）`;
+    reviewWrap.appendChild(h);
+    const list = document.createElement('div');
+    list.className = 'review-list';
+    mock.readingWrong.forEach(w => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="rp">${w.passageType}「${w.passageTitle}」</div><div class="rq">${w.q}</div><div class="ra">正解: ${w.correct}</div><div class="re">${w.explain}</div>`;
+      list.appendChild(div);
+    });
+    reviewWrap.appendChild(list);
+  }
+
+  const wh = document.createElement('div');
+  wh.className = 'review-section-title';
+  wh.textContent = '✏️ 英作文の振り返り';
+  reviewWrap.appendChild(wh);
+  mock.writingQueue.forEach((item, i) => {
+    const isOpinion = item.type === '意見論述';
+    const mine = mock.writingAnswers[i] || '';
+    const div = document.createElement('div');
+    div.className = 'writing-review-item';
+    div.innerHTML = `
+      <div class="rp">${item.type}</div>
+      <div class="wr-q">${isOpinion ? item.data.q : item.data.email}</div>
+      <div class="wr-label" style="color:#5B6CF5;">あなたの解答（${countWords(mine)}語）</div>
+      <div class="wr-mine ${mine ? '' : 'empty'}">${mine ? mine.replace(/</g, '&lt;') : '（未記入）'}</div>
+    `;
+    reviewWrap.appendChild(div);
+  });
+}
+
+document.getElementById('btn-mock-retry').addEventListener('click', () => {
+  goPage('page-mock-intro');
+});
+</script>
+
+</body>
+</html>

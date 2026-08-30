@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検2級 2次試験対策</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block; padding: 13px 28px; border-radius: 50px; border: none;
+    font-size: 0.95em; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-outline { background: #fff; color: #5B6CF5; border: 2px solid #5B6CF5; padding: 11px 26px; }
+  .btn-sound   { background: #eef0ff; color: #5B6CF5; padding: 9px 18px; font-size: 0.85em; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block; background: linear-gradient(135deg,#667eea,#764ba2); color: white;
+    border-radius: 50px; padding: 6px 18px; font-size: 0.85em; font-weight: 700; margin-bottom: 28px;
+  }
+
+  .flow-box { background: #f8f9ff; border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; text-align: left; }
+  .flow-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .flow-row { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; }
+  .flow-row .fr-num {
+    width: 22px; height: 22px; border-radius: 50%; background: #5B6CF5; color: #fff; font-weight: 800;
+    font-size: 0.72em; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+  }
+  .flow-row .fr-text { font-size: 0.85em; color: #555; line-height: 1.5; }
+  .flow-row .fr-text b { color: #333; }
+
+  .set-list { display: flex; flex-direction: column; gap: 10px; text-align: left; margin-bottom: 22px; }
+  .set-card {
+    display: flex; align-items: center; gap: 14px; background: #fff; border: 2px solid #e2e5f5;
+    border-radius: 14px; padding: 14px 16px; cursor: pointer; transition: all 0.15s;
+  }
+  .set-card:hover { border-color: #5B6CF5; background: #f8f9ff; }
+  .set-card.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .set-card .sc-icon { font-size: 1.8em; flex-shrink: 0; }
+  .set-card .sc-title { font-weight: 800; color: #333; font-size: 0.92em; }
+  .set-card .sc-desc { font-size: 0.76em; color: #999; margin-top: 2px; }
+
+  .mock-mode-card {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(135deg,#fff8ec,#fff2de); border: 2px solid #ffd98a;
+    border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; cursor: pointer; transition: all 0.15s; text-align: left;
+  }
+  .mock-mode-card:hover { border-color: #f7971e; box-shadow: 0 8px 20px rgba(247,151,30,0.18); transform: translateY(-2px); }
+  .mock-mode-card .mmc-icon { font-size: 2em; flex-shrink: 0; }
+  .mock-mode-card .mmc-title { font-weight: 800; color: #333; font-size: 0.95em; margin-bottom: 3px; }
+  .mock-mode-card .mmc-desc { font-size: 0.78em; color: #8a6113; line-height: 1.5; }
+  .mock-mode-card .mmc-arrow { font-size: 1.3em; color: #f7971e; flex-shrink: 0; }
+  .mode-divider { text-align: center; font-size: 0.78em; color: #aaa; margin: 4px 0 14px; }
+
+  .verdict-box { border-radius: 20px; padding: 22px 20px; margin-bottom: 20px; display: none; }
+  .verdict-box.show { display: block; }
+  .verdict-box.high { background: linear-gradient(135deg,#43e97b,#38f9d7); }
+  .verdict-box.mid  { background: linear-gradient(135deg,#f7971e,#ffd200); }
+  .verdict-box.low  { background: linear-gradient(135deg,#ff9a8b,#ff6a88); }
+  .verdict-box .v-icon { font-size: 2.4em; margin-bottom: 6px; }
+  .verdict-box .v-title { font-size: 1.2em; font-weight: 900; color: #fff; margin-bottom: 4px; }
+  .verdict-box .v-score { font-size: 0.92em; color: rgba(255,255,255,0.9); font-weight: 700; }
+  .score-chip {
+    display: inline-block; font-size: 0.7em; font-weight: 800; border-radius: 50px; padding: 2px 10px; margin-left: 8px;
+  }
+  .score-chip.A { background: #eafff3; color: #1a9e5a; }
+  .score-chip.B { background: #fff6e0; color: #b8791a; }
+  .score-chip.C { background: #fff0ee; color: #d13a1f; }
+
+  /* ===== 練習ページ共通 ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .card-box {
+    background: #fff; border: 3px solid #5B6CF5; border-radius: 18px; padding: 18px; margin-bottom: 18px;
+  }
+  .card-box .cb-label { font-size: 0.72em; font-weight: 800; color: #5B6CF5; margin-bottom: 8px; }
+  .passage-text { font-size: 0.95em; line-height: 1.8; color: #222; margin-bottom: 14px; }
+  .illustration-wrap { width: 100%; border-radius: 12px; overflow: hidden; background: #eaf4ff; }
+  .illustration-wrap svg { width: 100%; height: auto; display: block; }
+
+  .no-card-note {
+    background: #fff8ec; border: 2px solid #ffd98a; border-radius: 14px; padding: 12px 16px; margin-bottom: 18px;
+    font-size: 0.82em; color: #8a6113; text-align: center; font-weight: 700;
+  }
+
+  .question-card { background: #f8f9ff; border-radius: 16px; padding: 20px 20px; margin-bottom: 16px; }
+  .question-no { display:inline-block; background:#5B6CF5; color:#fff; font-weight:900; font-size:0.78em; border-radius:50px; padding:3px 12px; margin-bottom:10px; }
+  .question-en { font-size: 1.1em; font-weight: 700; color: #222; line-height: 1.6; margin-bottom: 10px; }
+  .hint-text { font-size: 0.82em; color: #888; line-height: 1.5; }
+
+  .answer-textarea {
+    width: 100%; min-height: 90px; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 14px 16px; font-size: 0.95em; font-family: inherit; line-height: 1.6; resize: vertical;
+    transition: border-color 0.15s; margin-bottom: 16px;
+  }
+  .answer-textarea:focus { outline: none; border-color: #5B6CF5; }
+
+  .model-box { background: #eafff3; border: 2px solid #43e97b; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; display: none; }
+  .model-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .model-box h4 { font-size: 0.85em; color: #1a9e5a; font-weight: 800; margin-bottom: 8px; }
+  .model-box .ma-text { font-size: 0.92em; color: #333; line-height: 1.7; }
+
+  .ai-box {
+    background: #eef0ff; border: 2px solid #5B6CF5; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px;
+    display: none;
+  }
+  .ai-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .ai-box h4 { font-size: 0.85em; color: #5B6CF5; font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px; }
+  .ai-score-badge { display:inline-block; font-weight:900; font-size:0.8em; padding:2px 12px; border-radius:50px; background:#5B6CF5; color:#fff; }
+  .ai-section { margin-bottom: 10px; }
+  .ai-section:last-child { margin-bottom: 0; }
+  .ai-section .as-label { font-size: 0.75em; font-weight: 800; color: #5B6CF5; margin-bottom: 3px; }
+  .ai-section .as-text { font-size: 0.88em; color: #333; line-height: 1.6; }
+  .ai-loading { font-size: 0.85em; color: #666; text-align: center; padding: 10px; }
+  .ai-error { font-size: 0.85em; color: #d13a1f; background: #fff0ee; border-radius: 10px; padding: 10px 12px; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .result-icon { font-size: 4em; margin-bottom: 10px; }
+  .score-msg { font-size: 1.15em; font-weight: 900; color: #333; margin-bottom: 24px; }
+
+  .attitude-box { background: #f8f9ff; border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; text-align: left; }
+  .attitude-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 10px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: #555; padding: 5px 0; }
+  .check-item input { width: 16px; height: 16px; accent-color: #5B6CF5; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item { background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
+  .review-item .rq { font-weight: 700; color: #333; font-size: 0.9em; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.86em; color: #1a9e5a; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  @media (max-width: 480px) { .set-card .sc-desc { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検2級 2次試験対策</div>
+      <div class="hd-sub">面接（スピーキング）練習</div>
+    </div>
+    <a class="hd-home-link" href="英検2級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">🎤</div>
+    <div class="title-main">面接練習</div>
+    <div class="title-sub">絵カードを使った本番形式で練習しよう</div>
+    <div class="title-tagline">音読｜カードの質問｜自分についての質問</div>
+
+    <div class="flow-box">
+      <h3>面接の流れ</h3>
+      <div class="flow-row"><div class="fr-num">1</div><div class="fr-text"><b>入室・あいさつ</b>："Hello." "How are you?" と聞かれたら笑顔で答えよう</div></div>
+      <div class="flow-row"><div class="fr-num">2</div><div class="fr-text"><b>カードを見る</b>：パッセージ（文章）と絵を20秒ほど黙読</div></div>
+      <div class="flow-row"><div class="fr-num">3</div><div class="fr-text"><b>音読</b>：パッセージを声に出して読む</div></div>
+      <div class="flow-row"><div class="fr-num">4</div><div class="fr-text"><b>No.1〜3</b>：パッセージと絵についての質問に答える</div></div>
+      <div class="flow-row"><div class="fr-num">5</div><div class="fr-text"><b>No.4〜5</b>：カードを裏返し、自分自身についての質問に答える</div></div>
+      <div class="flow-row"><div class="fr-num">6</div><div class="fr-text"><b>カードを返して退室</b>："Thank you." と言って終了</div></div>
+    </div>
+
+    <div class="mock-mode-card" id="btn-start-mock">
+      <div class="mmc-icon">🎯</div>
+      <div class="mmc-body">
+        <div class="mmc-title">模試モードに挑戦</div>
+        <div class="mmc-desc">カードはランダムに1枚。5問すべて答え終えたら、AI採点をもとに合格可能性を判定します。</div>
+      </div>
+      <div class="mmc-arrow">›</div>
+    </div>
+
+    <div class="mode-divider">または、カードを選んで練習する</div>
+
+    <div class="set-list" id="set-list"></div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">この面接カードで練習する</button>
+  </div>
+
+  <!-- ===== 練習ページ ===== -->
+  <div id="page-practice" class="page">
+    <button class="back-link" id="btn-back-to-title">← カード選択に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">No.1 / 5</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <div class="card-box" id="card-box">
+      <div class="cb-label">📋 面接カード</div>
+      <div class="passage-text" id="passage-text"></div>
+      <div class="illustration-wrap" id="illustration-wrap"></div>
+    </div>
+
+    <div class="no-card-note" id="no-card-note" style="display:none;">📋 ここからはカードを見ずに、あなた自身のことを答える質問です</div>
+
+    <div class="question-card">
+      <span class="question-no" id="question-no">No.1</span>
+      <div class="question-en" id="question-en"></div>
+      <button class="btn btn-sound" id="btn-play-question">🔊 質問を聞く</button>
+      <div class="hint-text" id="hint-text" style="margin-top:10px;"></div>
+    </div>
+
+    <textarea class="answer-textarea" id="answer-textarea" placeholder="英語で答えを書いてみよう..."></textarea>
+
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <button class="btn btn-outline" style="flex:1;" id="btn-show-model">解答例を見る</button>
+      <button class="btn btn-primary" style="flex:1;" id="btn-ai-check">🤖 AIに採点してもらう</button>
+    </div>
+
+    <div class="model-box" id="model-box">
+      <h4>💡 解答例</h4>
+      <div class="ma-text" id="model-text"></div>
+    </div>
+
+    <div class="ai-box" id="ai-box"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" id="btn-next">次の質問へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="result-icon">🎉</div>
+    <div class="score-msg">お疲れさまでした！</div>
+
+    <div class="verdict-box" id="verdict-box">
+      <div class="v-icon" id="verdict-icon">🎉</div>
+      <div class="v-title" id="verdict-title"></div>
+      <div class="v-score" id="verdict-score"></div>
+    </div>
+    <div class="mock-caveat-box" id="mock-caveat" style="display:none; background:#f8f9ff; border-radius:14px; padding:14px 16px; margin-bottom:20px; text-align:left; font-size:0.78em; color:#888; line-height:1.7;">
+      ※このスコアは、AIが採点した各設問の評価をもとにした<b>簡易的な推定</b>です。実際の面接では発音・流暢さ・アイコンタクトなども評価されますが、このアプリはテキストでの解答のみを採点しています。
+    </div>
+
+    <div class="attitude-box">
+      <h3>✅ アティチュード（態度）セルフチェック</h3>
+      <label class="check-item"><input type="checkbox"> 相手の目（カメラ）を見て話せた</label>
+      <label class="check-item"><input type="checkbox"> 笑顔・大きな声で答えられた</label>
+      <label class="check-item"><input type="checkbox"> わからないときに "Could you say that again, please?" と聞き返せた（聞けなくてもOK、フレーズを覚えよう）</label>
+      <label class="check-item"><input type="checkbox"> Yes/Noのあとに、理由もつけ加えられた</label>
+    </div>
+
+    <div class="review-list" id="review-list"></div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-retry">もう一度このカードで練習</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title2">カード選択に戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// データ：面接カード2セット（英検2級レベル）
+// ================================================================
+const CARD_SETS = [
+  {
+    icon: "🔌", title: "電気自動車の普及", desc: "The Growth of Electric Vehicles",
+    passage: "Electric vehicles have become increasingly popular in recent years as more people become concerned about air pollution and climate change. Many governments now offer financial incentives, such as tax reductions, to encourage citizens to purchase electric cars instead of traditional gasoline vehicles. However, some drivers are still hesitant because of the limited number of charging stations in certain areas.",
+    illustration: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+      <defs>
+        <linearGradient id="e-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9edff"/><stop offset="1" stop-color="#b8d9f5"/></linearGradient>
+        <linearGradient id="e-road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa2ab"/><stop offset="1" stop-color="#7a828b"/></linearGradient>
+        <radialGradient id="e-skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#ffe9cf"/><stop offset="1" stop-color="#eeba85"/></radialGradient>
+        <linearGradient id="e-shirt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74dcf0"/><stop offset="1" stop-color="#289cb8"/></linearGradient>
+        <linearGradient id="e-pants" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6c7bea"/><stop offset="1" stop-color="#38449e"/></linearGradient>
+        <linearGradient id="e-car" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8fa3"/><stop offset="1" stop-color="#e8506e"/></linearGradient>
+        <linearGradient id="e-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3d24"/><stop offset="1" stop-color="#2e1e10"/></linearGradient>
+      </defs>
+      <rect width="400" height="130" fill="url(#e-sky)"/>
+      <rect y="130" width="400" height="90" fill="url(#e-road)"/>
+      <rect x="0" y="128" width="400" height="4" fill="#ffd200" opacity="0.7"/>
+      <rect x="15" y="55" width="60" height="75" fill="#e0d6c8"/>
+      <rect x="22" y="65" width="14" height="14" fill="#bfe3ff"/>
+      <rect x="42" y="65" width="14" height="14" fill="#bfe3ff"/>
+      <rect x="22" y="85" width="14" height="14" fill="#bfe3ff"/>
+      <ellipse cx="230" cy="213" rx="105" ry="6" fill="#3a3f45" opacity="0.2"/>
+      <rect x="70" y="120" width="16" height="65" rx="3" fill="url(#e-shirt)"/>
+      <rect x="58" y="100" width="40" height="28" rx="4" fill="#333"/>
+      <rect x="63" y="105" width="30" height="14" rx="2" fill="#4fd1c5"/>
+      <path d="M78,128 Q105,150 141,168" stroke="#222" stroke-width="3" fill="none"/>
+      <rect x="185" y="130" width="90" height="30" rx="10" fill="url(#e-car)"/>
+      <rect x="150" y="155" width="160" height="35" rx="14" fill="url(#e-car)"/>
+      <rect x="193" y="136" width="30" height="18" rx="3" fill="#cfe8ff"/>
+      <rect x="228" y="136" width="38" height="18" rx="3" fill="#cfe8ff"/>
+      <circle cx="180" cy="195" r="16" fill="#333"/>
+      <circle cx="180" cy="195" r="7" fill="#999"/>
+      <circle cx="270" cy="195" r="16" fill="#333"/>
+      <circle cx="270" cy="195" r="7" fill="#999"/>
+      <rect x="144" y="163" width="8" height="10" fill="#222"/>
+      <line x1="99" y1="134" x2="90" y2="166" stroke="url(#e-skin)" stroke-width="12" stroke-linecap="round"/>
+      <line x1="141" y1="134" x2="148" y2="168" stroke="url(#e-skin)" stroke-width="11" stroke-linecap="round"/>
+      <rect x="103" y="180" width="14" height="30" rx="5" fill="url(#e-pants)"/>
+      <rect x="121" y="180" width="14" height="30" rx="5" fill="url(#e-pants)"/>
+      <rect x="101" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <rect x="119" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <rect x="97" y="124" width="44" height="56" rx="16" fill="url(#e-shirt)"/>
+      <rect x="113" y="114" width="12" height="12" fill="url(#e-skin)"/>
+      <circle cx="119" cy="97" r="21" fill="url(#e-skin)"/>
+      <path d="M99,90 Q119,64 139,90 L136,81 Q119,68 102,81 Z" fill="url(#e-hair)"/>
+      <circle cx="113" cy="96" r="2.5" fill="#333"/>
+      <circle cx="125" cy="96" r="2.5" fill="#333"/>
+      <path d="M111,104 Q119,109 127,104" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="119" cy="60" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="119" y="65" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">1</text>
+    </svg>`,
+    people: ["① 電気自動車に充電ケーブルをつないでいる男性"],
+    questions: [
+      { no:"No.1", type:"passage", en:"Look at the passage. Why do some drivers hesitate to buy electric vehicles?", hint:"パッセージの内容から、電気自動車の購入をためらう理由を答えよう。", model:"Because there are a limited number of charging stations in certain areas." },
+      { no:"No.2", type:"picture", en:"Please look at the picture. What is the man doing?", hint:"「①の男性」の動作を現在進行形で答えよう。", model:"He is charging his electric car." },
+      { no:"No.3", type:"opinion", en:"Some people say that all new cars should be electric within the next twenty years. What do you think about that?", hint:"意見とその理由を1〜2文で述べよう。正解は1つではありません。", model:"I think that's a good goal because it would help reduce air pollution, although the government will need to build more charging stations to make it realistic." },
+      { no:"No.4", type:"personal", en:"Do you think electric cars will become more common in Japan in the future?", hint:"Yes/Noと理由を添えて答えよう。", model:"Yes, I think so. As battery technology improves, electric cars will likely become cheaper and more convenient." },
+      { no:"No.5", type:"personal", en:"What do you do to help protect the environment?", hint:"環境のためにしていることを1〜2文で答えよう。", model:"I try to use public transportation instead of asking my parents to drive me places." }
+    ]
+  },
+  {
+    icon: "💻", title: "リモートワークの広がり", desc: "The Shift to Remote Work",
+    passage: "Since the pandemic, many companies have allowed their employees to work from home instead of commuting to an office every day. While some workers enjoy the flexibility and extra time this provides, others find it difficult to stay motivated without face-to-face contact with their colleagues. Many companies are now experimenting with hybrid models that combine both remote and in-office work.",
+    illustration: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+      <defs>
+        <linearGradient id="w-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdf6ec"/><stop offset="1" stop-color="#f3e4cd"/></linearGradient>
+        <linearGradient id="w-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0c9a6"/><stop offset="1" stop-color="#c7a978"/></linearGradient>
+        <radialGradient id="w-skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#ffe9cf"/><stop offset="1" stop-color="#eeba85"/></radialGradient>
+        <linearGradient id="w-dress" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a3ff"/><stop offset="1" stop-color="#9257e0"/></linearGradient>
+        <linearGradient id="w-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c98a4b"/><stop offset="1" stop-color="#8a5a30"/></linearGradient>
+        <linearGradient id="w-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3d24"/><stop offset="1" stop-color="#2e1e10"/></linearGradient>
+      </defs>
+      <rect width="400" height="150" fill="url(#w-wall)"/>
+      <rect y="150" width="400" height="70" fill="url(#w-floor)"/>
+      <rect x="290" y="20" width="90" height="70" rx="4" fill="#cfe8ff" stroke="#8fb8d9" stroke-width="3"/>
+      <line x1="335" y1="20" x2="335" y2="90" stroke="#8fb8d9" stroke-width="3"/>
+      <line x1="290" y1="55" x2="380" y2="55" stroke="#8fb8d9" stroke-width="3"/>
+      <ellipse cx="30" cy="150" rx="22" ry="8" fill="#8a5a30"/>
+      <path d="M30,150 Q10,120 20,90 Q30,110 30,90 Q30,115 40,90 Q48,120 30,150 Z" fill="#5a9a3d"/>
+      <ellipse cx="190" cy="213" rx="95" ry="6" fill="#5a3d24" opacity="0.15"/>
+      <rect x="100" y="175" width="200" height="12" rx="2" fill="url(#w-wood)"/>
+      <rect x="108" y="187" width="8" height="28" fill="#8a5a30"/>
+      <rect x="284" y="187" width="8" height="28" fill="#8a5a30"/>
+      <rect x="260" y="163" width="16" height="14" fill="#fff" stroke="#ccc" stroke-width="1"/>
+      <rect x="264" y="150" width="8" height="15" fill="#8a5a30"/>
+      <rect x="170" y="128" width="100" height="52" rx="4" fill="#333"/>
+      <rect x="175" y="133" width="90" height="38" fill="#eef0ff"/>
+      <circle cx="195" cy="148" r="9" fill="#e8b88a"/>
+      <circle cx="220" cy="148" r="9" fill="#d99a6c"/>
+      <circle cx="245" cy="148" r="9" fill="#f0c9a0"/>
+      <circle cx="207" cy="163" r="9" fill="#c98a5a"/>
+      <rect x="150" y="184" width="120" height="6" rx="2" fill="#666"/>
+      <line x1="128" y1="128" x2="112" y2="108" stroke="url(#w-skin)" stroke-width="11" stroke-linecap="round"/>
+      <line x1="172" y1="132" x2="185" y2="158" stroke="url(#w-skin)" stroke-width="12" stroke-linecap="round"/>
+      <rect x="138" y="178" width="14" height="18" rx="4" fill="url(#w-dress)"/>
+      <rect x="156" y="178" width="14" height="18" rx="4" fill="url(#w-dress)"/>
+      <rect x="124" y="122" width="52" height="58" rx="16" fill="url(#w-dress)"/>
+      <rect x="144" y="112" width="12" height="12" fill="url(#w-skin)"/>
+      <circle cx="150" cy="94" r="23" fill="url(#w-skin)"/>
+      <path d="M126,86 Q150,58 174,86 L171,77 Q150,64 129,77 Z" fill="url(#w-hair)"/>
+      <ellipse cx="177" cy="98" rx="7" ry="14" fill="url(#w-hair)"/>
+      <circle cx="143" cy="93" r="2.5" fill="#333"/>
+      <circle cx="157" cy="93" r="2.5" fill="#333"/>
+      <path d="M141,102 Q150,107 159,102" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="150" cy="56" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="150" y="61" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">1</text>
+    </svg>`,
+    people: ["① オンライン会議をしている女性"],
+    questions: [
+      { no:"No.1", type:"passage", en:"Look at the passage. What kind of work model are many companies now experimenting with?", hint:"パッセージの内容から、多くの企業が試している働き方を答えよう。", model:"A hybrid model that combines remote and in-office work." },
+      { no:"No.2", type:"picture", en:"Please look at the picture. What is the woman doing?", hint:"「①の女性」の動作を現在進行形で答えよう。", model:"She is having a video call with her colleagues." },
+      { no:"No.3", type:"opinion", en:"Some people say that remote work will completely replace office work in the future. What do you think about that?", hint:"意見とその理由を1〜2文で述べよう。正解は1つではありません。", model:"I don't think remote work will completely replace offices, because face-to-face communication is still important for teamwork and building relationships." },
+      { no:"No.4", type:"personal", en:"Do you think you would prefer to work from home in the future?", hint:"Yes/Noと理由を添えて答えよう。", model:"Yes, I think I would, because I could save time by not commuting and focus better in a quiet environment." },
+      { no:"No.5", type:"personal", en:"What do you think is important when working with a team?", hint:"チームで働くときに大切なことを1〜2文で答えよう。", model:"I think clear communication is important, because misunderstandings can easily happen, especially when people are not in the same room." }
+    ]
+  }
+];
+
+// AI採点用（英作文アプリと同じGASウェブアプリURL）
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxhCBU9aZ5eymIXqsAhtQoUvgaGJwEEt67UAN_ysTeZGGSLc1gXvWP-tSZHvDopKITJmg/exec';
+
+// 模試の記録（英検2級対策.htmlの「これまでの記録」と同じキーに書き込む）
+const RECORDS_KEY = 'eiken_records_2kyu';
+function addRecord(rec) {
+  try {
+    const list = JSON.parse(localStorage.getItem(RECORDS_KEY)) || [];
+    list.unshift(rec);
+    if (list.length > 50) list.length = 50;
+    localStorage.setItem(RECORDS_KEY, JSON.stringify(list));
+  } catch(e) {}
+}
+function formatRecordDate(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ================================================================
+// 状態管理
+// ================================================================
+let selectedSetIndex = 0;
+let currentSet = null;
+let currentQIndex = 0;
+let userAnswers = [];
+let isMockMode = false;
+let questionScores = [];
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.92;
+  window.speechSynthesis.speak(utter);
+}
+
+// ---- タイトルページ：カード選択 ----
+function renderSetList() {
+  const list = document.getElementById('set-list');
+  list.innerHTML = '';
+  CARD_SETS.forEach((set, i) => {
+    const div = document.createElement('div');
+    div.className = 'set-card' + (i === selectedSetIndex ? ' selected' : '');
+    div.innerHTML = `<span class="sc-icon">${set.icon}</span><div><div class="sc-title">${set.title}</div><div class="sc-desc">${set.desc}</div></div>`;
+    div.addEventListener('click', () => {
+      selectedSetIndex = i;
+      renderSetList();
+    });
+    list.appendChild(div);
+  });
+}
+renderSetList();
+
+if (!('speechSynthesis' in window)) {
+  document.querySelectorAll('.btn-sound').forEach(b => { b.style.display = 'none'; });
+}
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  isMockMode = false;
+  startPractice();
+});
+document.getElementById('btn-start-mock').addEventListener('click', () => {
+  isMockMode = true;
+  selectedSetIndex = Math.floor(Math.random() * CARD_SETS.length);
+  startPractice();
+});
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+document.getElementById('btn-back-title2').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startPractice() {
+  currentSet = CARD_SETS[selectedSetIndex];
+  currentQIndex = 0;
+  userAnswers = new Array(currentSet.questions.length).fill('');
+  questionScores = new Array(currentSet.questions.length).fill(null);
+  goPage('page-practice');
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = currentSet.questions[currentQIndex];
+  document.getElementById('progress-text').textContent = `${q.no} / 5`;
+  document.getElementById('progress-bar').style.width = `${(currentQIndex / currentSet.questions.length) * 100}%`;
+
+  const needsCard = q.type !== 'personal';
+  document.getElementById('card-box').style.display = needsCard ? 'block' : 'none';
+  document.getElementById('no-card-note').style.display = needsCard ? 'none' : 'block';
+  if (needsCard) {
+    document.getElementById('passage-text').textContent = currentSet.passage;
+    document.getElementById('illustration-wrap').innerHTML = currentSet.illustration;
+  }
+
+  document.getElementById('question-no').textContent = q.no;
+  document.getElementById('question-en').textContent = q.en;
+  document.getElementById('hint-text').textContent = '💡 ' + q.hint;
+
+  document.getElementById('answer-textarea').value = userAnswers[currentQIndex] || '';
+
+  document.getElementById('model-box').classList.remove('show');
+  document.getElementById('model-text').textContent = q.model;
+
+  const aiBox = document.getElementById('ai-box');
+  aiBox.classList.remove('show');
+  aiBox.innerHTML = '';
+
+  document.getElementById('btn-next').textContent =
+    currentQIndex === currentSet.questions.length - 1 ? '練習を終える' : '次の質問へ';
+}
+
+document.getElementById('btn-play-question').addEventListener('click', () => {
+  const q = currentSet.questions[currentQIndex];
+  speak(q.en);
+});
+document.getElementById('btn-show-model').addEventListener('click', () => {
+  document.getElementById('model-box').classList.toggle('show');
+});
+document.getElementById('answer-textarea').addEventListener('input', () => {
+  userAnswers[currentQIndex] = document.getElementById('answer-textarea').value;
+  questionScores[currentQIndex] = null;
+  document.getElementById('ai-box').classList.remove('show');
+});
+
+document.getElementById('btn-ai-check').addEventListener('click', async () => {
+  const aiBox = document.getElementById('ai-box');
+  const q = currentSet.questions[currentQIndex];
+  const answer = document.getElementById('answer-textarea').value.trim();
+
+  if (!GAS_WEB_APP_URL) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">AI採点機能が設定されていません。</div>';
+    return;
+  }
+  if (!answer) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">先に英文を入力してください。</div>';
+    return;
+  }
+
+  aiBox.classList.add('show');
+  aiBox.innerHTML = '<div class="ai-loading">🤖 AIが採点しています...（数秒かかります）</div>';
+
+  const needsCard = q.type !== 'personal';
+
+  try {
+    const res = await fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        mode: 'interview',
+        type: q.type,
+        prompt: q.en,
+        passage: needsCard ? currentSet.passage : '',
+        reference: q.model,
+        answer: answer,
+        level: '2級'
+      })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      aiBox.innerHTML = `<div class="ai-error">エラー: ${escapeHtml(data.error)}</div>`;
+      return;
+    }
+
+    questionScores[currentQIndex] = data.score || null;
+
+    aiBox.innerHTML = `
+      <h4>🤖 AIによる採点 <span class="ai-score-badge">評価: ${escapeHtml(data.score || '-')}</span></h4>
+      <div class="ai-section"><div class="as-label">👍 よくできている点</div><div class="as-text">${escapeHtml(data.good_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">✏️ 改善するとよい点</div><div class="as-text">${escapeHtml(data.improve_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">💡 自然な英語の例</div><div class="as-text">${escapeHtml(data.corrected_example || '')}</div></div>
+    `;
+  } catch (err) {
+    aiBox.innerHTML = '<div class="ai-error">AIとの通信に失敗しました。インターネット接続を確認してください。</div>';
+  }
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  currentQIndex++;
+  if (currentQIndex < currentSet.questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function scoreToPoints(score) {
+  if (score === 'A') return 100;
+  if (score === 'B') return 70;
+  if (score === 'C') return 40;
+  return null;
+}
+
+function showResult() {
+  goPage('page-result');
+  document.querySelectorAll('#page-result .check-item input').forEach(cb => cb.checked = false);
+
+  const verdictBox = document.getElementById('verdict-box');
+  const mockCaveat = document.getElementById('mock-caveat');
+  const retryBtn = document.getElementById('btn-retry');
+
+  if (isMockMode) {
+    let total = 0;
+    let count = 0;
+    currentSet.questions.forEach((q, i) => {
+      const pts = scoreToPoints(questionScores[i]);
+      if (pts !== null) {
+        total += pts;
+        count++;
+      } else if (userAnswers[i] && userAnswers[i].trim()) {
+        total += 45; // AI未採点だが解答はある場合の目安点
+        count++;
+      } else {
+        total += 0;
+        count++;
+      }
+    });
+    const overall = count > 0 ? Math.round(total / count) : 0;
+
+    verdictBox.classList.add('show');
+    verdictBox.classList.remove('high', 'mid', 'low');
+    const icon = document.getElementById('verdict-icon');
+    const title = document.getElementById('verdict-title');
+    if (overall >= 75) {
+      verdictBox.classList.add('high');
+      icon.textContent = '🎉';
+      title.textContent = '合格の可能性は高いです！';
+    } else if (overall >= 60) {
+      verdictBox.classList.add('mid');
+      icon.textContent = '💪';
+      title.textContent = '合格ラインに近づいています！';
+    } else {
+      verdictBox.classList.add('low');
+      icon.textContent = '📚';
+      title.textContent = 'もう少し練習を続けましょう';
+    }
+    document.getElementById('verdict-score').textContent = `総合スコア目安：${overall}%`;
+    mockCaveat.style.display = 'block';
+    retryBtn.textContent = 'もう一度模試に挑戦（別のカード）';
+
+    addRecord({
+      ts: Date.now(),
+      date: formatRecordDate(Date.now()),
+      examType: '2次',
+      verdict: overall >= 75 ? 'high' : overall >= 60 ? 'mid' : 'low',
+      verdictLabel: title.textContent,
+      scorePct: overall,
+      detail: currentSet.title
+    });
+  } else {
+    verdictBox.classList.remove('show');
+    mockCaveat.style.display = 'none';
+    retryBtn.textContent = 'もう一度このカードで練習';
+  }
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '<div style="font-size:0.9em;font-weight:800;color:#5B6CF5;margin-bottom:10px;text-align:left;">📋 この面接カードの質問とあなたの解答</div>';
+  currentSet.questions.forEach((q, i) => {
+    const mine = userAnswers[i] || '';
+    const score = questionScores[i];
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="rq">${q.no}. ${q.en}${score ? `<span class="score-chip ${score}">AI評価: ${score}</span>` : ''}</div>
+      <div style="font-size:0.78em;color:#5B6CF5;font-weight:800;margin-top:8px;margin-bottom:3px;">あなたの解答</div>
+      <div style="font-size:0.86em;${mine ? 'color:#444;' : 'color:#bbb;font-style:italic;'}margin-bottom:6px;">${mine ? escapeHtml(mine) : '（未記入）'}</div>
+      <div style="font-size:0.78em;color:#1a9e5a;font-weight:800;margin-bottom:3px;">解答例</div>
+      <div class="ra">${q.model}</div>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+
+document.getElementById('btn-retry').addEventListener('click', () => {
+  if (isMockMode) {
+    selectedSetIndex = Math.floor(Math.random() * CARD_SETS.length);
+  }
+  startPractice();
+});
+
+// URLに ?mode=mock が付いている場合（ハブページの「2次試験の模試に挑戦」から来た場合）は
+// カード選択を待たず、模試モードを自動的にスタートする
+if (new URLSearchParams(location.search).get('mode') === 'mock') {
+  isMockMode = true;
+  selectedSetIndex = Math.floor(Math.random() * CARD_SETS.length);
+  startPractice();
+}
+</script>
+
+</body>
+</html>

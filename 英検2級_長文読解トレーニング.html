@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検2級 長文読解トレーニング</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  /* ===== ページ管理 ===== */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-red     { background: linear-gradient(135deg,#ff416c,#ff4b2b); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .type-list {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .type-list h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .type-row { display:flex; align-items:center; gap:10px; padding:6px 0; font-size:0.88em; color:#555; }
+  .type-row .dot { width:8px; height:8px; border-radius:50%; background:#5B6CF5; flex-shrink:0; }
+
+  .mode-box {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .mode-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .mode-options { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .mode-opt {
+    flex: 1; min-width: 90px;
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-opt.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-opt .n { font-size: 1.3em; font-weight: 900; color: #333; }
+  .mode-opt .l { font-size: 0.75em; color: #888; margin-top: 2px; }
+
+  .mode-tabs { display: flex; gap: 8px; }
+  .mode-tab {
+    flex: 1; background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-tab.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-tab .mt-title { font-weight: 800; font-size: 0.88em; color: #333; }
+  .mode-tab .mt-sub { font-size: 0.72em; color: #888; margin-top: 3px; }
+
+  .category-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .cat-chip {
+    flex: 1; min-width: 130px; background: #fff; border: 2px solid #e2e5f5; border-radius: 50px;
+    padding: 10px 14px; text-align: center; font-size: 0.85em; font-weight: 700; color: #999;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .cat-chip.selected { border-color: #5B6CF5; background: #eef0ff; color: #5B6CF5; }
+
+  /* ===== 出題ページ ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:12px;
+  }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  .passage-card {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 16px;
+    padding: 16px 18px; margin-bottom: 16px; max-height: 260px; overflow-y: auto;
+  }
+  .passage-title { font-weight: 800; color: #5B6CF5; margin-bottom: 8px; font-size: 0.95em; }
+  .passage-text { font-size: 0.9em; line-height: 1.75; color: #333; white-space: pre-line; }
+
+  .question-card {
+    background: #f8f9ff; border-radius: 16px; padding: 20px 20px; margin-bottom: 16px;
+  }
+  .question-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 6px; }
+  .question-en { font-size: 1.05em; font-weight: 700; color: #222; line-height: 1.6; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 14px 18px; text-align: left; font-size: 0.95em; font-weight: 700; color:#333;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #b9c0f0; background: #f8f9ff; }
+  .choice-btn.correct { border-color: #43e97b; background: #eafff3; color: #1a9e5a; }
+  .choice-btn.wrong { border-color: #ff4b2b; background: #fff0ee; color: #d13a1f; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    margin-top: 16px; padding: 16px 18px; border-radius: 14px; display: none;
+  }
+  .feedback-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .feedback-box.correct { background: #eafff3; border: 2px solid #43e97b; }
+  .feedback-box.wrong { background: #fff0ee; border: 2px solid #ff4b2b; }
+  .feedback-title { font-weight: 900; font-size: 0.95em; margin-bottom: 6px; }
+  .feedback-box.correct .feedback-title { color: #1a9e5a; }
+  .feedback-box.wrong .feedback-title { color: #d13a1f; }
+  .feedback-answer { font-size: 0.9em; color: #444; margin-bottom: 4px; }
+  .feedback-explain { font-size: 0.85em; color: #666; line-height: 1.5; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .score-circle {
+    width: 150px; height: 150px; border-radius: 50%;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .score-circle .num { font-size: 2.2em; font-weight: 900; }
+  .score-circle .den { font-size: 0.85em; opacity: 0.85; }
+  .score-msg { font-size: 1.05em; font-weight: 800; color: #333; margin-bottom: 24px; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item {
+    background: #fff0ee; border: 2px solid #ffd6cf; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .review-item .rp { font-size: 0.75em; color: #b06a5f; font-weight: 700; margin-bottom: 4px; }
+  .review-item .rq { font-weight: 700; color: #333; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.88em; color: #1a9e5a; font-weight: 700; margin-bottom: 4px; }
+  .review-item .re { font-size: 0.83em; color: #777; line-height: 1.5; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検2級 長文読解トレーニング</div>
+      <div class="hd-sub">1次試験対策｜掲示文・Eメール・説明文</div>
+    </div>
+    <a class="hd-home-link" href="英検2級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">📖</div>
+    <div class="title-main">長文読解クイズ</div>
+    <div class="title-sub">英文を読んで、内容に関する問題に答えよう</div>
+    <div class="title-tagline">文章4種類搭載｜毎回ランダム出題</div>
+
+    <div class="type-list">
+      <h3>出題される文章のタイプ</h3>
+      <div class="type-row"><span class="dot"></span>掲示・案内文（お知らせ・チラシなど）</div>
+      <div class="type-row"><span class="dot"></span>Eメール文</div>
+      <div class="type-row"><span class="dot"></span>説明文</div>
+      <div class="type-row"><span class="dot"></span>物語文</div>
+    </div>
+
+    <div class="mode-box">
+      <h3>練習モードを選ぼう</h3>
+      <div class="mode-tabs">
+        <div class="mode-tab selected" data-mode="all4">
+          <div class="mt-title">全種類を1つずつ</div>
+          <div class="mt-sub">4つの文章をバランスよく</div>
+        </div>
+        <div class="mode-tab" data-mode="custom">
+          <div class="mt-title">自分で種類を選ぶ</div>
+          <div class="mt-sub">好きなタイプだけ練習</div>
+        </div>
+      </div>
+
+      <div id="category-picker" class="category-picker" style="display:none;">
+        <div class="cat-chip selected" data-type="掲示・案内文">掲示・案内文</div>
+        <div class="cat-chip selected" data-type="Eメール文">Eメール文</div>
+        <div class="cat-chip selected" data-type="説明文">説明文</div>
+        <div class="cat-chip selected" data-type="物語文">物語文</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">スタート！</button>
+  </div>
+
+  <!-- ===== 出題ページ ===== -->
+  <div id="page-quiz" class="page">
+    <button class="back-link" id="btn-back-to-title">← 出題設定に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">問題 1 / 13</span>
+        <span id="progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <span class="cat-badge" id="cat-badge">掲示・案内文</span>
+
+    <div class="passage-card">
+      <div class="passage-title" id="passage-title"></div>
+      <div class="passage-text" id="passage-text"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-label" id="question-label">Q1</div>
+      <div class="question-en" id="question-en"></div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="feedback-box" id="feedback-box">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-answer" id="feedback-answer"></div>
+      <div class="feedback-explain" id="feedback-explain"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" id="btn-next" style="display:none;">次の問題へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="score-circle">
+      <div class="num" id="result-score">0</div>
+      <div class="den">/ <span id="result-total">13</span> 問正解</div>
+    </div>
+    <div class="score-msg" id="result-msg"></div>
+
+    <div id="review-wrap">
+      <div class="review-list" id="review-list"></div>
+    </div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-retry-all">もう一度挑戦する</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title">タイトルに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 長文データ（英検準2級レベル） =====
+const PASSAGES = [
+  { type:"掲示・案内文", title:"International Symposium on Sustainable Urban Development", text:
+`International Symposium on Sustainable Urban Development
+
+Date: Friday, November 8 - Saturday, November 9
+Venue: Riverside Convention Center, Hall B
+
+The Institute for Urban Studies is pleased to announce its annual international symposium, bringing together researchers, policymakers, and industry professionals from over twenty countries to discuss strategies for building more sustainable and resilient cities. This year's keynote address will be delivered by Professor Elena Vasquez, whose recent work on green infrastructure has influenced urban planning policies across Europe and South America.
+
+Participants may choose from more than fifteen breakout sessions covering topics ranging from renewable energy integration to affordable housing policy. Advance registration is required, and early-bird discounts are available until October 1 for those who register through the online portal. A limited number of travel grants are also available for graduate students presenting original research.
+
+All sessions will be conducted in English, with simultaneous interpretation available in French and Spanish upon request. For a detailed schedule and speaker biographies, please consult the symposium website.`,
+    questions: [
+      { q:"What is Professor Vasquez known for?", correct:"Her work on green infrastructure that has influenced urban planning", wrongs:["Her research on international trade policy","Her role as the symposium's main organizer","Her work developing renewable energy technology"], explain:"本文に \"whose recent work on green infrastructure has influenced urban planning policies\" とあります。" },
+      { q:"Who might be eligible for a travel grant?", correct:"Graduate students presenting original research", wrongs:["Anyone who registers before October 1","Professors delivering keynote addresses","Participants from South America only"], explain:"本文に \"A limited number of travel grants are also available for graduate students presenting original research.\" とあります。" },
+      { q:"What is available for non-English speakers?", correct:"Simultaneous interpretation in French and Spanish", wrongs:["Written translations of all presentations","Sessions conducted entirely in their native language","A separate symposium held in other languages"], explain:"本文に \"simultaneous interpretation available in French and Spanish upon request\" とあります。" }
+    ] },
+  { type:"Eメール文", title:"Regarding the Internship Position", text:
+`Subject: Regarding the Internship Position
+
+Dear Ms. Patterson,
+
+Thank you for considering my application for the summer internship position in your marketing department. I am writing to follow up on a few points from our phone conversation last week.
+
+You mentioned that the internship would likely involve assisting with the company's upcoming product launch campaign. I wanted to ask whether the position would give me the opportunity to contribute to the social media strategy specifically, as this is an area I have been developing through my university coursework and a part-time role I currently hold at a local nonprofit organization.
+
+Additionally, I understand that the internship is unpaid but offers course credit. Could you clarify whether there is any possibility of a stipend to help cover transportation costs, given that the office is located a considerable distance from campus? I completely understand if this is not something the company is able to offer, but I wanted to raise the question before finalizing my decision.
+
+I remain very enthusiastic about the opportunity and look forward to your response.
+
+Sincerely,
+Daniel Kim`,
+    questions: [
+      { q:"Why is Daniel writing this email?", correct:"To follow up on questions from a phone conversation", wrongs:["To formally accept the internship offer","To withdraw his application for the position","To complain about the unpaid nature of the internship"], explain:"本文に \"I am writing to follow up on a few points from our phone conversation\" とあります。" },
+      { q:"What specific area is Daniel interested in contributing to?", correct:"Social media strategy", wrongs:["Financial planning","Product design","Human resources"], explain:"本文に \"whether the position would give me the opportunity to contribute to the social media strategy specifically\" とあります。" },
+      { q:"What does Daniel ask about regarding compensation?", correct:"Whether a stipend for transportation is possible", wrongs:["Whether the internship could become a paid position","Whether he can receive academic credit","Whether he can work remotely instead"], explain:"本文に \"Could you clarify whether there is any possibility of a stipend to help cover transportation costs\" とあります。" }
+    ] },
+  { type:"説明文", title:"The Psychology of Sunk Costs", text:
+`Economists have long studied a curious pattern in human decision-making known as the sunk cost fallacy: the tendency to continue investing time, money, or effort into a project simply because of the resources already committed, even when continuing no longer makes rational sense. A classic example involves a person who keeps watching a disappointing movie in a theater simply because they have already paid for the ticket, rather than leaving and spending the remaining time more productively.
+
+From a purely economic standpoint, past costs that cannot be recovered should have no bearing on future decisions; only the potential costs and benefits going forward should matter. Yet research in behavioral economics suggests that humans are wired to avoid the psychological discomfort of admitting that a previous investment was wasted. This discomfort, sometimes described as loss aversion, can lead individuals and even large organizations to pour additional resources into failing projects rather than cutting their losses.
+
+Interestingly, the sunk cost fallacy appears to be less pronounced in young children and in some non-human animals, which has led some researchers to speculate that the bias may be partly learned through cultural exposure to concepts like waste and perseverance. Understanding this bias has practical implications: businesses that train employees to recognize sunk cost thinking often make faster, more rational decisions about when to abandon underperforming projects.`,
+    questions: [
+      { q:"What is the sunk cost fallacy?", correct:"Continuing to invest in something because of resources already spent, even when it's no longer rational", wrongs:["The tendency to avoid making any financial investments","A economic theory about predicting future costs accurately","The belief that all past investments will eventually pay off"], explain:"本文に \"the tendency to continue investing time, money, or effort into a project simply because of the resources already committed, even when continuing no longer makes rational sense\" とあります。" },
+      { q:"According to economic theory, what should influence future decisions?", correct:"Only potential future costs and benefits", wrongs:["Primarily the amount already invested","Both past and future costs equally","The emotional attachment to the project"], explain:"本文に \"only the potential costs and benefits going forward should matter\" とあります。" },
+      { q:"What do some researchers suspect about the sunk cost fallacy in children?", correct:"It may be partly learned through cultural exposure", wrongs:["Children are more affected by it than adults","It does not exist in children at all","Children learn to avoid it through formal education"], explain:"本文に \"the bias may be partly learned through cultural exposure to concepts like waste and perseverance\" とあります。" },
+      { q:"What is one practical benefit of understanding this bias?", correct:"Businesses can make faster, more rational decisions about failing projects", wrongs:["Companies can completely eliminate all financial risk","Employees become less likely to make any investments","Organizations can predict which projects will succeed"], explain:"本文に \"businesses that train employees to recognize sunk cost thinking often make faster, more rational decisions about when to abandon underperforming projects\" とあります。" }
+    ] },
+  { type:"物語文", title:"The Weight of Silence", text:
+`For three years, Hana had avoided calling her older sister, Mei, ever since their heated argument at their father's funeral. What had begun as a disagreement about funeral arrangements had spiraled into accusations neither of them could take back, and afterward, both women had simply retreated into a silence that neither knew how to break. Hana told herself, year after year, that she was waiting for Mei to apologize first, though she suspected, somewhere beneath her pride, that Mei was thinking precisely the same thing.
+
+It was a phone call from her nephew, Mei's son, that finally shifted something in Hana. He explained, in a voice trying hard to sound casual, that his mother had been diagnosed with an illness that, while not immediately life-threatening, had made her unusually reflective in recent weeks. "She mentions you sometimes," he said carefully. "I don't think she knows how to reach out either."
+
+That night, Hana sat with her phone in her hand for nearly an hour before dialing. When Mei answered, there was a long pause on both ends, thick with three years of unspoken words. Finally, Hana spoke first, her voice unsteady: "I've missed you." The silence that followed felt different this time, not the silence of resentment, but of two people realizing, at last, that neither had ever stopped caring.`,
+    questions: [
+      { q:"Why had Hana and Mei stopped speaking?", correct:"They had a serious argument about funeral arrangements", wrongs:["Mei moved to another country","They disagreed about their father's inheritance","Hana was too busy with her career"], explain:"本文に \"What had begun as a disagreement about funeral arrangements had spiraled into accusations\" とあります。" },
+      { q:"Why had neither sister apologized first?", correct:"Both were too proud and assumed the other felt the same way", wrongs:["Neither of them remembered what the argument was about","They had both moved to different countries","Their families forbade them from speaking"], explain:"本文に \"she suspected, somewhere beneath her pride, that Mei was thinking precisely the same thing\" とあります。" },
+      { q:"What prompted Hana to finally call her sister?", correct:"Learning that Mei had been diagnosed with an illness", wrongs:["Receiving a formal apology letter from Mei","Being reminded of the argument by a friend","Her nephew's wedding invitation"], explain:"甥から、母親（Mei）が病気と診断されたことを聞いたことがきっかけです。" },
+      { q:"How did the silence feel different at the end of the story?", correct:"It felt like relief and continued caring rather than resentment", wrongs:["It felt exactly the same as before","It felt more uncomfortable than before","It signaled the end of their relationship"], explain:"本文に \"The silence that followed felt different this time, not the silence of resentment, but of two people realizing... that neither had ever stopped caring.\" とあります。" }
+    ] }
+];
+
+// ===== 状態管理 =====
+let selectedMode = 'all4'; // 'all4' or 'custom'
+let selectedCategories = new Set(['掲示・案内文', 'Eメール文', '説明文', '物語文']);
+let flatQuestions = []; // {passageIndex, question}
+let currentIndex = 0;
+let correctCount = 0;
+let wrongQuestions = [];
+let answered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// 文章のタイプが偏らないよう、カテゴリごとに順番に選んでいく
+function pickPassages(n) {
+  const byCategory = {};
+  PASSAGES.forEach((p, i) => {
+    (byCategory[p.type] = byCategory[p.type] || []).push(i);
+  });
+  Object.keys(byCategory).forEach(k => { byCategory[k] = shuffle(byCategory[k]); });
+  const cats = shuffle(Object.keys(byCategory));
+
+  const selected = [];
+  while (selected.length < n) {
+    let addedAny = false;
+    for (const cat of cats) {
+      if (selected.length >= n) break;
+      const arr = byCategory[cat];
+      if (arr.length > 0) {
+        selected.push(arr.shift());
+        addedAny = true;
+      }
+    }
+    if (!addedAny) break;
+  }
+  return selected.map(i => PASSAGES[i]);
+}
+
+function buildFlatQuestions(passages) {
+  const list = [];
+  passages.forEach((p, pi) => {
+    p.questions.forEach((q, qi) => {
+      list.push({ passage: p, qIndexInPassage: qi, question: q });
+    });
+  });
+  return list;
+}
+
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('selected'));
+    tab.classList.add('selected');
+    selectedMode = tab.dataset.mode;
+    document.getElementById('category-picker').style.display = selectedMode === 'custom' ? 'flex' : 'none';
+  });
+});
+
+document.querySelectorAll('.cat-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const type = chip.dataset.type;
+    if (chip.classList.contains('selected')) {
+      if (selectedCategories.size === 1) return; // 最低1つは選択が必要
+      chip.classList.remove('selected');
+      selectedCategories.delete(type);
+    } else {
+      chip.classList.add('selected');
+      selectedCategories.add(type);
+    }
+  });
+});
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  startQuiz();
+});
+
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startQuiz() {
+  const passages = selectedMode === 'custom'
+    ? shuffle(PASSAGES.filter(p => selectedCategories.has(p.type)))
+    : pickPassages(4);
+  flatQuestions = buildFlatQuestions(passages);
+  currentIndex = 0;
+  correctCount = 0;
+  wrongQuestions = [];
+  goPage('page-quiz');
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const item = flatQuestions[currentIndex];
+  const passage = item.passage;
+  const q = item.question;
+
+  document.getElementById('progress-text').textContent = `問題 ${currentIndex + 1} / ${flatQuestions.length}`;
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('progress-bar').style.width = `${(currentIndex / flatQuestions.length) * 100}%`;
+  document.getElementById('cat-badge').textContent = passage.type;
+  document.getElementById('passage-title').textContent = passage.title;
+  document.getElementById('passage-text').textContent = passage.text;
+  document.getElementById('question-label').textContent = `Q${item.qIndexInPassage + 1}`;
+  document.getElementById('question-en').textContent = q.q;
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectAnswer(btn, opt, q, passage));
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('btn-next').style.display = 'none';
+}
+
+function selectAnswer(btn, opt, q, passage) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = opt === q.correct;
+
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('feedback-explain').textContent = q.explain;
+
+  if (isCorrect) {
+    correctCount++;
+  } else {
+    wrongQuestions.push({ passageTitle: passage.title, passageType: passage.type, q: q.q, correct: q.correct, explain: q.explain });
+  }
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  currentIndex++;
+  if (currentIndex < flatQuestions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  document.getElementById('progress-bar').style.width = '100%';
+  goPage('page-result');
+  document.getElementById('result-score').textContent = correctCount;
+  document.getElementById('result-total').textContent = flatQuestions.length;
+
+  const rate = correctCount / flatQuestions.length;
+  let msg = '';
+  if (rate === 1) msg = '🎉 パーフェクト！すばらしい！';
+  else if (rate >= 0.8) msg = '😊 よくできました！この調子！';
+  else if (rate >= 0.6) msg = '👍 もう少し！本文を読み直してみよう';
+  else msg = '💪 本文の内容をもう一度確認しよう';
+  document.getElementById('result-msg').textContent = msg;
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  if (wrongQuestions.length > 0) {
+    const heading = document.createElement('h3');
+    heading.style.cssText = 'font-size:0.9em;color:#d13a1f;font-weight:800;margin-bottom:10px;';
+    heading.textContent = `間違えた問題（${wrongQuestions.length}問）の復習`;
+    reviewList.appendChild(heading);
+
+    wrongQuestions.forEach(w => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `
+        <div class="rp">${w.passageType}「${w.passageTitle}」</div>
+        <div class="rq">${w.q}</div>
+        <div class="ra">正解: ${w.correct}</div>
+        <div class="re">${w.explain}</div>
+      `;
+      reviewList.appendChild(div);
+    });
+  }
+}
+
+document.getElementById('btn-retry-all').addEventListener('click', () => {
+  startQuiz();
+});
+
+document.getElementById('btn-back-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+</script>
+
+</body>
+</html>

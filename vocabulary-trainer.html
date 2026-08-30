@@ -204,6 +204,14 @@
     cursor: pointer; font-family: var(--font-body); white-space: nowrap; box-shadow: var(--shadow-sm);
   }
   .ov-open-btn:active { transform: translate(2px,2px); box-shadow: none; }
+  .header-btns { display: flex; align-items: center; gap: 8px; }
+  .home-link-btn {
+    display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 10px;
+    border: 2px solid var(--border-strong); background: var(--surface); color: var(--ink);
+    font-weight: 800; font-size: .74rem; text-decoration: none; font-family: var(--font-body);
+    white-space: nowrap; box-shadow: var(--shadow-sm);
+  }
+  .home-link-btn:active { transform: translate(2px,2px); box-shadow: none; }
   .ov-summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 4px; }
   .ov-summary-tile { text-align: center; padding: 12px 6px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); }
   .ov-summary-num { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; color: var(--seal); font-variant-numeric: tabular-nums; }
@@ -502,7 +510,10 @@
         <div class="logo">Vocabulary Trainer</div>
       </div>
     </div>
-    <button class="ov-open-btn" onclick="go('overview')">📊 学習状況</button>
+    <div class="header-btns">
+      <a class="home-link-btn" href="単語学習.html">🏠 戻る</a>
+      <button class="ov-open-btn" onclick="go('overview')">📊 学習状況</button>
+    </div>
   </div>
 
   <div id="unit-selector" class="unit-selector"></div>

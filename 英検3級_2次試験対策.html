@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検3級 2次試験対策</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block; padding: 13px 28px; border-radius: 50px; border: none;
+    font-size: 0.95em; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-outline { background: #fff; color: #5B6CF5; border: 2px solid #5B6CF5; padding: 11px 26px; }
+  .btn-sound   { background: #eef0ff; color: #5B6CF5; padding: 9px 18px; font-size: 0.85em; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block; background: linear-gradient(135deg,#667eea,#764ba2); color: white;
+    border-radius: 50px; padding: 6px 18px; font-size: 0.85em; font-weight: 700; margin-bottom: 28px;
+  }
+
+  .flow-box { background: #f8f9ff; border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; text-align: left; }
+  .flow-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .flow-row { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; }
+  .flow-row .fr-num {
+    width: 22px; height: 22px; border-radius: 50%; background: #5B6CF5; color: #fff; font-weight: 800;
+    font-size: 0.72em; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+  }
+  .flow-row .fr-text { font-size: 0.85em; color: #555; line-height: 1.5; }
+  .flow-row .fr-text b { color: #333; }
+
+  .set-list { display: flex; flex-direction: column; gap: 10px; text-align: left; margin-bottom: 22px; }
+  .set-card {
+    display: flex; align-items: center; gap: 14px; background: #fff; border: 2px solid #e2e5f5;
+    border-radius: 14px; padding: 14px 16px; cursor: pointer; transition: all 0.15s;
+  }
+  .set-card:hover { border-color: #5B6CF5; background: #f8f9ff; }
+  .set-card.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .set-card .sc-icon { font-size: 1.8em; flex-shrink: 0; }
+  .set-card .sc-title { font-weight: 800; color: #333; font-size: 0.92em; }
+  .set-card .sc-desc { font-size: 0.76em; color: #999; margin-top: 2px; }
+
+  .mock-mode-card {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(135deg,#fff8ec,#fff2de); border: 2px solid #ffd98a;
+    border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; cursor: pointer; transition: all 0.15s; text-align: left;
+  }
+  .mock-mode-card:hover { border-color: #f7971e; box-shadow: 0 8px 20px rgba(247,151,30,0.18); transform: translateY(-2px); }
+  .mock-mode-card .mmc-icon { font-size: 2em; flex-shrink: 0; }
+  .mock-mode-card .mmc-title { font-weight: 800; color: #333; font-size: 0.95em; margin-bottom: 3px; }
+  .mock-mode-card .mmc-desc { font-size: 0.78em; color: #8a6113; line-height: 1.5; }
+  .mock-mode-card .mmc-arrow { font-size: 1.3em; color: #f7971e; flex-shrink: 0; }
+  .mode-divider { text-align: center; font-size: 0.78em; color: #aaa; margin: 4px 0 14px; }
+
+  .verdict-box { border-radius: 20px; padding: 22px 20px; margin-bottom: 20px; display: none; }
+  .verdict-box.show { display: block; }
+  .verdict-box.high { background: linear-gradient(135deg,#43e97b,#38f9d7); }
+  .verdict-box.mid  { background: linear-gradient(135deg,#f7971e,#ffd200); }
+  .verdict-box.low  { background: linear-gradient(135deg,#ff9a8b,#ff6a88); }
+  .verdict-box .v-icon { font-size: 2.4em; margin-bottom: 6px; }
+  .verdict-box .v-title { font-size: 1.2em; font-weight: 900; color: #fff; margin-bottom: 4px; }
+  .verdict-box .v-score { font-size: 0.92em; color: rgba(255,255,255,0.9); font-weight: 700; }
+  .score-chip {
+    display: inline-block; font-size: 0.7em; font-weight: 800; border-radius: 50px; padding: 2px 10px; margin-left: 8px;
+  }
+  .score-chip.A { background: #eafff3; color: #1a9e5a; }
+  .score-chip.B { background: #fff6e0; color: #b8791a; }
+  .score-chip.C { background: #fff0ee; color: #d13a1f; }
+
+  /* ===== 練習ページ共通 ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .card-box {
+    background: #fff; border: 3px solid #5B6CF5; border-radius: 18px; padding: 18px; margin-bottom: 18px;
+  }
+  .card-box .cb-label { font-size: 0.72em; font-weight: 800; color: #5B6CF5; margin-bottom: 8px; }
+  .passage-text { font-size: 0.95em; line-height: 1.8; color: #222; margin-bottom: 14px; }
+  .illustration-wrap { width: 100%; border-radius: 12px; overflow: hidden; background: #eaf4ff; }
+  .illustration-wrap svg { width: 100%; height: auto; display: block; }
+
+  .no-card-note {
+    background: #fff8ec; border: 2px solid #ffd98a; border-radius: 14px; padding: 12px 16px; margin-bottom: 18px;
+    font-size: 0.82em; color: #8a6113; text-align: center; font-weight: 700;
+  }
+
+  .question-card { background: #f8f9ff; border-radius: 16px; padding: 20px 20px; margin-bottom: 16px; }
+  .question-no { display:inline-block; background:#5B6CF5; color:#fff; font-weight:900; font-size:0.78em; border-radius:50px; padding:3px 12px; margin-bottom:10px; }
+  .question-en { font-size: 1.1em; font-weight: 700; color: #222; line-height: 1.6; margin-bottom: 10px; }
+  .hint-text { font-size: 0.82em; color: #888; line-height: 1.5; }
+
+  .answer-textarea {
+    width: 100%; min-height: 90px; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 14px 16px; font-size: 0.95em; font-family: inherit; line-height: 1.6; resize: vertical;
+    transition: border-color 0.15s; margin-bottom: 16px;
+  }
+  .answer-textarea:focus { outline: none; border-color: #5B6CF5; }
+
+  .model-box { background: #eafff3; border: 2px solid #43e97b; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; display: none; }
+  .model-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .model-box h4 { font-size: 0.85em; color: #1a9e5a; font-weight: 800; margin-bottom: 8px; }
+  .model-box .ma-text { font-size: 0.92em; color: #333; line-height: 1.7; }
+
+  .ai-box {
+    background: #eef0ff; border: 2px solid #5B6CF5; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px;
+    display: none;
+  }
+  .ai-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .ai-box h4 { font-size: 0.85em; color: #5B6CF5; font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px; }
+  .ai-score-badge { display:inline-block; font-weight:900; font-size:0.8em; padding:2px 12px; border-radius:50px; background:#5B6CF5; color:#fff; }
+  .ai-section { margin-bottom: 10px; }
+  .ai-section:last-child { margin-bottom: 0; }
+  .ai-section .as-label { font-size: 0.75em; font-weight: 800; color: #5B6CF5; margin-bottom: 3px; }
+  .ai-section .as-text { font-size: 0.88em; color: #333; line-height: 1.6; }
+  .ai-loading { font-size: 0.85em; color: #666; text-align: center; padding: 10px; }
+  .ai-error { font-size: 0.85em; color: #d13a1f; background: #fff0ee; border-radius: 10px; padding: 10px 12px; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .result-icon { font-size: 4em; margin-bottom: 10px; }
+  .score-msg { font-size: 1.15em; font-weight: 900; color: #333; margin-bottom: 24px; }
+
+  .attitude-box { background: #f8f9ff; border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; text-align: left; }
+  .attitude-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 10px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: #555; padding: 5px 0; }
+  .check-item input { width: 16px; height: 16px; accent-color: #5B6CF5; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item { background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
+  .review-item .rq { font-weight: 700; color: #333; font-size: 0.9em; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.86em; color: #1a9e5a; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  @media (max-width: 480px) { .set-card .sc-desc { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検3級 2次試験対策</div>
+      <div class="hd-sub">面接（スピーキング）練習</div>
+    </div>
+    <a class="hd-home-link" href="英検3級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">🎤</div>
+    <div class="title-main">面接練習</div>
+    <div class="title-sub">絵カードを使った本番形式で練習しよう</div>
+    <div class="title-tagline">音読｜カードの質問｜自分についての質問</div>
+
+    <div class="flow-box">
+      <h3>面接の流れ</h3>
+      <div class="flow-row"><div class="fr-num">1</div><div class="fr-text"><b>入室・あいさつ</b>："Hello." "How are you?" と聞かれたら笑顔で答えよう</div></div>
+      <div class="flow-row"><div class="fr-num">2</div><div class="fr-text"><b>カードを見る</b>：パッセージ（文章）と絵を20秒ほど黙読</div></div>
+      <div class="flow-row"><div class="fr-num">3</div><div class="fr-text"><b>音読</b>：パッセージを声に出して読む</div></div>
+      <div class="flow-row"><div class="fr-num">4</div><div class="fr-text"><b>No.1〜3</b>：パッセージと絵についての質問に答える</div></div>
+      <div class="flow-row"><div class="fr-num">5</div><div class="fr-text"><b>No.4〜5</b>：カードを裏返し、自分自身についての質問に答える</div></div>
+      <div class="flow-row"><div class="fr-num">6</div><div class="fr-text"><b>カードを返して退室</b>："Thank you." と言って終了</div></div>
+    </div>
+
+    <div class="mock-mode-card" id="btn-start-mock">
+      <div class="mmc-icon">🎯</div>
+      <div class="mmc-body">
+        <div class="mmc-title">模試モードに挑戦</div>
+        <div class="mmc-desc">カードはランダムに1枚。5問すべて答え終えたら、AI採点をもとに合格可能性を判定します。</div>
+      </div>
+      <div class="mmc-arrow">›</div>
+    </div>
+
+    <div class="mode-divider">または、カードを選んで練習する</div>
+
+    <div class="set-list" id="set-list"></div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">この面接カードで練習する</button>
+  </div>
+
+  <!-- ===== 練習ページ ===== -->
+  <div id="page-practice" class="page">
+    <button class="back-link" id="btn-back-to-title">← カード選択に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">No.1 / 5</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <div class="card-box" id="card-box">
+      <div class="cb-label">📋 面接カード</div>
+      <div class="passage-text" id="passage-text"></div>
+      <div class="illustration-wrap" id="illustration-wrap"></div>
+    </div>
+
+    <div class="no-card-note" id="no-card-note" style="display:none;">📋 ここからはカードを見ずに、あなた自身のことを答える質問です</div>
+
+    <div class="question-card">
+      <span class="question-no" id="question-no">No.1</span>
+      <div class="question-en" id="question-en"></div>
+      <button class="btn btn-sound" id="btn-play-question">🔊 質問を聞く</button>
+      <div class="hint-text" id="hint-text" style="margin-top:10px;"></div>
+    </div>
+
+    <textarea class="answer-textarea" id="answer-textarea" placeholder="英語で答えを書いてみよう..."></textarea>
+
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <button class="btn btn-outline" style="flex:1;" id="btn-show-model">解答例を見る</button>
+      <button class="btn btn-primary" style="flex:1;" id="btn-ai-check">🤖 AIに採点してもらう</button>
+    </div>
+
+    <div class="model-box" id="model-box">
+      <h4>💡 解答例</h4>
+      <div class="ma-text" id="model-text"></div>
+    </div>
+
+    <div class="ai-box" id="ai-box"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" id="btn-next">次の質問へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="result-icon">🎉</div>
+    <div class="score-msg">お疲れさまでした！</div>
+
+    <div class="verdict-box" id="verdict-box">
+      <div class="v-icon" id="verdict-icon">🎉</div>
+      <div class="v-title" id="verdict-title"></div>
+      <div class="v-score" id="verdict-score"></div>
+    </div>
+    <div class="mock-caveat-box" id="mock-caveat" style="display:none; background:#f8f9ff; border-radius:14px; padding:14px 16px; margin-bottom:20px; text-align:left; font-size:0.78em; color:#888; line-height:1.7;">
+      ※このスコアは、AIが採点した各設問の評価をもとにした<b>簡易的な推定</b>です。実際の面接では発音・流暢さ・アイコンタクトなども評価されますが、このアプリはテキストでの解答のみを採点しています。
+    </div>
+
+    <div class="attitude-box">
+      <h3>✅ アティチュード（態度）セルフチェック</h3>
+      <label class="check-item"><input type="checkbox"> 相手の目（カメラ）を見て話せた</label>
+      <label class="check-item"><input type="checkbox"> 笑顔・大きな声で答えられた</label>
+      <label class="check-item"><input type="checkbox"> わからないときに "Could you say that again, please?" と聞き返せた（聞けなくてもOK、フレーズを覚えよう）</label>
+      <label class="check-item"><input type="checkbox"> Yes/Noのあとに、理由もつけ加えられた</label>
+    </div>
+
+    <div class="review-list" id="review-list"></div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-retry">もう一度このカードで練習</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title2">カード選択に戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// データ：面接カード4セット
+// ================================================================
+const CARD_SETS = [
+  {
+    icon: "🌳", title: "公園にて", desc: "At the Park",
+    passage: "Many people like to visit the park near their houses. In this park, there is a large pond, and people can see many kinds of birds there. Every Sunday, a group of volunteers cleans the park to keep it beautiful.",
+    illustration: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+      <defs>
+        <linearGradient id="p-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9edff"/><stop offset="1" stop-color="#a8d4f5"/></linearGradient>
+        <linearGradient id="p-ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bdea9a"/><stop offset="1" stop-color="#8bc766"/></linearGradient>
+        <radialGradient id="p-skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#ffe9cf"/><stop offset="1" stop-color="#eeba85"/></radialGradient>
+        <linearGradient id="p-orange" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb454"/><stop offset="1" stop-color="#ef7f0f"/></linearGradient>
+        <linearGradient id="p-blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6c7bea"/><stop offset="1" stop-color="#38449e"/></linearGradient>
+        <linearGradient id="p-teal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74dcf0"/><stop offset="1" stop-color="#289cb8"/></linearGradient>
+        <linearGradient id="p-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4a2e"/><stop offset="1" stop-color="#3c2814"/></linearGradient>
+        <linearGradient id="p-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9784c"/><stop offset="1" stop-color="#7a5228"/></linearGradient>
+        <radialGradient id="p-tree" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#8fce69"/><stop offset="1" stop-color="#5a9a3d"/></radialGradient>
+      </defs>
+      <rect width="400" height="140" fill="url(#p-sky)"/>
+      <rect y="140" width="400" height="80" fill="url(#p-ground)"/>
+      <circle cx="362" cy="34" r="22" fill="#ffe9a3"/>
+      <ellipse cx="70" cy="45" rx="26" ry="16" fill="#fff"/>
+      <ellipse cx="96" cy="50" rx="20" ry="13" fill="#fff"/>
+      <rect x="20" y="95" width="16" height="55" fill="url(#p-wood)"/>
+      <circle cx="28" cy="80" r="34" fill="url(#p-tree)"/>
+      <ellipse cx="345" cy="178" rx="50" ry="15" fill="#7ec8e3"/>
+      <path d="M310,175 Q345,169 380,175" stroke="#fff" stroke-width="2" fill="none" opacity="0.6"/>
+      <ellipse cx="110" cy="214" rx="30" ry="6" fill="#3b6b1e" opacity="0.18"/>
+      <ellipse cx="300" cy="207" rx="42" ry="6" fill="#3b6b1e" opacity="0.15"/>
+      <!-- kite string and kite -->
+      <line x1="178" y1="90" x2="230" y2="35" stroke="#888" stroke-width="1.5"/>
+      <polygon points="245,5 225,25 245,45 265,25" fill="#ff6a88"/>
+      <polygon points="245,5 265,25 245,25" fill="#ffd200"/>
+      <line x1="245" y1="5" x2="245" y2="45" stroke="#fff" stroke-width="1.5"/>
+      <line x1="225" y1="25" x2="265" y2="25" stroke="#fff" stroke-width="1.5"/>
+      <path d="M245,45 q-8,9 0,16 q8,7 0,16 q-8,9 0,16" stroke="#ff6a88" stroke-width="2.5" fill="none"/>
+      <!-- boy -->
+      <line x1="84" y1="134" x2="72" y2="170" stroke="url(#p-skin)" stroke-width="14" stroke-linecap="round"/>
+      <line x1="136" y1="134" x2="178" y2="90" stroke="url(#p-skin)" stroke-width="14" stroke-linecap="round"/>
+      <circle cx="178" cy="90" r="9" fill="url(#p-skin)"/>
+      <rect x="86" y="180" width="18" height="32" rx="6" fill="url(#p-blue)"/>
+      <rect x="116" y="180" width="18" height="32" rx="6" fill="url(#p-blue)"/>
+      <rect x="84" y="207" width="22" height="9" rx="3" fill="#333"/>
+      <rect x="114" y="207" width="22" height="9" rx="3" fill="#333"/>
+      <rect x="82" y="124" width="56" height="58" rx="18" fill="url(#p-orange)"/>
+      <rect x="104" y="114" width="12" height="14" fill="url(#p-skin)"/>
+      <circle cx="110" cy="95" r="24" fill="url(#p-skin)"/>
+      <path d="M86,88 Q110,58 134,88 L131,79 Q110,64 89,79 Z" fill="url(#p-hair)"/>
+      <circle cx="102" cy="94" r="2.5" fill="#333"/>
+      <circle cx="118" cy="94" r="2.5" fill="#333"/>
+      <path d="M100,103 Q110,109 120,103" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="110" cy="58" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="110" y="63" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">1</text>
+      <!-- bench -->
+      <rect x="250" y="148" width="100" height="8" rx="2" fill="url(#p-wood)"/>
+      <rect x="256" y="148" width="6" height="32" fill="#6b431f"/>
+      <rect x="336" y="148" width="6" height="32" fill="#6b431f"/>
+      <rect x="250" y="178" width="100" height="10" rx="2" fill="url(#p-wood)"/>
+      <rect x="256" y="188" width="8" height="22" fill="#6b431f"/>
+      <rect x="336" y="188" width="8" height="22" fill="#6b431f"/>
+      <!-- woman -->
+      <path d="M270,102 Q300,66 330,102 L332,132 Q300,121 268,132 Z" fill="url(#p-hair)"/>
+      <rect x="284" y="178" width="16" height="20" rx="6" fill="#333"/>
+      <rect x="302" y="178" width="16" height="20" rx="6" fill="#333"/>
+      <ellipse cx="292" cy="199" rx="10" ry="5" fill="#222"/>
+      <ellipse cx="310" cy="199" rx="10" ry="5" fill="#222"/>
+      <rect x="276" y="122" width="48" height="58" rx="18" fill="url(#p-teal)"/>
+      <line x1="278" y1="132" x2="291" y2="154" stroke="url(#p-skin)" stroke-width="12" stroke-linecap="round"/>
+      <line x1="322" y1="132" x2="309" y2="154" stroke="url(#p-skin)" stroke-width="12" stroke-linecap="round"/>
+      <rect x="294" y="112" width="12" height="14" fill="url(#p-skin)"/>
+      <circle cx="300" cy="95" r="22" fill="url(#p-skin)"/>
+      <path d="M279,88 Q300,64 321,88 L318,79 Q300,68 282,79 Z" fill="url(#p-hair)"/>
+      <circle cx="293" cy="94" r="2.5" fill="#333"/>
+      <circle cx="307" cy="94" r="2.5" fill="#333"/>
+      <path d="M291,102 Q300,107 309,102" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <polygon points="270,150 300,159 300,169 270,163" fill="#fff" stroke="#ccc" stroke-width="1"/>
+      <polygon points="330,150 300,159 300,169 330,163" fill="#fff" stroke="#ccc" stroke-width="1"/>
+      <line x1="300" y1="159" x2="300" y2="169" stroke="#999" stroke-width="1.5"/>
+      <line x1="277" y1="154" x2="295" y2="160" stroke="#ddd" stroke-width="1"/>
+      <line x1="323" y1="154" x2="305" y2="160" stroke="#ddd" stroke-width="1"/>
+      <circle cx="300" cy="58" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="300" y="63" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">2</text>
+    </svg>`,
+    people: ["① たこ（kite）をあげている男の子", "② ベンチで本を読んでいる女性"],
+    questions: [
+      { no:"No.1", type:"passage", en:"Look at the passage. Why do people like this park?", hint:"パッセージの内容から、公園の特徴を答えよう。", model:"Because there is a large pond, and people can see many kinds of birds there." },
+      { no:"No.2", type:"picture", en:"Please look at the picture. What is the boy doing?", hint:"「①の男の子」の動作を現在進行形（is 〜ing）で答えよう。", model:"He is flying a kite." },
+      { no:"No.3", type:"picture", en:"What is the woman doing?", hint:"「②の女性」の動作を現在進行形（is 〜ing）で答えよう。", model:"She is reading a book on the bench." },
+      { no:"No.4", type:"personal", en:"Do you often go to a park?", hint:"Yes/Noで答えたあと、理由をひとこと添えよう。", model:"Yes, I do. I like playing there with my friends after school." },
+      { no:"No.5", type:"personal", en:"What do you usually do on weekends?", hint:"自分の週末の過ごし方を1〜2文で答えよう。", model:"I usually play soccer with my friends. It's a lot of fun." }
+    ]
+  },
+  {
+    icon: "🥐", title: "パン屋にて", desc: "The New Bakery",
+    passage: "A new bakery opened near the station last month. The bakery sells many kinds of bread, and it is especially famous for its chocolate bread. Every morning, a lot of people wait in line before it opens.",
+    illustration: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+      <defs>
+        <linearGradient id="b-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff8ea"/><stop offset="1" stop-color="#ffe9c4"/></linearGradient>
+        <linearGradient id="b-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d7ae"/><stop offset="1" stop-color="#dcb37f"/></linearGradient>
+        <radialGradient id="b-skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#ffe9cf"/><stop offset="1" stop-color="#eeba85"/></radialGradient>
+        <linearGradient id="b-pink" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8fa3"/><stop offset="1" stop-color="#e8506e"/></linearGradient>
+        <linearGradient id="b-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a866"/><stop offset="1" stop-color="#a9682e"/></linearGradient>
+        <linearGradient id="b-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4a2e"/><stop offset="1" stop-color="#3c2814"/></linearGradient>
+      </defs>
+      <rect width="400" height="220" fill="url(#b-wall)"/>
+      <rect y="150" width="400" height="70" fill="url(#b-floor)"/>
+      <ellipse cx="150" cy="213" rx="32" ry="6" fill="#7a5228" opacity="0.2"/>
+      <ellipse cx="300" cy="213" rx="34" ry="6" fill="#7a5228" opacity="0.2"/>
+      <!-- bread display case (background) -->
+      <rect x="15" y="45" width="120" height="80" rx="8" fill="#fff" stroke="#e0b98a" stroke-width="3"/>
+      <rect x="15" y="30" width="120" height="16" rx="4" fill="url(#b-pink)"/>
+      <ellipse cx="45" cy="95" rx="18" ry="12" fill="#c98a4b"/>
+      <ellipse cx="80" cy="90" rx="16" ry="14" fill="#a9682e"/>
+      <ellipse cx="112" cy="98" rx="14" ry="10" fill="#e8bd85"/>
+      <!-- baker (man) -->
+      <line x1="124" y1="132" x2="140" y2="163" stroke="url(#b-skin)" stroke-width="13" stroke-linecap="round"/>
+      <line x1="176" y1="132" x2="160" y2="163" stroke="url(#b-skin)" stroke-width="13" stroke-linecap="round"/>
+      <rect x="122" y="122" width="56" height="56" rx="16" fill="#fff" stroke="#e6e6e6" stroke-width="2"/>
+      <rect x="122" y="122" width="56" height="10" fill="url(#b-pink)"/>
+      <rect x="144" y="112" width="12" height="12" fill="url(#b-skin)"/>
+      <circle cx="150" cy="95" r="23" fill="url(#b-skin)"/>
+      <circle cx="143" cy="94" r="2.5" fill="#333"/>
+      <circle cx="157" cy="94" r="2.5" fill="#333"/>
+      <path d="M141,103 Q150,109 159,103" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="150" cy="46" rx="20" ry="15" fill="#fff" stroke="#ddd" stroke-width="1.5"/>
+      <rect x="133" y="58" width="34" height="17" rx="4" fill="#fff" stroke="#ddd" stroke-width="1.5"/>
+      <rect x="95" y="178" width="110" height="14" rx="3" fill="url(#b-wood)"/>
+      <rect x="95" y="192" width="110" height="18" fill="#a9682e"/>
+      <ellipse cx="150" cy="172" rx="28" ry="10" fill="#e8cba0" stroke="#c98a4b" stroke-width="2"/>
+      <circle cx="150" cy="163" r="16" fill="#f2d9a8"/>
+      <circle cx="107" cy="142" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="107" y="147" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">1</text>
+      <!-- girl choosing bread -->
+      <rect x="335" y="150" width="52" height="36" rx="6" fill="url(#b-wood)" stroke="#8a5a30" stroke-width="2"/>
+      <circle cx="347" cy="150" r="10" fill="#c98a4b"/>
+      <circle cx="362" cy="148" r="11" fill="#a9682e"/>
+      <circle cx="376" cy="152" r="9" fill="#e8bd85"/>
+      <rect x="286" y="180" width="14" height="30" rx="5" fill="#333"/>
+      <rect x="304" y="180" width="14" height="30" rx="5" fill="#333"/>
+      <rect x="284" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <rect x="302" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <line x1="280" y1="136" x2="270" y2="168" stroke="url(#b-skin)" stroke-width="12" stroke-linecap="round"/>
+      <line x1="320" y1="136" x2="345" y2="155" stroke="url(#b-skin)" stroke-width="12" stroke-linecap="round"/>
+      <rect x="278" y="126" width="44" height="54" rx="16" fill="url(#b-pink)"/>
+      <rect x="294" y="116" width="12" height="12" fill="url(#b-skin)"/>
+      <circle cx="300" cy="98" r="22" fill="url(#b-skin)"/>
+      <path d="M279,92 Q300,64 321,92 L318,83 Q300,70 282,83 Z" fill="url(#b-hair)"/>
+      <ellipse cx="325" cy="97" rx="8" ry="15" fill="url(#b-hair)"/>
+      <circle cx="293" cy="97" r="2.5" fill="#333"/>
+      <circle cx="307" cy="97" r="2.5" fill="#333"/>
+      <path d="M291,105 Q300,110 309,105" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="300" cy="60" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="300" y="65" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">2</text>
+    </svg>`,
+    people: ["① パンを作っている男性（お店の人）", "② パンを選んでいる女の子"],
+    questions: [
+      { no:"No.1", type:"passage", en:"Look at the passage. Why is the bakery famous?", hint:"パッセージの内容から、パン屋が有名な理由を答えよう。", model:"It is famous for its chocolate bread." },
+      { no:"No.2", type:"picture", en:"Please look at the picture. What is the man doing?", hint:"「①の男性」の動作を現在進行形で答えよう。", model:"He is baking bread." },
+      { no:"No.3", type:"picture", en:"What is the girl doing?", hint:"「②の女の子」の動作を現在進行形で答えよう。", model:"She is choosing bread." },
+      { no:"No.4", type:"personal", en:"Do you like bread?", hint:"Yes/Noで答えたあと、理由をひとこと添えよう。", model:"Yes, I do. I especially like chocolate bread." },
+      { no:"No.5", type:"personal", en:"What did you eat for breakfast this morning?", hint:"今朝食べたものを1〜2文で答えよう。", model:"I ate rice and miso soup for breakfast this morning." }
+    ]
+  },
+  {
+    icon: "📚", title: "学校の図書室", desc: "The School Library",
+    passage: "The school library is open every day after school. Students can borrow up to five books at one time. This month, the library is having a special event about Japanese history books.",
+    illustration: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+      <defs>
+        <linearGradient id="l-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2f3ff"/><stop offset="1" stop-color="#dfe2fa"/></linearGradient>
+        <linearGradient id="l-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e5f8"/><stop offset="1" stop-color="#c7cbef"/></linearGradient>
+        <radialGradient id="l-skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#ffe9cf"/><stop offset="1" stop-color="#eeba85"/></radialGradient>
+        <linearGradient id="l-green" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6bef9e"/><stop offset="1" stop-color="#22b866"/></linearGradient>
+        <linearGradient id="l-pink" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8fa3"/><stop offset="1" stop-color="#e8506e"/></linearGradient>
+        <linearGradient id="l-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c98a4b"/><stop offset="1" stop-color="#8a5a30"/></linearGradient>
+        <linearGradient id="l-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3d24"/><stop offset="1" stop-color="#2e1e10"/></linearGradient>
+      </defs>
+      <rect width="400" height="220" fill="url(#l-wall)"/>
+      <rect y="170" width="400" height="50" fill="url(#l-floor)"/>
+      <ellipse cx="142" cy="215" rx="52" ry="6" fill="#5a5f9e" opacity="0.14"/>
+      <ellipse cx="294" cy="213" rx="30" ry="6" fill="#5a5f9e" opacity="0.14"/>
+      <!-- tall bookshelf (background) -->
+      <rect x="15" y="20" width="36" height="150" fill="url(#l-wood)"/>
+      <rect x="15" y="55" width="36" height="4" fill="#8a5a30"/>
+      <rect x="15" y="90" width="36" height="4" fill="#8a5a30"/>
+      <rect x="15" y="125" width="36" height="4" fill="#8a5a30"/>
+      <rect x="19" y="26" width="8" height="26" fill="#ff9a8b"/>
+      <rect x="28" y="26" width="8" height="26" fill="#43c6e5"/>
+      <rect x="37" y="26" width="8" height="26" fill="#ffd200"/>
+      <rect x="19" y="61" width="8" height="26" fill="#43e97b"/>
+      <rect x="28" y="61" width="8" height="26" fill="#ff6a88"/>
+      <rect x="37" y="61" width="8" height="26" fill="#5B6CF5"/>
+      <rect x="19" y="96" width="8" height="26" fill="#ffd200"/>
+      <rect x="28" y="96" width="8" height="26" fill="#43c6e5"/>
+      <rect x="37" y="96" width="8" height="26" fill="#ff9a8b"/>
+      <!-- boy reading at table -->
+      <rect x="95" y="180" width="100" height="10" rx="2" fill="url(#l-wood)"/>
+      <rect x="100" y="190" width="8" height="24" fill="#8a5a30"/>
+      <rect x="182" y="190" width="8" height="24" fill="#8a5a30"/>
+      <line x1="120" y1="130" x2="131" y2="160" stroke="url(#l-skin)" stroke-width="12" stroke-linecap="round"/>
+      <line x1="164" y1="130" x2="153" y2="160" stroke="url(#l-skin)" stroke-width="12" stroke-linecap="round"/>
+      <rect x="118" y="120" width="48" height="55" rx="16" fill="url(#l-green)"/>
+      <rect x="136" y="111" width="12" height="12" fill="url(#l-skin)"/>
+      <circle cx="142" cy="94" r="22" fill="url(#l-skin)"/>
+      <path d="M120,88 Q142,60 164,88 L161,79 Q142,66 123,79 Z" fill="url(#l-hair)"/>
+      <circle cx="135" cy="93" r="2.5" fill="#333"/>
+      <circle cx="149" cy="93" r="2.5" fill="#333"/>
+      <path d="M133,101 Q142,106 151,101" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <polygon points="112,172 142,163 142,178 112,182" fill="#fff" stroke="#ccc" stroke-width="1"/>
+      <polygon points="172,172 142,163 142,178 172,182" fill="#fff" stroke="#ccc" stroke-width="1"/>
+      <line x1="142" y1="163" x2="142" y2="178" stroke="#999" stroke-width="1.5"/>
+      <circle cx="142" cy="58" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="142" y="63" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">1</text>
+      <!-- small shelf near girl -->
+      <rect x="330" y="55" width="52" height="130" fill="url(#l-wood)"/>
+      <rect x="330" y="88" width="52" height="4" fill="#8a5a30"/>
+      <rect x="330" y="121" width="52" height="4" fill="#8a5a30"/>
+      <rect x="335" y="61" width="8" height="24" fill="#ff6a88"/>
+      <rect x="345" y="61" width="8" height="24" fill="#43c6e5"/>
+      <rect x="355" y="61" width="8" height="24" fill="#ffd200"/>
+      <rect x="365" y="61" width="8" height="24" fill="#43e97b"/>
+      <rect x="335" y="127" width="8" height="24" fill="#5B6CF5"/>
+      <rect x="345" y="127" width="8" height="24" fill="#ff9a8b"/>
+      <rect x="355" y="127" width="8" height="24" fill="#43c6e5"/>
+      <!-- girl placing a book -->
+      <rect x="278" y="180" width="14" height="30" rx="5" fill="#333"/>
+      <rect x="296" y="180" width="14" height="30" rx="5" fill="#333"/>
+      <rect x="276" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <rect x="294" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <line x1="274" y1="132" x2="266" y2="164" stroke="url(#l-skin)" stroke-width="12" stroke-linecap="round"/>
+      <line x1="314" y1="132" x2="333" y2="96" stroke="url(#l-skin)" stroke-width="12" stroke-linecap="round"/>
+      <rect x="272" y="124" width="44" height="54" rx="16" fill="url(#l-pink)"/>
+      <rect x="288" y="114" width="12" height="12" fill="url(#l-skin)"/>
+      <circle cx="294" cy="97" r="21" fill="url(#l-skin)"/>
+      <path d="M274,90 Q294,64 314,90 L311,81 Q294,68 277,81 Z" fill="url(#l-hair)"/>
+      <circle cx="288" cy="96" r="2.5" fill="#333"/>
+      <circle cx="301" cy="96" r="2.5" fill="#333"/>
+      <path d="M286,104 Q294,109 303,104" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <rect x="325" y="84" width="20" height="24" rx="2" fill="#ffd200" stroke="#e0b800" stroke-width="1"/>
+      <circle cx="294" cy="60" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="294" y="65" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">2</text>
+    </svg>`,
+    people: ["① テーブルで本を読んでいる男の子", "② 本を棚に戻している女の子"],
+    questions: [
+      { no:"No.1", type:"passage", en:"Look at the passage. How many books can students borrow at one time?", hint:"パッセージの内容から、借りられる冊数を答えよう。", model:"They can borrow up to five books at one time." },
+      { no:"No.2", type:"picture", en:"Please look at the picture. What is the boy doing?", hint:"「①の男の子」の動作を現在進行形で答えよう。", model:"He is reading a book at the table." },
+      { no:"No.3", type:"picture", en:"What is the girl doing?", hint:"「②の女の子」の動作を現在進行形で答えよう。", model:"She is putting a book on the shelf." },
+      { no:"No.4", type:"personal", en:"Do you often go to the library?", hint:"Yes/Noで答えたあと、理由をひとこと添えよう。", model:"Yes, I do. I go there to study after school." },
+      { no:"No.5", type:"personal", en:"What kind of books do you like to read?", hint:"好きな本のジャンルを1〜2文で答えよう。", model:"I like reading mystery stories. They are very exciting." }
+    ]
+  },
+  {
+    icon: "🎂", title: "おばあちゃんの誕生日会", desc: "Grandma's Birthday Party",
+    passage: "Last weekend, Yuka's family had a birthday party for her grandmother. They cooked her favorite dishes and made a big cake together. Everyone had a wonderful time.",
+    illustration: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+      <defs>
+        <linearGradient id="c-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff5f9"/><stop offset="1" stop-color="#ffe3ee"/></linearGradient>
+        <linearGradient id="c-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6d3e0"/><stop offset="1" stop-color="#e8b2c6"/></linearGradient>
+        <radialGradient id="c-skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#ffe9cf"/><stop offset="1" stop-color="#eeba85"/></radialGradient>
+        <linearGradient id="c-teal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74dcf0"/><stop offset="1" stop-color="#289cb8"/></linearGradient>
+        <linearGradient id="c-purple" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a3ff"/><stop offset="1" stop-color="#9257e0"/></linearGradient>
+        <linearGradient id="c-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c98a4b"/><stop offset="1" stop-color="#8a5a30"/></linearGradient>
+        <linearGradient id="c-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3d24"/><stop offset="1" stop-color="#2e1e10"/></linearGradient>
+      </defs>
+      <rect width="400" height="220" fill="url(#c-wall)"/>
+      <rect y="170" width="400" height="50" fill="url(#c-floor)"/>
+      <ellipse cx="150" cy="215" rx="34" ry="6" fill="#9a4d6b" opacity="0.15"/>
+      <ellipse cx="330" cy="215" rx="34" ry="6" fill="#9a4d6b" opacity="0.15"/>
+      <circle cx="40" cy="42" r="18" fill="#ff6a88"/>
+      <line x1="40" y1="60" x2="38" y2="95" stroke="#bbb" stroke-width="1.5"/>
+      <circle cx="72" cy="58" r="14" fill="#ffd200"/>
+      <line x1="72" y1="72" x2="68" y2="98" stroke="#bbb" stroke-width="1.5"/>
+      <circle cx="362" cy="46" r="16" fill="#43c6e5"/>
+      <line x1="362" y1="62" x2="366" y2="92" stroke="#bbb" stroke-width="1.5"/>
+      <!-- empty table (walking toward it) -->
+      <rect x="290" y="175" width="72" height="10" rx="2" fill="url(#c-wood)"/>
+      <rect x="296" y="185" width="8" height="25" fill="#8a5a30"/>
+      <rect x="348" y="185" width="8" height="25" fill="#8a5a30"/>
+      <!-- boy carrying cake -->
+      <rect x="136" y="180" width="14" height="30" rx="5" fill="#333"/>
+      <rect x="154" y="180" width="14" height="30" rx="5" fill="#333"/>
+      <rect x="134" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <rect x="152" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <line x1="170" y1="132" x2="196" y2="146" stroke="url(#c-skin)" stroke-width="12" stroke-linecap="round"/>
+      <line x1="170" y1="150" x2="196" y2="158" stroke="url(#c-skin)" stroke-width="12" stroke-linecap="round"/>
+      <rect x="128" y="124" width="44" height="54" rx="16" fill="url(#c-teal)"/>
+      <rect x="144" y="114" width="12" height="12" fill="url(#c-skin)"/>
+      <circle cx="150" cy="97" r="21" fill="url(#c-skin)"/>
+      <path d="M130,90 Q150,64 170,90 L167,81 Q150,70 133,81 Z" fill="url(#c-hair)"/>
+      <circle cx="144" cy="96" r="2.5" fill="#333"/>
+      <circle cx="156" cy="96" r="2.5" fill="#333"/>
+      <path d="M143,104 Q150,109 158,104" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="150" cy="60" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="150" y="65" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">1</text>
+      <!-- cake on tray held by the boy -->
+      <rect x="188" y="149" width="62" height="8" rx="2" fill="#fff" stroke="#ddd" stroke-width="1"/>
+      <rect x="196" y="122" width="46" height="27" rx="4" fill="#ffd6e8" stroke="#ffb8d6" stroke-width="1.5"/>
+      <rect x="196" y="122" width="46" height="8" fill="#fff"/>
+      <line x1="207" y1="122" x2="207" y2="107" stroke="#ff6a88" stroke-width="3"/>
+      <line x1="219" y1="122" x2="219" y2="105" stroke="#43c6e5" stroke-width="3"/>
+      <line x1="231" y1="122" x2="231" y2="107" stroke="#ffd200" stroke-width="3"/>
+      <circle cx="207" cy="105" r="3" fill="#ff9a3c"/>
+      <circle cx="219" cy="103" r="3" fill="#ff9a3c"/>
+      <circle cx="231" cy="105" r="3" fill="#ff9a3c"/>
+      <!-- girl taking a picture -->
+      <rect x="316" y="190" width="10" height="20" fill="url(#c-skin)"/>
+      <rect x="334" y="190" width="10" height="20" fill="url(#c-skin)"/>
+      <rect x="312" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <rect x="330" y="207" width="18" height="9" rx="3" fill="#222"/>
+      <rect x="306" y="124" width="48" height="68" rx="18" fill="url(#c-purple)"/>
+      <line x1="308" y1="134" x2="317" y2="109" stroke="url(#c-skin)" stroke-width="11" stroke-linecap="round"/>
+      <line x1="352" y1="134" x2="343" y2="109" stroke="url(#c-skin)" stroke-width="11" stroke-linecap="round"/>
+      <rect x="324" y="114" width="12" height="12" fill="url(#c-skin)"/>
+      <circle cx="330" cy="97" r="21" fill="url(#c-skin)"/>
+      <path d="M310,90 Q330,64 350,90 L347,81 Q330,70 313,81 Z" fill="url(#c-hair)"/>
+      <ellipse cx="306" cy="95" rx="7" ry="12" fill="url(#c-hair)"/>
+      <ellipse cx="354" cy="95" rx="7" ry="12" fill="url(#c-hair)"/>
+      <circle cx="324" cy="96" r="2.5" fill="#333"/>
+      <circle cx="336" cy="96" r="2.5" fill="#333"/>
+      <rect x="313" y="98" width="34" height="22" rx="3" fill="#333"/>
+      <circle cx="330" cy="109" r="9" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <rect x="317" y="94" width="8" height="6" fill="#ccc"/>
+      <circle cx="330" cy="60" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
+      <text x="330" y="65" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">2</text>
+    </svg>`,
+    people: ["① ケーキを運んでいる男の子", "② カメラで写真を撮っている女の子"],
+    questions: [
+      { no:"No.1", type:"passage", en:"Look at the passage. What did they make together?", hint:"パッセージの内容から、家族で作ったものを答えよう。", model:"They made a big cake together." },
+      { no:"No.2", type:"picture", en:"Please look at the picture. What is the boy doing?", hint:"「①の男の子」の動作を現在進行形で答えよう。", model:"He is carrying a cake to the table." },
+      { no:"No.3", type:"picture", en:"What is the girl doing?", hint:"「②の女の子」の動作を現在進行形で答えよう。", model:"She is taking a picture." },
+      { no:"No.4", type:"personal", en:"Do you like birthday parties?", hint:"Yes/Noで答えたあと、理由をひとこと添えよう。", model:"Yes, I do. I like spending time with my family." },
+      { no:"No.5", type:"personal", en:"What did you do last weekend?", hint:"先週末にしたことを1〜2文で答えよう。", model:"I went shopping with my mother last weekend." }
+    ]
+  }
+];
+
+// AI採点用（英作文アプリと同じGASウェブアプリURL）
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxhCBU9aZ5eymIXqsAhtQoUvgaGJwEEt67UAN_ysTeZGGSLc1gXvWP-tSZHvDopKITJmg/exec';
+
+// 模試の記録（英検3級対策.htmlの「これまでの記録」と同じキーに書き込む）
+const RECORDS_KEY = 'eiken_records_3kyu';
+function addRecord(rec) {
+  try {
+    const list = JSON.parse(localStorage.getItem(RECORDS_KEY)) || [];
+    list.unshift(rec);
+    if (list.length > 50) list.length = 50;
+    localStorage.setItem(RECORDS_KEY, JSON.stringify(list));
+  } catch(e) {}
+}
+function formatRecordDate(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ================================================================
+// 状態管理
+// ================================================================
+let selectedSetIndex = 0;
+let currentSet = null;
+let currentQIndex = 0;
+let userAnswers = [];
+let isMockMode = false;
+let questionScores = [];
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.92;
+  window.speechSynthesis.speak(utter);
+}
+
+// ---- タイトルページ：カード選択 ----
+function renderSetList() {
+  const list = document.getElementById('set-list');
+  list.innerHTML = '';
+  CARD_SETS.forEach((set, i) => {
+    const div = document.createElement('div');
+    div.className = 'set-card' + (i === selectedSetIndex ? ' selected' : '');
+    div.innerHTML = `<span class="sc-icon">${set.icon}</span><div><div class="sc-title">${set.title}</div><div class="sc-desc">${set.desc}</div></div>`;
+    div.addEventListener('click', () => {
+      selectedSetIndex = i;
+      renderSetList();
+    });
+    list.appendChild(div);
+  });
+}
+renderSetList();
+
+if (!('speechSynthesis' in window)) {
+  document.querySelectorAll('.btn-sound').forEach(b => { b.style.display = 'none'; });
+}
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  isMockMode = false;
+  startPractice();
+});
+document.getElementById('btn-start-mock').addEventListener('click', () => {
+  isMockMode = true;
+  selectedSetIndex = Math.floor(Math.random() * CARD_SETS.length);
+  startPractice();
+});
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+document.getElementById('btn-back-title2').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startPractice() {
+  currentSet = CARD_SETS[selectedSetIndex];
+  currentQIndex = 0;
+  userAnswers = new Array(currentSet.questions.length).fill('');
+  questionScores = new Array(currentSet.questions.length).fill(null);
+  goPage('page-practice');
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = currentSet.questions[currentQIndex];
+  document.getElementById('progress-text').textContent = `${q.no} / 5`;
+  document.getElementById('progress-bar').style.width = `${(currentQIndex / currentSet.questions.length) * 100}%`;
+
+  const needsCard = q.type !== 'personal';
+  document.getElementById('card-box').style.display = needsCard ? 'block' : 'none';
+  document.getElementById('no-card-note').style.display = needsCard ? 'none' : 'block';
+  if (needsCard) {
+    document.getElementById('passage-text').textContent = currentSet.passage;
+    document.getElementById('illustration-wrap').innerHTML = currentSet.illustration;
+  }
+
+  document.getElementById('question-no').textContent = q.no;
+  document.getElementById('question-en').textContent = q.en;
+  document.getElementById('hint-text').textContent = '💡 ' + q.hint;
+
+  document.getElementById('answer-textarea').value = userAnswers[currentQIndex] || '';
+
+  document.getElementById('model-box').classList.remove('show');
+  document.getElementById('model-text').textContent = q.model;
+
+  const aiBox = document.getElementById('ai-box');
+  aiBox.classList.remove('show');
+  aiBox.innerHTML = '';
+
+  document.getElementById('btn-next').textContent =
+    currentQIndex === currentSet.questions.length - 1 ? '練習を終える' : '次の質問へ';
+}
+
+document.getElementById('btn-play-question').addEventListener('click', () => {
+  const q = currentSet.questions[currentQIndex];
+  speak(q.en);
+});
+document.getElementById('btn-show-model').addEventListener('click', () => {
+  document.getElementById('model-box').classList.toggle('show');
+});
+document.getElementById('answer-textarea').addEventListener('input', () => {
+  userAnswers[currentQIndex] = document.getElementById('answer-textarea').value;
+  questionScores[currentQIndex] = null;
+  document.getElementById('ai-box').classList.remove('show');
+});
+
+document.getElementById('btn-ai-check').addEventListener('click', async () => {
+  const aiBox = document.getElementById('ai-box');
+  const q = currentSet.questions[currentQIndex];
+  const answer = document.getElementById('answer-textarea').value.trim();
+
+  if (!GAS_WEB_APP_URL) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">AI採点機能が設定されていません。</div>';
+    return;
+  }
+  if (!answer) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">先に英文を入力してください。</div>';
+    return;
+  }
+
+  aiBox.classList.add('show');
+  aiBox.innerHTML = '<div class="ai-loading">🤖 AIが採点しています...（数秒かかります）</div>';
+
+  const needsCard = q.type !== 'personal';
+
+  try {
+    const res = await fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        mode: 'interview',
+        type: q.type,
+        prompt: q.en,
+        passage: needsCard ? currentSet.passage : '',
+        reference: q.model,
+        answer: answer
+      })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      aiBox.innerHTML = `<div class="ai-error">エラー: ${escapeHtml(data.error)}</div>`;
+      return;
+    }
+
+    questionScores[currentQIndex] = data.score || null;
+
+    aiBox.innerHTML = `
+      <h4>🤖 AIによる採点 <span class="ai-score-badge">評価: ${escapeHtml(data.score || '-')}</span></h4>
+      <div class="ai-section"><div class="as-label">👍 よくできている点</div><div class="as-text">${escapeHtml(data.good_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">✏️ 改善するとよい点</div><div class="as-text">${escapeHtml(data.improve_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">💡 自然な英語の例</div><div class="as-text">${escapeHtml(data.corrected_example || '')}</div></div>
+    `;
+  } catch (err) {
+    aiBox.innerHTML = '<div class="ai-error">AIとの通信に失敗しました。インターネット接続を確認してください。</div>';
+  }
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  currentQIndex++;
+  if (currentQIndex < currentSet.questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function scoreToPoints(score) {
+  if (score === 'A') return 100;
+  if (score === 'B') return 70;
+  if (score === 'C') return 40;
+  return null;
+}
+
+function showResult() {
+  goPage('page-result');
+  document.querySelectorAll('#page-result .check-item input').forEach(cb => cb.checked = false);
+
+  const verdictBox = document.getElementById('verdict-box');
+  const mockCaveat = document.getElementById('mock-caveat');
+  const retryBtn = document.getElementById('btn-retry');
+
+  if (isMockMode) {
+    let total = 0;
+    let count = 0;
+    currentSet.questions.forEach((q, i) => {
+      const pts = scoreToPoints(questionScores[i]);
+      if (pts !== null) {
+        total += pts;
+        count++;
+      } else if (userAnswers[i] && userAnswers[i].trim()) {
+        total += 45; // AI未採点だが解答はある場合の目安点
+        count++;
+      } else {
+        total += 0;
+        count++;
+      }
+    });
+    const overall = count > 0 ? Math.round(total / count) : 0;
+
+    verdictBox.classList.add('show');
+    verdictBox.classList.remove('high', 'mid', 'low');
+    const icon = document.getElementById('verdict-icon');
+    const title = document.getElementById('verdict-title');
+    if (overall >= 75) {
+      verdictBox.classList.add('high');
+      icon.textContent = '🎉';
+      title.textContent = '合格の可能性は高いです！';
+    } else if (overall >= 60) {
+      verdictBox.classList.add('mid');
+      icon.textContent = '💪';
+      title.textContent = '合格ラインに近づいています！';
+    } else {
+      verdictBox.classList.add('low');
+      icon.textContent = '📚';
+      title.textContent = 'もう少し練習を続けましょう';
+    }
+    document.getElementById('verdict-score').textContent = `総合スコア目安：${overall}%`;
+    mockCaveat.style.display = 'block';
+    retryBtn.textContent = 'もう一度模試に挑戦（別のカード）';
+
+    addRecord({
+      ts: Date.now(),
+      date: formatRecordDate(Date.now()),
+      examType: '2次',
+      verdict: overall >= 75 ? 'high' : overall >= 60 ? 'mid' : 'low',
+      verdictLabel: title.textContent,
+      scorePct: overall,
+      detail: currentSet.title
+    });
+  } else {
+    verdictBox.classList.remove('show');
+    mockCaveat.style.display = 'none';
+    retryBtn.textContent = 'もう一度このカードで練習';
+  }
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '<div style="font-size:0.9em;font-weight:800;color:#5B6CF5;margin-bottom:10px;text-align:left;">📋 この面接カードの質問とあなたの解答</div>';
+  currentSet.questions.forEach((q, i) => {
+    const mine = userAnswers[i] || '';
+    const score = questionScores[i];
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="rq">${q.no}. ${q.en}${score ? `<span class="score-chip ${score}">AI評価: ${score}</span>` : ''}</div>
+      <div style="font-size:0.78em;color:#5B6CF5;font-weight:800;margin-top:8px;margin-bottom:3px;">あなたの解答</div>
+      <div style="font-size:0.86em;${mine ? 'color:#444;' : 'color:#bbb;font-style:italic;'}margin-bottom:6px;">${mine ? escapeHtml(mine) : '（未記入）'}</div>
+      <div style="font-size:0.78em;color:#1a9e5a;font-weight:800;margin-bottom:3px;">解答例</div>
+      <div class="ra">${q.model}</div>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+
+document.getElementById('btn-retry').addEventListener('click', () => {
+  if (isMockMode) {
+    selectedSetIndex = Math.floor(Math.random() * CARD_SETS.length);
+  }
+  startPractice();
+});
+
+// URLに ?mode=mock が付いている場合（ハブページの「2次試験の模試に挑戦」から来た場合）は
+// カード選択を待たず、模試モードを自動的にスタートする
+if (new URLSearchParams(location.search).get('mode') === 'mock') {
+  isMockMode = true;
+  selectedSetIndex = Math.floor(Math.random() * CARD_SETS.length);
+  startPractice();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検3級 長文読解トレーニング</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  /* ===== ヘッダー ===== */
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  /* ===== ページ管理 ===== */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-red     { background: linear-gradient(135deg,#ff416c,#ff4b2b); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== タイトルページ ===== */
+  #page-title { text-align: center; padding-top: 30px; }
+  .title-icon  { font-size: 4.5em; margin-bottom: 10px; }
+  .title-main  { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+  .title-sub   { font-size: 0.92em; color: #888; margin-bottom: 24px; }
+  .title-tagline {
+    display: inline-block;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .type-list {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .type-list h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .type-row { display:flex; align-items:center; gap:10px; padding:6px 0; font-size:0.88em; color:#555; }
+  .type-row .dot { width:8px; height:8px; border-radius:50%; background:#5B6CF5; flex-shrink:0; }
+
+  .mode-box {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .mode-box h3 { font-size: 0.9em; color: #5B6CF5; font-weight: 800; margin-bottom: 12px; }
+  .mode-options { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .mode-opt {
+    flex: 1; min-width: 90px;
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-opt.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-opt .n { font-size: 1.3em; font-weight: 900; color: #333; }
+  .mode-opt .l { font-size: 0.75em; color: #888; margin-top: 2px; }
+
+  .mode-tabs { display: flex; gap: 8px; }
+  .mode-tab {
+    flex: 1; background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .mode-tab.selected { border-color: #5B6CF5; background: #eef0ff; }
+  .mode-tab .mt-title { font-weight: 800; font-size: 0.88em; color: #333; }
+  .mode-tab .mt-sub { font-size: 0.72em; color: #888; margin-top: 3px; }
+
+  .category-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .cat-chip {
+    flex: 1; min-width: 130px; background: #fff; border: 2px solid #e2e5f5; border-radius: 50px;
+    padding: 10px 14px; text-align: center; font-size: 0.85em; font-weight: 700; color: #999;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .cat-chip.selected { border-color: #5B6CF5; background: #eef0ff; color: #5B6CF5; }
+
+  /* ===== 出題ページ ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:12px;
+  }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 4px; background: none; border: none;
+    color: #888; font-size: 0.82em; font-weight: 700; cursor: pointer; padding: 0;
+    margin-bottom: 14px; font-family: inherit;
+  }
+  .back-link:hover { color: #5B6CF5; }
+
+  .passage-card {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 16px;
+    padding: 16px 18px; margin-bottom: 16px; max-height: 260px; overflow-y: auto;
+  }
+  .passage-title { font-weight: 800; color: #5B6CF5; margin-bottom: 8px; font-size: 0.95em; }
+  .passage-text { font-size: 0.9em; line-height: 1.75; color: #333; white-space: pre-line; }
+
+  .question-card {
+    background: #f8f9ff; border-radius: 16px; padding: 20px 20px; margin-bottom: 16px;
+  }
+  .question-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 6px; }
+  .question-en { font-size: 1.05em; font-weight: 700; color: #222; line-height: 1.6; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 14px 18px; text-align: left; font-size: 0.95em; font-weight: 700; color:#333;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #b9c0f0; background: #f8f9ff; }
+  .choice-btn.correct { border-color: #43e97b; background: #eafff3; color: #1a9e5a; }
+  .choice-btn.wrong { border-color: #ff4b2b; background: #fff0ee; color: #d13a1f; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    margin-top: 16px; padding: 16px 18px; border-radius: 14px; display: none;
+  }
+  .feedback-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .feedback-box.correct { background: #eafff3; border: 2px solid #43e97b; }
+  .feedback-box.wrong { background: #fff0ee; border: 2px solid #ff4b2b; }
+  .feedback-title { font-weight: 900; font-size: 0.95em; margin-bottom: 6px; }
+  .feedback-box.correct .feedback-title { color: #1a9e5a; }
+  .feedback-box.wrong .feedback-title { color: #d13a1f; }
+  .feedback-answer { font-size: 0.9em; color: #444; margin-bottom: 4px; }
+  .feedback-explain { font-size: 0.85em; color: #666; line-height: 1.5; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 結果ページ ===== */
+  #page-result { text-align: center; padding-top: 20px; }
+  .score-circle {
+    width: 150px; height: 150px; border-radius: 50%;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .score-circle .num { font-size: 2.2em; font-weight: 900; }
+  .score-circle .den { font-size: 0.85em; opacity: 0.85; }
+  .score-msg { font-size: 1.05em; font-weight: 800; color: #333; margin-bottom: 24px; }
+
+  .review-list { text-align: left; margin-bottom: 20px; }
+  .review-item {
+    background: #fff0ee; border: 2px solid #ffd6cf; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .review-item .rp { font-size: 0.75em; color: #b06a5f; font-weight: 700; margin-bottom: 4px; }
+  .review-item .rq { font-weight: 700; color: #333; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.88em; color: #1a9e5a; font-weight: 700; margin-bottom: 4px; }
+  .review-item .re { font-size: 0.83em; color: #777; line-height: 1.5; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検3級 長文読解トレーニング</div>
+      <div class="hd-sub">1次試験対策｜掲示文・Eメール・説明文</div>
+    </div>
+    <a class="hd-home-link" href="英検3級対策.html">🏠 メニュー</a>
+  </div>
+
+  <!-- ===== タイトルページ ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">📖</div>
+    <div class="title-main">長文読解クイズ</div>
+    <div class="title-sub">英文を読んで、内容に関する問題に答えよう</div>
+    <div class="title-tagline">文章16種類搭載｜毎回ランダム出題</div>
+
+    <div class="type-list">
+      <h3>出題される文章のタイプ</h3>
+      <div class="type-row"><span class="dot"></span>掲示・案内文（お知らせ・チラシなど）</div>
+      <div class="type-row"><span class="dot"></span>Eメール文</div>
+      <div class="type-row"><span class="dot"></span>説明文</div>
+      <div class="type-row"><span class="dot"></span>物語文</div>
+    </div>
+
+    <div class="mode-box">
+      <h3>練習モードを選ぼう</h3>
+      <div class="mode-tabs">
+        <div class="mode-tab selected" data-mode="all4">
+          <div class="mt-title">全種類を1つずつ</div>
+          <div class="mt-sub">4つの文章をバランスよく</div>
+        </div>
+        <div class="mode-tab" data-mode="custom">
+          <div class="mt-title">自分で種類を選ぶ</div>
+          <div class="mt-sub">好きなタイプだけ練習</div>
+        </div>
+      </div>
+
+      <div id="category-picker" class="category-picker" style="display:none;">
+        <div class="cat-chip selected" data-type="掲示・案内文">掲示・案内文</div>
+        <div class="cat-chip selected" data-type="Eメール文">Eメール文</div>
+        <div class="cat-chip selected" data-type="説明文">説明文</div>
+        <div class="cat-chip selected" data-type="物語文">物語文</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start" style="max-width:280px;margin:0 auto;">スタート！</button>
+  </div>
+
+  <!-- ===== 出題ページ ===== -->
+  <div id="page-quiz" class="page">
+    <button class="back-link" id="btn-back-to-title">← 出題設定に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progress-text">問題 1 / 13</span>
+        <span id="progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <span class="cat-badge" id="cat-badge">掲示・案内文</span>
+
+    <div class="passage-card">
+      <div class="passage-title" id="passage-title"></div>
+      <div class="passage-text" id="passage-text"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-label" id="question-label">Q1</div>
+      <div class="question-en" id="question-en"></div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="feedback-box" id="feedback-box">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-answer" id="feedback-answer"></div>
+      <div class="feedback-explain" id="feedback-explain"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" id="btn-next" style="display:none;">次の問題へ</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div id="page-result" class="page">
+    <div class="score-circle">
+      <div class="num" id="result-score">0</div>
+      <div class="den">/ <span id="result-total">13</span> 問正解</div>
+    </div>
+    <div class="score-msg" id="result-msg"></div>
+
+    <div id="review-wrap">
+      <div class="review-list" id="review-list"></div>
+    </div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-retry-all">もう一度挑戦する</button>
+      <button class="btn btn-gray btn-block" id="btn-back-title">タイトルに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 長文データ（英検3級レベル） =====
+const PASSAGES = [
+  {
+    type: "掲示・案内文",
+    title: "City Library Book Sale",
+    text:
+`City Library Book Sale
+
+Date: Saturday, June 14
+Time: 10:00 a.m. – 3:00 p.m.
+Place: City Library, 2nd Floor
+
+We are having our yearly book sale! We have many books for children and adults. Most books are 100 yen. Some new books are 300 yen. If you bring your own bag, you can get a 10% discount. The sale will start one hour early for library members, from 9:00 a.m.
+
+For more information, call the library at 042-123-4567.`,
+    questions: [
+      {
+        q: "What time does the book sale start for library members?",
+        correct: "9:00 a.m.",
+        wrongs: ["10:00 a.m.", "3:00 p.m.", "2:00 p.m."],
+        explain: "本文に \"The sale will start one hour early for library members, from 9:00 a.m.\" とあります。"
+      },
+      {
+        q: "How can people get a discount?",
+        correct: "By bringing their own bag",
+        wrongs: ["By becoming a library member", "By buying new books", "By calling the library"],
+        explain: "本文に \"If you bring your own bag, you can get a 10% discount.\" とあります。"
+      },
+      {
+        q: "How much are most of the books?",
+        correct: "100 yen",
+        wrongs: ["300 yen", "Free", "10% off"],
+        explain: "本文に \"Most books are 100 yen.\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "掲示・案内文",
+    title: "Sunshine Swimming Pool",
+    text:
+`Sunshine Swimming Pool - Summer Hours
+
+Open: July 1 - August 31
+Weekdays: 10:00 a.m. - 6:00 p.m.
+Weekends & Holidays: 9:00 a.m. - 7:00 p.m.
+Closed every Monday for cleaning (except national holidays)
+
+Entrance Fee:
+Adults: 500 yen
+Students (6-18 years old): 300 yen
+Children under 6: Free
+
+Family Ticket (2 adults + 2 children): 1,200 yen - Save 300 yen!
+
+Swimming lessons for beginners are held every Wednesday at 4:00 p.m. Please sign up at the front desk one day before the lesson.
+
+For questions, visit our website or call 042-555-7890.`,
+    questions: [
+      {
+        q: "When is the pool closed?",
+        correct: "Every Monday",
+        wrongs: ["Every Sunday", "Every Saturday", "Every Wednesday"],
+        explain: "本文に \"Closed every Monday for cleaning\" とあります。"
+      },
+      {
+        q: "How much does a family ticket save?",
+        correct: "300 yen",
+        wrongs: ["500 yen", "1,200 yen", "200 yen"],
+        explain: "本文に \"Family Ticket ... Save 300 yen!\" とあります。"
+      },
+      {
+        q: "What should people do before taking a swimming lesson?",
+        correct: "Sign up at the front desk one day before",
+        wrongs: ["Pay an extra fee", "Bring their own swimsuit", "Call the pool on Monday"],
+        explain: "本文に \"Please sign up at the front desk one day before the lesson.\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "掲示・案内文",
+    title: "Green Town Autumn Festival",
+    text:
+`Green Town Autumn Festival
+
+Date: Sunday, October 20
+Time: 11:00 a.m. - 4:00 p.m.
+Place: Green Town Park
+
+Come and enjoy food stalls, music, and games! This year, we will also have a used book fair. If you have books you don't need anymore, please bring them and give them to the volunteers at the entrance. All the money from the book fair will be used to buy new books for the town library.
+
+Local high school students will perform a dance show at 1:00 p.m. Don't miss it!
+
+Parking is limited, so we ask visitors to come by bicycle or bus if possible.`,
+    questions: [
+      {
+        q: "What will happen to the money from the book fair?",
+        correct: "It will be used to buy new library books",
+        wrongs: ["It will be given to the volunteers", "It will be used for next year's festival", "It will be returned to the students"],
+        explain: "本文に \"All the money from the book fair will be used to buy new books for the town library.\" とあります。"
+      },
+      {
+        q: "What time is the dance show?",
+        correct: "1:00 p.m.",
+        wrongs: ["11:00 a.m.", "4:00 p.m.", "10:00 a.m."],
+        explain: "本文に \"Local high school students will perform a dance show at 1:00 p.m.\" とあります。"
+      },
+      {
+        q: "Why does the notice ask people to come by bicycle or bus?",
+        correct: "Because parking space is limited",
+        wrongs: ["Because the park is far from the station", "Because bicycles are free that day", "Because cars are not allowed in town"],
+        explain: "本文に \"Parking is limited, so we ask visitors to come by bicycle or bus\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "掲示・案内文",
+    title: "Sakura City Museum Closed for Renovation",
+    text:
+`Notice: Sakura City Museum Closed for Renovation
+
+The Sakura City Museum will be closed from November 1 to December 15 for renovation work. During this time, we will build a new room for children's programs and update our lighting system.
+
+We are sorry for any inconvenience. However, we have some good news: when the museum reopens on December 16, all visitors will receive a free postcard as a special gift. Also, entrance will be free for the first three days after reopening.
+
+If you have a museum membership card, your membership will be extended for one extra month at no cost.
+
+Thank you for your understanding.`,
+    questions: [
+      {
+        q: "Why will the museum be closed?",
+        correct: "For renovation work",
+        wrongs: ["Because of an accident", "For summer vacation", "Because it is moving to a new building"],
+        explain: "本文に \"closed ... for renovation work\" とあります。"
+      },
+      {
+        q: "What will visitors get when the museum reopens?",
+        correct: "A free postcard",
+        wrongs: ["A free ticket for next year", "A discount coupon", "A museum T-shirt"],
+        explain: "本文に \"all visitors will receive a free postcard as a special gift\" とあります。"
+      },
+      {
+        q: "What will happen to museum members?",
+        correct: "Their membership will be extended for one month",
+        wrongs: ["They will get a refund", "They must renew immediately", "They will lose their membership"],
+        explain: "本文に \"your membership will be extended for one extra month at no cost\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "Eメール文",
+    title: "E-mail from Emily",
+    text:
+`Subject: This Weekend
+
+Hi Kenji,
+
+How are you? I have a great idea for this weekend. My family is going camping near Lake Green on Saturday. Would you like to join us? We will leave at 8:00 in the morning and come back on Sunday evening. We are going to swim in the lake, cook dinner outside, and watch the stars at night. My father will drive us there, so you don't need to worry about transportation. Please tell me by Thursday if you can come, because we need to buy food for everyone.
+
+I hope you can join us!
+
+Your friend,
+Emily`,
+    questions: [
+      {
+        q: "What does Emily want Kenji to do?",
+        correct: "Come camping with her family",
+        wrongs: ["Drive her family to the lake", "Buy food for the trip", "Watch stars at Kenji's house"],
+        explain: "本文に \"Would you like to join us?\" とあり、キャンプに誘っています。"
+      },
+      {
+        q: "Why does Emily need an answer by Thursday?",
+        correct: "She has to buy food for everyone",
+        wrongs: ["The camp site closes on Thursday", "Her father needs to know the plan", "The weather will change"],
+        explain: "本文に \"we need to buy food for everyone\" とあります。"
+      },
+      {
+        q: "When will Emily's family come back?",
+        correct: "Sunday evening",
+        wrongs: ["Saturday morning", "Saturday evening", "Sunday morning"],
+        explain: "本文に \"come back on Sunday evening\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "Eメール文",
+    title: "Our Science Project",
+    text:
+`Subject: Our Science Project
+
+Hi Aya,
+
+Thank you for helping me with the science project yesterday. I think our idea about plant growth is very interesting. I already bought some seeds and small pots at the store near my house. Could you bring the camera on Saturday? We need to take pictures of the plants every day for our report. Also, I found some good information about sunlight and plant growth in a book at the library. I will bring it to school tomorrow so we can read it together during lunch.
+
+Let's do our best!
+
+Yui`,
+    questions: [
+      {
+        q: "What does Yui ask Aya to bring?",
+        correct: "A camera",
+        wrongs: ["Seeds", "Small pots", "A science book"],
+        explain: "本文に \"Could you bring the camera on Saturday?\" とあります。"
+      },
+      {
+        q: "Why do they need to take pictures every day?",
+        correct: "For their report",
+        wrongs: ["For a school newspaper", "To show their teacher immediately", "To sell at the festival"],
+        explain: "本文に \"We need to take pictures of the plants every day for our report.\" とあります。"
+      },
+      {
+        q: "When will Yui bring the library book to school?",
+        correct: "Tomorrow",
+        wrongs: ["Today", "On Saturday", "Next week"],
+        explain: "本文に \"I will bring it to school tomorrow\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "Eメール文",
+    title: "See You Soon!",
+    text:
+`Subject: See You Soon!
+
+Dear Haruto,
+
+I am so happy that you and your family are coming to visit us during the winter vacation! Your grandfather and I have already started planning some fun things to do. There is a new hot spring near our house, and we can all go there together. Also, your cousin Rina will come from Osaka on the same day, so you can play with her too.
+
+Could you tell me what food you would like to eat? I want to cook your favorite dish for the first night. Please give my love to your parents.
+
+Love,
+Grandma`,
+    questions: [
+      {
+        q: "What does Grandma want to know?",
+        correct: "What food Haruto would like to eat",
+        wrongs: ["When Haruto will arrive", "Who Haruto will bring", "Where Haruto wants to go"],
+        explain: "本文に \"Could you tell me what food you would like to eat?\" とあります。"
+      },
+      {
+        q: "Who else will visit Grandma at the same time?",
+        correct: "Haruto's cousin Rina",
+        wrongs: ["Haruto's teacher", "Haruto's friend from school", "Haruto's uncle"],
+        explain: "本文に \"your cousin Rina will come from Osaka on the same day\" とあります。"
+      },
+      {
+        q: "What are Grandma and Grandfather planning to do?",
+        correct: "Go to a hot spring together",
+        wrongs: ["Go skiing together", "Visit Osaka together", "Cook a big dinner party"],
+        explain: "本文に \"There is a new hot spring near our house, and we can all go there together.\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "Eメール文",
+    title: "Birthday Party Plan",
+    text:
+`Subject: Birthday Party Plan
+
+Hi Sara,
+
+Thanks for offering to help plan Ken's birthday party next Saturday! I already booked the community room at the park from 2:00 to 5:00 p.m. Could you make the invitation cards? I think ten of his classmates are coming. I will order a cake from the bakery near the station, but I need to know if anyone doesn't like chocolate. Can you ask around and let me know by Wednesday? Also, my brother said he can bring his speaker for music, so we don't need to worry about that.
+
+Thanks again for your help!
+
+Mio`,
+    questions: [
+      {
+        q: "What does Mio ask Sara to make?",
+        correct: "Invitation cards",
+        wrongs: ["A birthday cake", "A party schedule", "A gift list"],
+        explain: "本文に \"Could you make the invitation cards?\" とあります。"
+      },
+      {
+        q: "What does Mio need to know by Wednesday?",
+        correct: "Whether anyone dislikes chocolate",
+        wrongs: ["How many people are coming", "What time the party starts", "Where the bakery is"],
+        explain: "本文に \"I need to know if anyone doesn't like chocolate. Can you ask around and let me know by Wednesday?\" とあります。"
+      },
+      {
+        q: "Who will bring the speaker for music?",
+        correct: "Mio's brother",
+        wrongs: ["Sara", "Ken", "The bakery"],
+        explain: "本文に \"my brother said he can bring his speaker for music\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "説明文",
+    title: "Growing Vegetables",
+    text:
+`Last spring, my class started a special project. Our teacher gave each group of students a small area in the school garden. We decided to grow tomatoes and cucumbers. At first, it was difficult because we didn't know how to take care of the plants. We watered them every morning before class, but some of the plants still turned yellow. We asked Mr. Tanaka, a local farmer, for advice. He told us that we were giving the plants too much water. After we listened to his advice, our vegetables started growing well. In September, we finally picked our first tomatoes. We were so happy that we decided to share them with other classes. Now, our class is planning to grow more vegetables next year.`,
+    questions: [
+      {
+        q: "What problem did the students have at first?",
+        correct: "Some plants turned yellow",
+        wrongs: ["They didn't have enough sunlight", "They had no place to grow vegetables", "They forgot to water the plants"],
+        explain: "本文に \"some of the plants still turned yellow\" とあります。"
+      },
+      {
+        q: "Who helped the students solve their problem?",
+        correct: "A local farmer",
+        wrongs: ["Their teacher", "Their parents", "Another class"],
+        explain: "本文に \"We asked Mr. Tanaka, a local farmer, for advice.\" とあります。"
+      },
+      {
+        q: "What was the students' mistake?",
+        correct: "Giving too much water",
+        wrongs: ["Giving too little water", "Planting too many vegetables", "Not asking for help early"],
+        explain: "本文に \"we were giving the plants too much water\" とあります。"
+      },
+      {
+        q: "What did the students do with their tomatoes?",
+        correct: "Shared them with other classes",
+        wrongs: ["Sold them at a market", "Took them home", "Planted them again"],
+        explain: "本文に \"we decided to share them with other classes\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "説明文",
+    title: "The History of Furoshiki",
+    text:
+`Furoshiki is a traditional Japanese cloth used for wrapping things. People have used furoshiki for hundreds of years to carry clothes, gifts, and other items. In the past, people often took furoshiki to public baths to wrap their clothes. Today, fewer people use furoshiki in their daily lives because plastic bags and shopping bags are more common. However, some people are starting to use furoshiki again because it does not create plastic waste. You can also use furoshiki in many different ways, such as making a bag or wrapping a bottle as a present. Some stores now sell furoshiki with modern, colorful designs, so young people are becoming interested in it too.`,
+    questions: [
+      {
+        q: "What was furoshiki used for in the past?",
+        correct: "Wrapping clothes at public baths",
+        wrongs: ["Making shopping bags", "Selling in modern stores", "Carrying plastic waste"],
+        explain: "本文に \"people often took furoshiki to public baths to wrap their clothes\" とあります。"
+      },
+      {
+        q: "Why are some people using furoshiki again?",
+        correct: "Because it does not create plastic waste",
+        wrongs: ["Because it is cheaper than bags", "Because stores stopped selling bags", "Because it is required by law"],
+        explain: "本文に \"it does not create plastic waste\" とあります。"
+      },
+      {
+        q: "Why are young people becoming interested in furoshiki?",
+        correct: "Because of its modern, colorful designs",
+        wrongs: ["Because it is taught at school", "Because it is used at public baths", "Because it is cheaper than plastic bags"],
+        explain: "本文に \"stores now sell furoshiki with modern, colorful designs, so young people are becoming interested\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "説明文",
+    title: "Recycling at School",
+    text:
+`Last year, students at Midori Junior High School started a recycling project. Every classroom now has three boxes: one for paper, one for plastic bottles, and one for cans. Before lunch, students collect the recycling from each room and take it to a large collection area behind the school. Once a month, a local recycling company comes to pick up everything. The money the school earns from recycling is used to buy new sports equipment for the students. Last year, the school was able to buy ten new soccer balls and five basketballs with this money. The students hope to collect even more next year.`,
+    questions: [
+      {
+        q: "What do students do with the boxes of recycling?",
+        correct: "They take them to a collection area behind the school",
+        wrongs: ["They sell them to other schools", "They take them home", "They give them to the recycling company directly"],
+        explain: "本文に \"take it to a large collection area behind the school\" とあります。"
+      },
+      {
+        q: "How often does the recycling company visit the school?",
+        correct: "Once a month",
+        wrongs: ["Every day", "Once a week", "Twice a year"],
+        explain: "本文に \"Once a month, a local recycling company comes to pick up everything.\" とあります。"
+      },
+      {
+        q: "What did the school buy with the recycling money last year?",
+        correct: "Soccer balls and basketballs",
+        wrongs: ["New computers", "Books for the library", "School uniforms"],
+        explain: "本文に \"the school was able to buy ten new soccer balls and five basketballs\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "説明文",
+    title: "Guide Dogs",
+    text:
+`Guide dogs help people who cannot see well. These dogs go through special training for about a year before they can start working. During training, they learn to stop at stairs, avoid obstacles, and wait for traffic lights to change. After training, a dog is matched with a person who needs help. The dog and the person then train together for several weeks to build trust. Guide dogs wear a special harness so that people know they are working and should not pet them. Because of guide dogs, many people with poor eyesight can walk to work, go shopping, and travel more safely.`,
+    questions: [
+      {
+        q: "How long does a guide dog train before starting work?",
+        correct: "About a year",
+        wrongs: ["About a week", "About a month", "About five years"],
+        explain: "本文に \"These dogs go through special training for about a year before they can start working.\" とあります。"
+      },
+      {
+        q: "What do guide dogs learn during training?",
+        correct: "To stop at stairs and avoid obstacles",
+        wrongs: ["To bark at strangers", "To carry bags", "To open doors"],
+        explain: "本文に \"they learn to stop at stairs, avoid obstacles, and wait for traffic lights\" とあります。"
+      },
+      {
+        q: "Why do guide dogs wear a special harness?",
+        correct: "So people know not to pet them while working",
+        wrongs: ["To keep them warm", "To help them run faster", "To show they are still training"],
+        explain: "本文に \"Guide dogs wear a special harness so that people know they are working and should not pet them.\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "物語文",
+    title: "The Missing Notebook",
+    text:
+`Yuji was very worried. It was Friday afternoon, and he could not find his math notebook anywhere. He needed it for homework over the weekend. He looked in his desk, his bag, and even his locker, but it was not there. Then he remembered that he had studied with his friend Sora in the library after school on Thursday. He decided to check the library before going home. When he got there, he asked the librarian if anyone had found a notebook. She smiled and took a blue notebook from a box under the counter. It was his! Yuji thanked her many times and promised to be more careful next time.`,
+    questions: [
+      {
+        q: "What was Yuji looking for?",
+        correct: "His math notebook",
+        wrongs: ["His pencil case", "His school bag", "His locker key"],
+        explain: "本文の最初に \"he could not find his math notebook\" とあります。"
+      },
+      {
+        q: "Where did Yuji finally find it?",
+        correct: "In the library",
+        wrongs: ["In his desk", "In his bag", "At Sora's house"],
+        explain: "本文に \"he asked the librarian ... took a blue notebook from a box\" とあり、図書室で見つかったことがわかります。"
+      },
+      {
+        q: "How did Yuji probably feel at the end of the story?",
+        correct: "Relieved",
+        wrongs: ["Angry", "Confused", "Bored"],
+        explain: "ノートが見つかり \"Yuji thanked her many times\" とあるので、安心した（relieved）と考えられます。"
+      }
+    ]
+  },
+  {
+    type: "物語文",
+    title: "The Speech Contest",
+    text:
+`Mei was chosen to give a speech at the school speech contest. She was very nervous because she had never spoken in front of so many people before. Every night after dinner, she practiced her speech in front of her little brother. At first, she made a lot of mistakes and even forgot some parts. Her brother always cheered her up and said, "You can do it!" On the day of the contest, Mei's hands were shaking, but she remembered her brother's words. She took a deep breath and started speaking slowly and clearly. When she finished, everyone clapped loudly. Mei didn't win first place, but she felt proud of herself for trying her best.`,
+    questions: [
+      {
+        q: "Why was Mei nervous?",
+        correct: "She had never spoken in front of so many people before",
+        wrongs: ["She forgot her speech at home", "She didn't like her topic", "She was sick that day"],
+        explain: "本文に \"she had never spoken in front of so many people before\" とあります。"
+      },
+      {
+        q: "Who helped Mei practice her speech?",
+        correct: "Her little brother",
+        wrongs: ["Her teacher", "Her classmate", "Her mother"],
+        explain: "本文に \"she practiced her speech in front of her little brother\" とあります。"
+      },
+      {
+        q: "How did Mei feel after the contest?",
+        correct: "Proud of herself",
+        wrongs: ["Angry at herself", "Embarrassed", "Disappointed in her brother"],
+        explain: "本文に \"she felt proud of herself for trying her best\" とあります。"
+      }
+    ]
+  },
+  {
+    type: "物語文",
+    title: "The Missing Dog",
+    text:
+`One evening, Daiki noticed that his dog, Pochi, was not in the yard. He looked everywhere in the house and garden, but Pochi was gone. Daiki and his father decided to walk around the neighborhood to look for him. They asked several neighbors if they had seen a small brown dog. Mrs. Sato, who lived two houses away, said she had seen a dog like that near the park an hour ago. Daiki and his father hurried to the park and called Pochi's name. After a few minutes, they heard a bark from behind a tree. It was Pochi! He was tired and hungry, but he was safe. Daiki hugged Pochi tightly and thanked Mrs. Sato the next day.`,
+    questions: [
+      {
+        q: "What did Daiki and his father do first?",
+        correct: "They walked around the neighborhood asking neighbors",
+        wrongs: ["They called the police", "They searched the park first", "They waited at home"],
+        explain: "本文に \"Daiki and his father decided to walk around the neighborhood to look for him\" とあります。"
+      },
+      {
+        q: "Who gave Daiki and his father useful information?",
+        correct: "Mrs. Sato",
+        wrongs: ["A police officer", "Daiki's teacher", "Pochi's owner"],
+        explain: "本文に \"Mrs. Sato ... said she had seen a dog like that near the park\" とあります。"
+      },
+      {
+        q: "Where did they finally find Pochi?",
+        correct: "Near a tree in the park",
+        wrongs: ["In the yard", "At Mrs. Sato's house", "At school"],
+        explain: "本文に \"they heard a bark from behind a tree\" とあり、公園の木の後ろで見つかったことがわかります。"
+      }
+    ]
+  },
+  {
+    type: "物語文",
+    title: "A New Friend",
+    text:
+`Rina moved to a new school in April. She didn't know anyone and felt lonely during the first week. One day at lunch, she sat alone at a table near the window. A classmate named Kota noticed her and walked over. "Can I sit here?" he asked with a smile. They talked about their favorite games and both loved the same soccer team. After that day, Kota introduced Rina to his other friends, and soon she had many people to talk to. A month later, Rina told her mother that moving to the new school wasn't so scary anymore, thanks to one kind classmate.`,
+    questions: [
+      {
+        q: "How did Rina feel during her first week at the new school?",
+        correct: "Lonely",
+        wrongs: ["Excited", "Angry", "Bored"],
+        explain: "本文に \"She didn't know anyone and felt lonely during the first week.\" とあります。"
+      },
+      {
+        q: "What did Kota do for Rina?",
+        correct: "He introduced her to his friends",
+        wrongs: ["He gave her his lunch", "He walked her home", "He lent her his notebook"],
+        explain: "本文に \"Kota introduced Rina to his other friends\" とあります。"
+      },
+      {
+        q: "What did Rina and Kota have in common?",
+        correct: "They liked the same soccer team",
+        wrongs: ["They lived in the same town", "They had the same teacher", "They played the same instrument"],
+        explain: "本文に \"both loved the same soccer team\" とあります。"
+      }
+    ]
+  }
+];
+
+// ===== 状態管理 =====
+let selectedMode = 'all4'; // 'all4' or 'custom'
+let selectedCategories = new Set(['掲示・案内文', 'Eメール文', '説明文', '物語文']);
+let flatQuestions = []; // {passageIndex, question}
+let currentIndex = 0;
+let correctCount = 0;
+let wrongQuestions = [];
+let answered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// 文章のタイプが偏らないよう、カテゴリごとに順番に選んでいく
+function pickPassages(n) {
+  const byCategory = {};
+  PASSAGES.forEach((p, i) => {
+    (byCategory[p.type] = byCategory[p.type] || []).push(i);
+  });
+  Object.keys(byCategory).forEach(k => { byCategory[k] = shuffle(byCategory[k]); });
+  const cats = shuffle(Object.keys(byCategory));
+
+  const selected = [];
+  while (selected.length < n) {
+    let addedAny = false;
+    for (const cat of cats) {
+      if (selected.length >= n) break;
+      const arr = byCategory[cat];
+      if (arr.length > 0) {
+        selected.push(arr.shift());
+        addedAny = true;
+      }
+    }
+    if (!addedAny) break;
+  }
+  return selected.map(i => PASSAGES[i]);
+}
+
+function buildFlatQuestions(passages) {
+  const list = [];
+  passages.forEach((p, pi) => {
+    p.questions.forEach((q, qi) => {
+      list.push({ passage: p, qIndexInPassage: qi, question: q });
+    });
+  });
+  return list;
+}
+
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('selected'));
+    tab.classList.add('selected');
+    selectedMode = tab.dataset.mode;
+    document.getElementById('category-picker').style.display = selectedMode === 'custom' ? 'flex' : 'none';
+  });
+});
+
+document.querySelectorAll('.cat-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const type = chip.dataset.type;
+    if (chip.classList.contains('selected')) {
+      if (selectedCategories.size === 1) return; // 最低1つは選択が必要
+      chip.classList.remove('selected');
+      selectedCategories.delete(type);
+    } else {
+      chip.classList.add('selected');
+      selectedCategories.add(type);
+    }
+  });
+});
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  startQuiz();
+});
+
+document.getElementById('btn-back-to-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+
+function startQuiz() {
+  const passages = selectedMode === 'custom'
+    ? shuffle(PASSAGES.filter(p => selectedCategories.has(p.type)))
+    : pickPassages(4);
+  flatQuestions = buildFlatQuestions(passages);
+  currentIndex = 0;
+  correctCount = 0;
+  wrongQuestions = [];
+  goPage('page-quiz');
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const item = flatQuestions[currentIndex];
+  const passage = item.passage;
+  const q = item.question;
+
+  document.getElementById('progress-text').textContent = `問題 ${currentIndex + 1} / ${flatQuestions.length}`;
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('progress-bar').style.width = `${(currentIndex / flatQuestions.length) * 100}%`;
+  document.getElementById('cat-badge').textContent = passage.type;
+  document.getElementById('passage-title').textContent = passage.title;
+  document.getElementById('passage-text').textContent = passage.text;
+  document.getElementById('question-label').textContent = `Q${item.qIndexInPassage + 1}`;
+  document.getElementById('question-en').textContent = q.q;
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectAnswer(btn, opt, q, passage));
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('btn-next').style.display = 'none';
+}
+
+function selectAnswer(btn, opt, q, passage) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = opt === q.correct;
+
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('feedback-explain').textContent = q.explain;
+
+  if (isCorrect) {
+    correctCount++;
+  } else {
+    wrongQuestions.push({ passageTitle: passage.title, passageType: passage.type, q: q.q, correct: q.correct, explain: q.explain });
+  }
+  document.getElementById('progress-score').textContent = `正解 ${correctCount}`;
+  document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  currentIndex++;
+  if (currentIndex < flatQuestions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  document.getElementById('progress-bar').style.width = '100%';
+  goPage('page-result');
+  document.getElementById('result-score').textContent = correctCount;
+  document.getElementById('result-total').textContent = flatQuestions.length;
+
+  const rate = correctCount / flatQuestions.length;
+  let msg = '';
+  if (rate === 1) msg = '🎉 パーフェクト！すばらしい！';
+  else if (rate >= 0.8) msg = '😊 よくできました！この調子！';
+  else if (rate >= 0.6) msg = '👍 もう少し！本文を読み直してみよう';
+  else msg = '💪 本文の内容をもう一度確認しよう';
+  document.getElementById('result-msg').textContent = msg;
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  if (wrongQuestions.length > 0) {
+    const heading = document.createElement('h3');
+    heading.style.cssText = 'font-size:0.9em;color:#d13a1f;font-weight:800;margin-bottom:10px;';
+    heading.textContent = `間違えた問題（${wrongQuestions.length}問）の復習`;
+    reviewList.appendChild(heading);
+
+    wrongQuestions.forEach(w => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `
+        <div class="rp">${w.passageType}「${w.passageTitle}」</div>
+        <div class="rq">${w.q}</div>
+        <div class="ra">正解: ${w.correct}</div>
+        <div class="re">${w.explain}</div>
+      `;
+      reviewList.appendChild(div);
+    });
+  }
+}
+
+document.getElementById('btn-retry-all').addEventListener('click', () => {
+  startQuiz();
+});
+
+document.getElementById('btn-back-title').addEventListener('click', () => {
+  goPage('page-title');
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英検3級対策</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-btn {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border: none; border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s; cursor: pointer;
+    font-family: inherit; display: none;
+  }
+  .hd-home-btn.show { display: inline-block; }
+  .hd-home-btn:hover { background: rgba(255,255,255,0.32); }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  #page-title.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .title-icon { font-size: 4.5em; margin-bottom: 10px; text-align: center; }
+  .title-main { font-size: 1.6em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; text-align: center; }
+  .title-sub  { font-size: 0.92em; color: #888; margin-bottom: 28px; text-align: center; }
+
+  .menu-list { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+
+  .menu-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #f8f9ff;
+    border: 2px solid #e2e5f5;
+    border-radius: 18px;
+    padding: 18px 20px;
+    text-decoration: none;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .menu-card:hover { border-color: #5B6CF5; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(91,108,245,0.15); }
+  .menu-card.mock-card { background: linear-gradient(135deg,#fff8ec,#fff2de); border-color: #ffd98a; }
+  .menu-card.mock-card:hover { border-color: #f7971e; box-shadow: 0 8px 20px rgba(247,151,30,0.18); }
+  .menu-card .mc-icon {
+    font-size: 2.2em; flex-shrink: 0; width: 64px; height: 64px;
+    background: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .menu-card .mc-body { flex: 1; }
+  .menu-card .mc-title { font-size: 1.05em; font-weight: 800; color: #333; margin-bottom: 4px; }
+  .menu-card .mc-desc { font-size: 0.82em; color: #888; line-height: 1.5; }
+  .menu-card .mc-tag {
+    display: inline-block; font-size: 0.7em; font-weight: 700; color: #5B6CF5;
+    background: #eef0ff; border-radius: 50px; padding: 2px 10px; margin-top: 6px;
+  }
+  .menu-card.mock-card .mc-tag { color: #b8791a; background: #ffedcc; }
+  .menu-card .mc-arrow { font-size: 1.3em; color: #5B6CF5; flex-shrink: 0; }
+
+  .footer-note { margin-top: 26px; font-size: 0.78em; color: #aaa; line-height: 1.6; text-align: center; }
+  .mode-divider {
+    font-size: 0.78em; font-weight: 800; color: #aaa; text-align: center; margin: 6px 0 2px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    display: inline-block; padding: 13px 28px; border-radius: 50px; border: none;
+    font-size: 0.95em; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-outline { background: #fff; color: #5B6CF5; border: 2px solid #5B6CF5; padding: 11px 26px; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== 模試イントロ ===== */
+  .mock-steps { background:#f8f9ff; border-radius:16px; padding:18px 20px; margin-bottom:22px; text-align:left; }
+  .mock-steps h3 { font-size:0.9em; color:#5B6CF5; font-weight:800; margin-bottom:12px; }
+  .mock-step-row { display:flex; align-items:center; gap:12px; padding:8px 0; }
+  .mock-step-row .msr-num {
+    width:28px; height:28px; border-radius:50%; background:#5B6CF5; color:#fff; font-weight:800;
+    font-size:0.85em; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .mock-step-row .msr-text { font-size:0.87em; color:#444; }
+  .mock-step-row .msr-text b { color:#222; }
+  .mock-caveat { font-size:0.76em; color:#aaa; line-height:1.6; margin-top:10px; text-align:left; }
+
+  /* ===== 進捗バー ===== */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.82em; color:#888; margin-bottom:6px; font-weight:700; }
+  .progress-bar-bg { background:#eee; border-radius:8px; height:8px; overflow:hidden; }
+  .progress-bar-fill { background: linear-gradient(135deg,#667eea,#764ba2); height:100%; border-radius:8px; transition: width 0.3s; }
+  .section-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:800;
+    border-radius:50px; padding:5px 14px; margin-bottom:14px;
+  }
+  .cat-badge {
+    display:inline-block; background:#eef0ff; color:#5B6CF5; font-size:0.75em; font-weight:700;
+    border-radius:50px; padding:4px 12px; margin-bottom:12px; margin-left:8px;
+  }
+
+  /* ===== 文法クイズ（4択） ===== */
+  .question-card { background: #f8f9ff; border-radius: 16px; padding: 24px 20px; margin-bottom: 18px; }
+  .question-en { font-size: 1.1em; font-weight: 700; color: #222; line-height: 1.6; }
+  .question-en .blank { color: #5B6CF5; font-weight: 900; border-bottom: 2px solid #5B6CF5; padding: 0 4px; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 12px;
+    padding: 14px 18px; text-align: left; font-size: 0.98em; font-weight: 700; color:#333;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #b9c0f0; background: #f8f9ff; }
+  .choice-btn.correct { border-color: #43e97b; background: #eafff3; color: #1a9e5a; }
+  .choice-btn.wrong { border-color: #ff4b2b; background: #fff0ee; color: #d13a1f; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box { margin-top: 16px; padding: 16px 18px; border-radius: 14px; display: none; }
+  .feedback-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .feedback-box.correct { background: #eafff3; border: 2px solid #43e97b; }
+  .feedback-box.wrong { background: #fff0ee; border: 2px solid #ff4b2b; }
+  .feedback-title { font-weight: 900; font-size: 0.95em; margin-bottom: 6px; }
+  .feedback-box.correct .feedback-title { color: #1a9e5a; }
+  .feedback-box.wrong .feedback-title { color: #d13a1f; }
+  .feedback-answer { font-size: 0.9em; color: #444; margin-bottom: 4px; }
+  .feedback-explain { font-size: 0.85em; color: #666; line-height: 1.5; }
+
+  .nav-row { margin-top: 20px; text-align: right; }
+
+  /* ===== 長文読解 ===== */
+  .passage-card {
+    background: #fff; border: 2px solid #e2e5f5; border-radius: 16px;
+    padding: 16px 18px; margin-bottom: 16px; max-height: 220px; overflow-y: auto;
+  }
+  .passage-title { font-weight: 800; color: #5B6CF5; margin-bottom: 8px; font-size: 0.95em; }
+  .passage-text { font-size: 0.88em; line-height: 1.75; color: #333; white-space: pre-line; }
+  .question-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 6px; }
+
+  /* ===== 英作文 ===== */
+  .prompt-card { background: #f8f9ff; border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; }
+  .prompt-label { font-size: 0.78em; color: #888; font-weight: 700; margin-bottom: 8px; }
+  .prompt-text { font-size: 1.02em; font-weight: 700; color: #222; line-height: 1.7; }
+  .prompt-text u { color: #5B6CF5; text-decoration-color: #5B6CF5; }
+
+  .tip-box { background: #fffaf0; border: 2px solid #ffe4b8; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+  .tip-box h4 { font-size: 0.82em; color: #d98c1f; font-weight: 800; margin-bottom: 8px; }
+  .tip-box ul { padding-left: 18px; }
+  .tip-box li { font-size: 0.83em; color: #7a5c25; line-height: 1.6; margin-bottom: 3px; }
+  .phrase-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .phrase-tag {
+    background: #fff; border: 1px solid #ffe4b8; color: #b8791a; font-size: 0.78em; font-weight: 700;
+    padding: 4px 10px; border-radius: 50px;
+  }
+
+  .answer-textarea {
+    width: 100%; min-height: 110px; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 14px 16px; font-size: 0.95em; font-family: inherit; line-height: 1.6; resize: vertical;
+    transition: border-color 0.15s;
+  }
+  .answer-textarea:focus { outline: none; border-color: #5B6CF5; }
+
+  .counter-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; margin-bottom: 16px; }
+  .counter-badge { font-size: 0.82em; font-weight: 800; padding: 4px 12px; border-radius: 50px; }
+  .counter-badge.empty  { background: #f0f0f0; color: #999; }
+  .counter-badge.good   { background: #eafff3; color: #1a9e5a; }
+  .counter-badge.near   { background: #fff6e0; color: #b8791a; }
+  .counter-badge.off    { background: #fff0ee; color: #d13a1f; }
+  .counter-target { font-size: 0.78em; color: #999; }
+
+  .check-box { background: #f8f9ff; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; }
+  .check-box h4 { font-size: 0.82em; color: #5B6CF5; font-weight: 800; margin-bottom: 8px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: #555; padding: 4px 0; }
+  .check-item input { width: 16px; height: 16px; accent-color: #5B6CF5; }
+
+  .model-box { background: #eafff3; border: 2px solid #43e97b; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; display: none; }
+  .model-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .model-box h4 { font-size: 0.85em; color: #1a9e5a; font-weight: 800; margin-bottom: 10px; }
+  .model-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #b9e8cf; }
+  .model-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .model-item .mi-label { font-size: 0.72em; font-weight: 800; color: #1a9e5a; margin-bottom: 3px; }
+  .model-item .mi-text { font-size: 0.9em; color: #333; line-height: 1.6; }
+  .model-item .mi-count { font-size: 0.75em; color: #4caf7d; margin-top: 4px; font-weight: 700; }
+
+  .ai-box { background: #eef0ff; border: 2px solid #5B6CF5; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; display: none; }
+  .ai-box.show { display: block; animation: fadeIn 0.25s ease; }
+  .ai-box h4 { font-size: 0.85em; color: #5B6CF5; font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px; }
+  .ai-score-badge { display:inline-block; font-weight:900; font-size:0.8em; padding:2px 12px; border-radius:50px; background:#5B6CF5; color:#fff; }
+  .ai-section { margin-bottom: 10px; }
+  .ai-section:last-child { margin-bottom: 0; }
+  .ai-section .as-label { font-size: 0.75em; font-weight: 800; color: #5B6CF5; margin-bottom: 3px; }
+  .ai-section .as-text { font-size: 0.88em; color: #333; line-height: 1.6; }
+  .ai-loading { font-size: 0.85em; color: #666; text-align: center; padding: 10px; }
+  .ai-error { font-size: 0.85em; color: #d13a1f; background: #fff0ee; border-radius: 10px; padding: 10px 12px; }
+
+  /* ===== 模試 結果ページ ===== */
+  #page-mock-result { text-align: center; }
+  .verdict-box {
+    border-radius: 20px; padding: 26px 20px; margin-bottom: 22px;
+  }
+  .verdict-box.high { background: linear-gradient(135deg,#43e97b,#38f9d7); }
+  .verdict-box.mid  { background: linear-gradient(135deg,#f7971e,#ffd200); }
+  .verdict-box.low  { background: linear-gradient(135deg,#ff9a8b,#ff6a88); }
+  .verdict-icon { font-size: 2.6em; margin-bottom: 8px; }
+  .verdict-title { font-size: 1.25em; font-weight: 900; color: #fff; margin-bottom: 4px; }
+  .verdict-score { font-size: 0.95em; color: rgba(255,255,255,0.9); font-weight: 700; }
+
+  .section-scores { text-align: left; margin-bottom: 20px; }
+  .section-score-row { margin-bottom: 14px; }
+  .section-score-row .ssr-top { display:flex; justify-content:space-between; font-size:0.85em; font-weight:800; color:#333; margin-bottom:6px; }
+  .section-score-bar-bg { background:#eee; border-radius:8px; height:10px; overflow:hidden; }
+  .section-score-bar-fill { height:100%; border-radius:8px; background: linear-gradient(135deg,#667eea,#764ba2); }
+
+  .mock-caveat-box {
+    background:#f8f9ff; border-radius:14px; padding:14px 16px; margin-bottom:20px; text-align:left;
+    font-size:0.78em; color:#888; line-height:1.7;
+  }
+
+  .review-section-title {
+    font-size: 0.95em; font-weight: 900; color: #5B6CF5; margin: 20px 0 10px; text-align: left;
+    border-bottom: 2px solid #eef0ff; padding-bottom: 6px;
+  }
+  .review-list { text-align: left; margin-bottom: 10px; }
+  .review-item { background: #fff0ee; border: 2px solid #ffd6cf; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
+  .review-item .rp { font-size: 0.75em; color: #b06a5f; font-weight: 700; margin-bottom: 4px; }
+  .review-item .rq { font-weight: 700; color: #333; margin-bottom: 6px; }
+  .review-item .ra { font-size: 0.88em; color: #1a9e5a; font-weight: 700; margin-bottom: 4px; }
+  .review-item .re { font-size: 0.83em; color: #777; line-height: 1.5; }
+
+  .writing-review-item { background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; text-align: left; }
+  .writing-review-item .wr-q { font-weight: 700; color: #333; font-size: 0.9em; margin-bottom: 8px; line-height: 1.5; }
+  .writing-review-item .wr-label { font-size: 0.72em; font-weight: 800; margin-top: 8px; margin-bottom: 3px; }
+  .writing-review-item .wr-mine { font-size: 0.86em; color: #444; background: #fff; border-radius: 8px; padding: 8px 10px; min-height: 20px; }
+  .writing-review-item .wr-mine.empty { color: #bbb; font-style: italic; }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+
+  /* ===== 模試の記録 ===== */
+  .record-item { background:#f8f9ff; border:2px solid #e2e5f5; border-radius:14px; padding:14px 16px; margin-bottom:10px; text-align:left; }
+  .record-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .record-date { font-size:0.78em; color:#999; font-weight:700; }
+  .record-type-badge { font-size:0.72em; font-weight:800; padding:2px 10px; border-radius:50px; }
+  .record-type-badge.t1 { background:#eef0ff; color:#5B6CF5; }
+  .record-type-badge.t2 { background:#ffedcc; color:#b8791a; }
+  .record-verdict { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .record-verdict-icon { font-size:1.3em; }
+  .record-verdict-text { font-weight:800; font-size:0.95em; }
+  .record-verdict-text.high { color:#1a9e5a; }
+  .record-verdict-text.mid { color:#b8791a; }
+  .record-verdict-text.low { color:#d13a1f; }
+  .record-score { font-size:0.85em; color:#555; font-weight:700; margin-left:auto; }
+  .record-detail { font-size:0.78em; color:#888; margin-top:4px; }
+  .records-empty { text-align:center; color:#aaa; font-size:0.9em; padding:40px 20px; line-height:1.8; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">英検3級対策</div>
+      <div class="hd-sub">文法・語法｜長文読解｜英作文｜面接</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <a class="hd-home-link" href="英検対策.html">← 級選択</a>
+      <button class="hd-home-btn" id="btn-header-home">🏠 ホーム</button>
+    </div>
+  </div>
+
+  <!-- ===== メニュー ===== -->
+  <div id="page-title" class="page active">
+    <div class="title-icon">🎯</div>
+    <div class="title-main">英検3級対策</div>
+    <div class="title-sub">練習したい項目を選んでスタートしよう</div>
+
+    <div class="menu-list">
+      <div class="menu-card" id="btn-go-records">
+        <div class="mc-icon">📊</div>
+        <div class="mc-body">
+          <div class="mc-title">これまでの記録</div>
+          <div class="mc-desc">1次・2次の模試判定を記録として振り返る。</div>
+          <span class="mc-tag">記録を見る</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </div>
+
+      <div class="menu-card mock-card" id="btn-go-mock">
+        <div class="mc-icon">🏆</div>
+        <div class="mc-body">
+          <div class="mc-title">1次試験模試に挑戦</div>
+          <div class="mc-desc">文法・長文・英作文を通しで解いて、最後に合格可能性をチェック。</div>
+          <span class="mc-tag">模試モード</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </div>
+
+      <a class="menu-card" href="英検3級_文法語法トレーニング.html">
+        <div class="mc-icon">📘</div>
+        <div class="mc-body">
+          <div class="mc-title">文法・語法</div>
+          <div class="mc-desc">空所補充形式の4択クイズ。全48問、出題数も選べる。</div>
+          <span class="mc-tag">クイズ形式</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="英検3級_長文読解トレーニング.html">
+        <div class="mc-icon">📖</div>
+        <div class="mc-body">
+          <div class="mc-title">長文読解</div>
+          <div class="mc-desc">掲示文・Eメール・説明文・物語文、16種類の文章から出題。</div>
+          <span class="mc-tag">クイズ形式</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="英検3級_英作文トレーニング.html">
+        <div class="mc-icon">✏️</div>
+        <div class="mc-body">
+          <div class="mc-title">英作文</div>
+          <div class="mc-desc">意見英作文・Eメール返信を練習。模範解答やAI採点で自己添削。</div>
+          <span class="mc-tag">ライティング形式</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+
+      <a class="menu-card mock-card" href="英検3級_2次試験対策.html?mode=mock">
+        <div class="mc-icon">🎯</div>
+        <div class="mc-body">
+          <div class="mc-title">2次試験の模試に挑戦</div>
+          <div class="mc-desc">面接カードをランダムに1枚出題。AI採点で合格可能性をチェック。</div>
+          <span class="mc-tag">模試モード</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="英検3級_2次試験対策.html">
+        <div class="mc-icon">🎤</div>
+        <div class="mc-body">
+          <div class="mc-title">2次試験（面接）</div>
+          <div class="mc-desc">絵カード形式で音読・質問応答を練習。音声のお手本つき。</div>
+          <span class="mc-tag">スピーキング形式</span>
+        </div>
+        <div class="mc-arrow">›</div>
+      </a>
+    </div>
+
+    <div class="footer-note">模試モード以外の各ページには「🏠 メニュー」リンクがあり、いつでもここに戻れます。</div>
+  </div>
+
+  <!-- ===== 模試の記録 ===== -->
+  <div id="page-records" class="page">
+    <div class="title-icon">📊</div>
+    <div class="title-main">これまでの記録</div>
+    <div class="title-sub">模試の判定履歴（この端末のブラウザに保存されています）</div>
+
+    <div id="records-list"></div>
+
+    <div class="result-btns" style="margin-top:20px;">
+      <button class="btn btn-gray btn-block" id="btn-records-back">メニューに戻る</button>
+      <button class="btn btn-outline btn-block" id="btn-records-clear">記録をすべて削除</button>
+    </div>
+  </div>
+
+  <!-- ===== 模試イントロ ===== -->
+  <div id="page-mock-intro" class="page">
+    <div class="title-icon">🏆</div>
+    <div class="title-main">模試モード</div>
+    <div class="title-sub">3つの分野を通しで解いて、最後に合格可能性をチェックしよう</div>
+
+    <div class="mock-steps">
+      <h3>出題内容</h3>
+      <div class="mock-step-row"><div class="msr-num">1</div><div class="msr-text"><b>文法・語法</b>：4択問題を15問</div></div>
+      <div class="mock-step-row"><div class="msr-num">2</div><div class="msr-text"><b>長文読解</b>：文章3つ分の問題（約9〜10問）</div></div>
+      <div class="mock-step-row"><div class="msr-num">3</div><div class="msr-text"><b>英作文</b>：意見英作文＋Eメール返信を1問ずつ</div></div>
+      <div class="mock-caveat">※出題内容は毎回ランダムに変わります。全部終わると「合格可能性」の目安が表示されます。</div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start-mock" style="max-width:280px;margin:0 auto;">模試スタート！</button>
+  </div>
+
+  <!-- ===== 模試：文法 ===== -->
+  <div id="page-mock-grammar" class="page">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="mg-progress-text">文法 問題 1 / 15</span>
+        <span id="mg-progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="mg-progress-bar" style="width:0%"></div></div>
+    </div>
+    <span class="section-badge">STEP 1 / 3：文法・語法</span>
+
+    <div class="question-card"><div class="question-en" id="mg-question-en"></div></div>
+    <div class="choices" id="mg-choices"></div>
+
+    <div class="feedback-box" id="mg-feedback-box">
+      <div class="feedback-title" id="mg-feedback-title"></div>
+      <div class="feedback-answer" id="mg-feedback-answer"></div>
+      <div class="feedback-explain" id="mg-feedback-explain"></div>
+    </div>
+
+    <div class="nav-row"><button class="btn btn-primary" id="mg-btn-next" style="display:none;">次へ</button></div>
+  </div>
+
+  <!-- ===== 模試：長文読解 ===== -->
+  <div id="page-mock-reading" class="page">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="mr-progress-text">長文 問題 1 / 9</span>
+        <span id="mr-progress-score">正解 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="mr-progress-bar" style="width:0%"></div></div>
+    </div>
+    <span class="section-badge">STEP 2 / 3：長文読解</span><span class="cat-badge" id="mr-cat-badge"></span>
+
+    <div class="passage-card">
+      <div class="passage-title" id="mr-passage-title"></div>
+      <div class="passage-text" id="mr-passage-text"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-label" id="mr-question-label"></div>
+      <div class="question-en" id="mr-question-en" style="font-size:1em;"></div>
+    </div>
+    <div class="choices" id="mr-choices"></div>
+
+    <div class="feedback-box" id="mr-feedback-box">
+      <div class="feedback-title" id="mr-feedback-title"></div>
+      <div class="feedback-answer" id="mr-feedback-answer"></div>
+      <div class="feedback-explain" id="mr-feedback-explain"></div>
+    </div>
+
+    <div class="nav-row"><button class="btn btn-primary" id="mr-btn-next" style="display:none;">次へ</button></div>
+  </div>
+
+  <!-- ===== 模試：英作文 ===== -->
+  <div id="page-mock-writing" class="page">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="mw-progress-text">英作文 課題 1 / 2</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="mw-progress-bar" style="width:0%"></div></div>
+    </div>
+    <span class="section-badge">STEP 3 / 3：英作文</span>
+
+    <div class="prompt-card">
+      <div class="prompt-label" id="mw-prompt-label"></div>
+      <div class="prompt-text" id="mw-prompt-text"></div>
+    </div>
+
+    <div class="tip-box">
+      <h4 id="mw-tip-title">📝 書き方のヒント</h4>
+      <ul id="mw-tip-list"></ul>
+      <div class="phrase-tags" id="mw-phrase-tags"></div>
+    </div>
+
+    <textarea class="answer-textarea" id="mw-answer-textarea" placeholder="ここに英文を書いてみよう..."></textarea>
+    <div class="counter-row">
+      <span class="counter-badge empty" id="mw-counter-badge">0 語</span>
+      <span class="counter-target">目安：25～35語</span>
+    </div>
+
+    <div class="check-box">
+      <h4>✅ 書き終わったらセルフチェック</h4>
+      <label class="check-item"><input type="checkbox"> 質問にきちんと答えている</label>
+      <label class="check-item"><input type="checkbox"> 理由や説明を書き加えている</label>
+      <label class="check-item"><input type="checkbox"> 語数が25～35語くらいになっている</label>
+      <label class="check-item"><input type="checkbox"> つづり・大文字・ピリオドを見直した</label>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <button class="btn btn-outline" style="flex:1;" id="mw-btn-show-model">模範解答を見る</button>
+      <button class="btn btn-primary" style="flex:1;" id="mw-btn-ai-check">🤖 AIに採点してもらう</button>
+    </div>
+
+    <div class="model-box" id="mw-model-box">
+      <h4>💡 模範解答例</h4>
+      <div id="mw-model-list"></div>
+    </div>
+
+    <div class="ai-box" id="mw-ai-box"></div>
+
+    <div class="nav-row"><button class="btn btn-primary" id="mw-btn-next">次へ</button></div>
+  </div>
+
+  <!-- ===== 模試：結果 ===== -->
+  <div id="page-mock-result" class="page">
+    <div class="verdict-box" id="verdict-box">
+      <div class="verdict-icon" id="verdict-icon">🎉</div>
+      <div class="verdict-title" id="verdict-title">合格の可能性は高いです！</div>
+      <div class="verdict-score" id="verdict-score">総合スコア目安：80%</div>
+    </div>
+
+    <div class="section-scores">
+      <div class="section-score-row">
+        <div class="ssr-top"><span>📘 文法・語法</span><span id="score-grammar-text">0 / 15</span></div>
+        <div class="section-score-bar-bg"><div class="section-score-bar-fill" id="score-grammar-bar" style="width:0%"></div></div>
+      </div>
+      <div class="section-score-row">
+        <div class="ssr-top"><span>📖 長文読解</span><span id="score-reading-text">0 / 9</span></div>
+        <div class="section-score-bar-bg"><div class="section-score-bar-fill" id="score-reading-bar" style="width:0%"></div></div>
+      </div>
+      <div class="section-score-row">
+        <div class="ssr-top"><span>✏️ 英作文（自己評価の目安）</span><span id="score-writing-text">-</span></div>
+        <div class="section-score-bar-bg"><div class="section-score-bar-fill" id="score-writing-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="mock-caveat-box">
+      ※このスコアは、選択式問題の正答率と英作文の目安をもとにした<b>簡易的な推定</b>です。実際の英検のスコア（CSE）算出方法とは異なり、リスニングや2次試験（面接）は含まれていません。参考の一つとしてご利用ください。
+    </div>
+
+    <div id="mock-review-wrap"></div>
+
+    <div class="result-btns">
+      <button class="btn btn-green btn-block" id="btn-mock-retry">もう一度模試に挑戦</button>
+      <button class="btn btn-gray btn-block" id="btn-mock-back-title">メニューに戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// 共有データ（英検3級_文法語法トレーニング.html / 長文読解トレーニング.html / 英作文トレーニング.html と同じ内容）
+// ================================================================
+const GRAMMAR_BANK = [
+  { cat:"動詞の形", en:"I ___ soccer every Saturday.", correct:"play", wrongs:["plays","playing","played"], explain:"主語がIなので動詞は原形のplayを使います。" },
+  { cat:"動詞の形", en:"My sister ___ English very well.", correct:"speaks", wrongs:["speak","speaking","spoken"], explain:"主語が3人称単数（sister）のときは動詞にsをつけます。" },
+  { cat:"進行形", en:"She ___ a letter now.", correct:"is writing", wrongs:["write","writes","wrote"], explain:"nowがあるので現在進行形〈be動詞+動詞のing形〉を使います。" },
+  { cat:"過去形", en:"We ___ to the park yesterday.", correct:"went", wrongs:["go","goes","going"], explain:"yesterdayがあるので過去形にします。goの過去形はwent。" },
+  { cat:"未来形", en:"I ___ visit Kyoto next month.", correct:"will", wrongs:["am","do","was"], explain:"next monthは未来の内容なのでwillを使います。" },
+  { cat:"助動詞", en:"You ___ finish your homework before dinner.", correct:"must", wrongs:["are","do","can"], explain:"「〜しなければならない」はmust+動詞の原形で表します。" },
+  { cat:"助動詞", en:"She can ___ the piano.", correct:"play", wrongs:["plays","playing","played"], explain:"助動詞canの後ろの動詞は必ず原形になります。" },
+  { cat:"比較", en:"This book is ___ than that one.", correct:"more interesting", wrongs:["interesting","most interesting","interestinger"], explain:"つづりの長い形容詞の比較級はmoreを前につけます。" },
+  { cat:"比較", en:"Mt. Fuji is the ___ mountain in Japan.", correct:"highest", wrongs:["high","higher","most high"], explain:"最上級は「the+形容詞+est」の形にします。" },
+  { cat:"比較", en:"He ___ as fast as his brother.", correct:"runs", wrongs:["run","ran","running"], explain:"as〜asの原級比較でも主語が3人称単数ならsをつけます。" },
+  { cat:"現在完了", en:"I have ___ to Okinawa twice.", correct:"been", wrongs:["be","being","was"], explain:"現在完了〈have/has+過去分詞〉の経験用法。beの過去分詞はbeen。" },
+  { cat:"現在完了", en:"She has lived in Nagoya ___ five years.", correct:"for", wrongs:["since","from","at"], explain:"「〜の間」と期間を表すときはforを使います。" },
+  { cat:"現在完了", en:"I have known him ___ I was a child.", correct:"since", wrongs:["for","during","when"], explain:"「〜以来」と過去のある時点を表すときはsinceを使います。" },
+  { cat:"受動態", en:"This room ___ cleaned every day.", correct:"is", wrongs:["was","cleans","cleaning"], explain:"受動態は〈be動詞+過去分詞〉。every dayなので現在形isを使います。" },
+  { cat:"受動態", en:"The window was ___ by Tom.", correct:"broken", wrongs:["break","broke","breaking"], explain:"受動態〈be+過去分詞〉。breakの過去分詞はbroken。" },
+  { cat:"不定詞", en:"I want ___ a doctor in the future.", correct:"to be", wrongs:["be","being","been"], explain:"want to+動詞の原形で「〜したい」という意味になります。" },
+  { cat:"動名詞", en:"My hobby is ___ pictures.", correct:"taking", wrongs:["take","takes","took"], explain:"be動詞の補語には動名詞（-ing形）を使うことができます。" },
+  { cat:"動名詞", en:"Ken finished ___ his homework.", correct:"doing", wrongs:["do","to do","did"], explain:"finishは動名詞（-ing形）を目的語にとる動詞です。" },
+  { cat:"動名詞", en:"We enjoyed ___ the movie.", correct:"watching", wrongs:["watch","to watch","watched"], explain:"enjoyは動名詞（-ing形）のみを目的語にとる動詞です。" },
+  { cat:"熟語", en:"He is good ___ playing soccer.", correct:"at", wrongs:["in","for","with"], explain:"「be good at 〜ing」で「〜が得意だ」という意味の熟語です。" },
+  { cat:"熟語", en:"I'm interested ___ Japanese history.", correct:"in", wrongs:["of","at","with"], explain:"「be interested in 〜」で「〜に興味がある」という意味です。" },
+  { cat:"熟語", en:"She is looking forward ___ seeing you.", correct:"to", wrongs:["for","at","of"], explain:"「look forward to 〜ing」で「〜を楽しみにする」。このtoは前置詞です。" },
+  { cat:"疑問文", en:"___ you like tea or coffee?", correct:"Do", wrongs:["Does","Are","Is"], explain:"一般動詞の疑問文はDo/Doesを使います。主語がyouなのでDo。" },
+  { cat:"疑問文", en:"___ is your birthday?", correct:"When", wrongs:["What","Where","Who"], explain:"日時をたずねるときはWhenを使います。" },
+  { cat:"間接疑問文", en:"I don't know ___ she lives.", correct:"where", wrongs:["what","that","which"], explain:"「彼女がどこに住んでいるか」なのでwhereを使う間接疑問文です。" },
+  { cat:"間接疑問文", en:"Could you tell me ___ time it is?", correct:"what", wrongs:["which","how","who"], explain:"「何時ですか」はWhat time is it?の間接疑問文です。" },
+  { cat:"There is/are", en:"There ___ a lot of books on the desk.", correct:"are", wrongs:["is","has","have"], explain:"a lot of books（複数）が主語なのでareを使います。" },
+  { cat:"There is/are", en:"There ___ an apple in the box.", correct:"is", wrongs:["are","be","being"], explain:"an apple（単数）が主語なのでisを使います。" },
+  { cat:"使役動詞", en:"My mother let me ___ her car.", correct:"use", wrongs:["to use","used","using"], explain:"let+人+動詞の原形で「（人）に〜させる（許可）」という意味です。" },
+  { cat:"使役動詞", en:"My father made me ___ my room.", correct:"clean", wrongs:["to clean","cleaned","cleaning"], explain:"make+人+動詞の原形で「（人）に〜させる（強制）」という意味です。" },
+  { cat:"関係代名詞", en:"This is the book ___ I bought yesterday.", correct:"which", wrongs:["who","whose","what"], explain:"ものを説明する関係代名詞はwhich（またはthat）を使います。" },
+  { cat:"関係代名詞", en:"I have a friend ___ can speak French.", correct:"who", wrongs:["which","whose","what"], explain:"人を説明する関係代名詞はwhoを使います。" },
+  { cat:"関係代名詞", en:"That is the girl ___ mother is a teacher.", correct:"whose", wrongs:["who","whom","which"], explain:"「〜の」と所有を表す関係代名詞はwhoseを使います。" },
+  { cat:"接続詞", en:"He speaks English, ___ his brother doesn't.", correct:"but", wrongs:["so","because","if"], explain:"対比を表す接続詞はbutを使います。" },
+  { cat:"接続詞", en:"I stayed home ___ it was raining.", correct:"because", wrongs:["though","but","or"], explain:"理由を表す接続詞はbecauseを使います。" },
+  { cat:"接続詞", en:"___ you finish your work, call me.", correct:"When", wrongs:["What","Who","Why"], explain:"「〜したら」と時を表す接続詞はwhenを使います。" },
+  { cat:"接続詞", en:"If it ___ tomorrow, we will stay home.", correct:"rains", wrongs:["rain","rained","will rain"], explain:"時・条件を表す副詞節では、未来のことでも現在形を使います。" },
+  { cat:"助動詞", en:"You look tired. You ___ rest.", correct:"should", wrongs:["can","must not","were"], explain:"「〜すべきだ」というアドバイスは助動詞shouldで表します。" },
+  { cat:"助動詞", en:"You ___ run in the hallway.", correct:"mustn't", wrongs:["must","can","will"], explain:"「〜してはいけない」という禁止はmust notで表します。" },
+  { cat:"感嘆文", en:"What a beautiful flower ___!", correct:"it is", wrongs:["is it","it was","does it"], explain:"感嘆文は〈What+a+形容詞+名詞+主語+動詞!〉の語順です。" },
+  { cat:"感嘆文", en:"How ___ this question is!", correct:"difficult", wrongs:["difficultly","more difficult","most difficult"], explain:"感嘆文〈How+形容詞/副詞+主語+動詞!〉では形容詞の原級を使います。" },
+  { cat:"付加疑問文", en:"You are from Canada, ___?", correct:"aren't you", wrongs:["are you","do you","don't you"], explain:"肯定文の付加疑問文は、後ろに否定の短縮形をつけます。" },
+  { cat:"付加疑問文", en:"He can't swim, ___?", correct:"can he", wrongs:["can't he","does he","is he"], explain:"否定文の付加疑問文は、後ろに肯定形をつけます。" },
+  { cat:"不定詞", en:"She asked me ___ close the window.", correct:"to", wrongs:["that","for","of"], explain:"ask+人+to+動詞の原形で「人に〜するよう頼む」という意味です。" },
+  { cat:"不定詞", en:"It is important ___ students to study every day.", correct:"for", wrongs:["of","to","with"], explain:"「It is 形容詞 for 人 to 〜」で「人にとって〜することは…だ」という意味です。" },
+  { cat:"前置詞", en:"Please wait ___ me at the station.", correct:"for", wrongs:["to","at","on"], explain:"「wait for 〜」で「〜を待つ」という意味の熟語です。" },
+  { cat:"前置詞", en:"We arrived ___ the airport at noon.", correct:"at", wrongs:["to","in","on"], explain:"arrive at+狭い場所（空港・駅など）。arrive in+広い場所（国・都市）。" },
+  { cat:"前置詞", en:"I'm afraid ___ dogs.", correct:"of", wrongs:["at","with","to"], explain:"「be afraid of 〜」で「〜を恐れる」という意味の熟語です。" }
+];
+
+const READING_PASSAGES = [
+  { type:"掲示・案内文", title:"City Library Book Sale", text:
+`City Library Book Sale
+
+Date: Saturday, June 14
+Time: 10:00 a.m. – 3:00 p.m.
+Place: City Library, 2nd Floor
+
+We are having our yearly book sale! We have many books for children and adults. Most books are 100 yen. Some new books are 300 yen. If you bring your own bag, you can get a 10% discount. The sale will start one hour early for library members, from 9:00 a.m.
+
+For more information, call the library at 042-123-4567.`,
+    questions: [
+      { q:"What time does the book sale start for library members?", correct:"9:00 a.m.", wrongs:["10:00 a.m.","3:00 p.m.","2:00 p.m."], explain:"本文に \"The sale will start one hour early for library members, from 9:00 a.m.\" とあります。" },
+      { q:"How can people get a discount?", correct:"By bringing their own bag", wrongs:["By becoming a library member","By buying new books","By calling the library"], explain:"本文に \"If you bring your own bag, you can get a 10% discount.\" とあります。" },
+      { q:"How much are most of the books?", correct:"100 yen", wrongs:["300 yen","Free","10% off"], explain:"本文に \"Most books are 100 yen.\" とあります。" }
+    ] },
+  { type:"掲示・案内文", title:"Sunshine Swimming Pool", text:
+`Sunshine Swimming Pool - Summer Hours
+
+Open: July 1 - August 31
+Weekdays: 10:00 a.m. - 6:00 p.m.
+Weekends & Holidays: 9:00 a.m. - 7:00 p.m.
+Closed every Monday for cleaning (except national holidays)
+
+Entrance Fee:
+Adults: 500 yen
+Students (6-18 years old): 300 yen
+Children under 6: Free
+
+Family Ticket (2 adults + 2 children): 1,200 yen - Save 300 yen!
+
+Swimming lessons for beginners are held every Wednesday at 4:00 p.m. Please sign up at the front desk one day before the lesson.
+
+For questions, visit our website or call 042-555-7890.`,
+    questions: [
+      { q:"When is the pool closed?", correct:"Every Monday", wrongs:["Every Sunday","Every Saturday","Every Wednesday"], explain:"本文に \"Closed every Monday for cleaning\" とあります。" },
+      { q:"How much does a family ticket save?", correct:"300 yen", wrongs:["500 yen","1,200 yen","200 yen"], explain:"本文に \"Family Ticket ... Save 300 yen!\" とあります。" },
+      { q:"What should people do before taking a swimming lesson?", correct:"Sign up at the front desk one day before", wrongs:["Pay an extra fee","Bring their own swimsuit","Call the pool on Monday"], explain:"本文に \"Please sign up at the front desk one day before the lesson.\" とあります。" }
+    ] },
+  { type:"掲示・案内文", title:"Green Town Autumn Festival", text:
+`Green Town Autumn Festival
+
+Date: Sunday, October 20
+Time: 11:00 a.m. - 4:00 p.m.
+Place: Green Town Park
+
+Come and enjoy food stalls, music, and games! This year, we will also have a used book fair. If you have books you don't need anymore, please bring them and give them to the volunteers at the entrance. All the money from the book fair will be used to buy new books for the town library.
+
+Local high school students will perform a dance show at 1:00 p.m. Don't miss it!
+
+Parking is limited, so we ask visitors to come by bicycle or bus if possible.`,
+    questions: [
+      { q:"What will happen to the money from the book fair?", correct:"It will be used to buy new library books", wrongs:["It will be given to the volunteers","It will be used for next year's festival","It will be returned to the students"], explain:"本文に \"All the money from the book fair will be used to buy new books for the town library.\" とあります。" },
+      { q:"What time is the dance show?", correct:"1:00 p.m.", wrongs:["11:00 a.m.","4:00 p.m.","10:00 a.m."], explain:"本文に \"Local high school students will perform a dance show at 1:00 p.m.\" とあります。" },
+      { q:"Why does the notice ask people to come by bicycle or bus?", correct:"Because parking space is limited", wrongs:["Because the park is far from the station","Because bicycles are free that day","Because cars are not allowed in town"], explain:"本文に \"Parking is limited, so we ask visitors to come by bicycle or bus\" とあります。" }
+    ] },
+  { type:"掲示・案内文", title:"Sakura City Museum Closed for Renovation", text:
+`Notice: Sakura City Museum Closed for Renovation
+
+The Sakura City Museum will be closed from November 1 to December 15 for renovation work. During this time, we will build a new room for children's programs and update our lighting system.
+
+We are sorry for any inconvenience. However, we have some good news: when the museum reopens on December 16, all visitors will receive a free postcard as a special gift. Also, entrance will be free for the first three days after reopening.
+
+If you have a museum membership card, your membership will be extended for one extra month at no cost.
+
+Thank you for your understanding.`,
+    questions: [
+      { q:"Why will the museum be closed?", correct:"For renovation work", wrongs:["Because of an accident","For summer vacation","Because it is moving to a new building"], explain:"本文に \"closed ... for renovation work\" とあります。" },
+      { q:"What will visitors get when the museum reopens?", correct:"A free postcard", wrongs:["A free ticket for next year","A discount coupon","A museum T-shirt"], explain:"本文に \"all visitors will receive a free postcard as a special gift\" とあります。" },
+      { q:"What will happen to museum members?", correct:"Their membership will be extended for one month", wrongs:["They will get a refund","They must renew immediately","They will lose their membership"], explain:"本文に \"your membership will be extended for one extra month at no cost\" とあります。" }
+    ] },
+  { type:"Eメール文", title:"E-mail from Emily", text:
+`Subject: This Weekend
+
+Hi Kenji,
+
+How are you? I have a great idea for this weekend. My family is going camping near Lake Green on Saturday. Would you like to join us? We will leave at 8:00 in the morning and come back on Sunday evening. We are going to swim in the lake, cook dinner outside, and watch the stars at night. My father will drive us there, so you don't need to worry about transportation. Please tell me by Thursday if you can come, because we need to buy food for everyone.
+
+I hope you can join us!
+
+Your friend,
+Emily`,
+    questions: [
+      { q:"What does Emily want Kenji to do?", correct:"Come camping with her family", wrongs:["Drive her family to the lake","Buy food for the trip","Watch stars at Kenji's house"], explain:"本文に \"Would you like to join us?\" とあり、キャンプに誘っています。" },
+      { q:"Why does Emily need an answer by Thursday?", correct:"She has to buy food for everyone", wrongs:["The camp site closes on Thursday","Her father needs to know the plan","The weather will change"], explain:"本文に \"we need to buy food for everyone\" とあります。" },
+      { q:"When will Emily's family come back?", correct:"Sunday evening", wrongs:["Saturday morning","Saturday evening","Sunday morning"], explain:"本文に \"come back on Sunday evening\" とあります。" }
+    ] },
+  { type:"Eメール文", title:"Our Science Project", text:
+`Subject: Our Science Project
+
+Hi Aya,
+
+Thank you for helping me with the science project yesterday. I think our idea about plant growth is very interesting. I already bought some seeds and small pots at the store near my house. Could you bring the camera on Saturday? We need to take pictures of the plants every day for our report. Also, I found some good information about sunlight and plant growth in a book at the library. I will bring it to school tomorrow so we can read it together during lunch.
+
+Let's do our best!
+
+Yui`,
+    questions: [
+      { q:"What does Yui ask Aya to bring?", correct:"A camera", wrongs:["Seeds","Small pots","A science book"], explain:"本文に \"Could you bring the camera on Saturday?\" とあります。" },
+      { q:"Why do they need to take pictures every day?", correct:"For their report", wrongs:["For a school newspaper","To show their teacher immediately","To sell at the festival"], explain:"本文に \"We need to take pictures of the plants every day for our report.\" とあります。" },
+      { q:"When will Yui bring the library book to school?", correct:"Tomorrow", wrongs:["Today","On Saturday","Next week"], explain:"本文に \"I will bring it to school tomorrow\" とあります。" }
+    ] },
+  { type:"Eメール文", title:"See You Soon!", text:
+`Subject: See You Soon!
+
+Dear Haruto,
+
+I am so happy that you and your family are coming to visit us during the winter vacation! Your grandfather and I have already started planning some fun things to do. There is a new hot spring near our house, and we can all go there together. Also, your cousin Rina will come from Osaka on the same day, so you can play with her too.
+
+Could you tell me what food you would like to eat? I want to cook your favorite dish for the first night. Please give my love to your parents.
+
+Love,
+Grandma`,
+    questions: [
+      { q:"What does Grandma want to know?", correct:"What food Haruto would like to eat", wrongs:["When Haruto will arrive","Who Haruto will bring","Where Haruto wants to go"], explain:"本文に \"Could you tell me what food you would like to eat?\" とあります。" },
+      { q:"Who else will visit Grandma at the same time?", correct:"Haruto's cousin Rina", wrongs:["Haruto's teacher","Haruto's friend from school","Haruto's uncle"], explain:"本文に \"your cousin Rina will come from Osaka on the same day\" とあります。" },
+      { q:"What are Grandma and Grandfather planning to do?", correct:"Go to a hot spring together", wrongs:["Go skiing together","Visit Osaka together","Cook a big dinner party"], explain:"本文に \"There is a new hot spring near our house, and we can all go there together.\" とあります。" }
+    ] },
+  { type:"Eメール文", title:"Birthday Party Plan", text:
+`Subject: Birthday Party Plan
+
+Hi Sara,
+
+Thanks for offering to help plan Ken's birthday party next Saturday! I already booked the community room at the park from 2:00 to 5:00 p.m. Could you make the invitation cards? I think ten of his classmates are coming. I will order a cake from the bakery near the station, but I need to know if anyone doesn't like chocolate. Can you ask around and let me know by Wednesday? Also, my brother said he can bring his speaker for music, so we don't need to worry about that.
+
+Thanks again for your help!
+
+Mio`,
+    questions: [
+      { q:"What does Mio ask Sara to make?", correct:"Invitation cards", wrongs:["A birthday cake","A party schedule","A gift list"], explain:"本文に \"Could you make the invitation cards?\" とあります。" },
+      { q:"What does Mio need to know by Wednesday?", correct:"Whether anyone dislikes chocolate", wrongs:["How many people are coming","What time the party starts","Where the bakery is"], explain:"本文に \"I need to know if anyone doesn't like chocolate. Can you ask around and let me know by Wednesday?\" とあります。" },
+      { q:"Who will bring the speaker for music?", correct:"Mio's brother", wrongs:["Sara","Ken","The bakery"], explain:"本文に \"my brother said he can bring his speaker for music\" とあります。" }
+    ] },
+  { type:"説明文", title:"Growing Vegetables", text:
+`Last spring, my class started a special project. Our teacher gave each group of students a small area in the school garden. We decided to grow tomatoes and cucumbers. At first, it was difficult because we didn't know how to take care of the plants. We watered them every morning before class, but some of the plants still turned yellow. We asked Mr. Tanaka, a local farmer, for advice. He told us that we were giving the plants too much water. After we listened to his advice, our vegetables started growing well. In September, we finally picked our first tomatoes. We were so happy that we decided to share them with other classes. Now, our class is planning to grow more vegetables next year.`,
+    questions: [
+      { q:"What problem did the students have at first?", correct:"Some plants turned yellow", wrongs:["They didn't have enough sunlight","They had no place to grow vegetables","They forgot to water the plants"], explain:"本文に \"some of the plants still turned yellow\" とあります。" },
+      { q:"Who helped the students solve their problem?", correct:"A local farmer", wrongs:["Their teacher","Their parents","Another class"], explain:"本文に \"We asked Mr. Tanaka, a local farmer, for advice.\" とあります。" },
+      { q:"What was the students' mistake?", correct:"Giving too much water", wrongs:["Giving too little water","Planting too many vegetables","Not asking for help early"], explain:"本文に \"we were giving the plants too much water\" とあります。" },
+      { q:"What did the students do with their tomatoes?", correct:"Shared them with other classes", wrongs:["Sold them at a market","Took them home","Planted them again"], explain:"本文に \"we decided to share them with other classes\" とあります。" }
+    ] },
+  { type:"説明文", title:"The History of Furoshiki", text:
+`Furoshiki is a traditional Japanese cloth used for wrapping things. People have used furoshiki for hundreds of years to carry clothes, gifts, and other items. In the past, people often took furoshiki to public baths to wrap their clothes. Today, fewer people use furoshiki in their daily lives because plastic bags and shopping bags are more common. However, some people are starting to use furoshiki again because it does not create plastic waste. You can also use furoshiki in many different ways, such as making a bag or wrapping a bottle as a present. Some stores now sell furoshiki with modern, colorful designs, so young people are becoming interested in it too.`,
+    questions: [
+      { q:"What was furoshiki used for in the past?", correct:"Wrapping clothes at public baths", wrongs:["Making shopping bags","Selling in modern stores","Carrying plastic waste"], explain:"本文に \"people often took furoshiki to public baths to wrap their clothes\" とあります。" },
+      { q:"Why are some people using furoshiki again?", correct:"Because it does not create plastic waste", wrongs:["Because it is cheaper than bags","Because stores stopped selling bags","Because it is required by law"], explain:"本文に \"it does not create plastic waste\" とあります。" },
+      { q:"Why are young people becoming interested in furoshiki?", correct:"Because of its modern, colorful designs", wrongs:["Because it is taught at school","Because it is used at public baths","Because it is cheaper than plastic bags"], explain:"本文に \"stores now sell furoshiki with modern, colorful designs, so young people are becoming interested\" とあります。" }
+    ] },
+  { type:"説明文", title:"Recycling at School", text:
+`Last year, students at Midori Junior High School started a recycling project. Every classroom now has three boxes: one for paper, one for plastic bottles, and one for cans. Before lunch, students collect the recycling from each room and take it to a large collection area behind the school. Once a month, a local recycling company comes to pick up everything. The money the school earns from recycling is used to buy new sports equipment for the students. Last year, the school was able to buy ten new soccer balls and five basketballs with this money. The students hope to collect even more next year.`,
+    questions: [
+      { q:"What do students do with the boxes of recycling?", correct:"They take them to a collection area behind the school", wrongs:["They sell them to other schools","They take them home","They give them to the recycling company directly"], explain:"本文に \"take it to a large collection area behind the school\" とあります。" },
+      { q:"How often does the recycling company visit the school?", correct:"Once a month", wrongs:["Every day","Once a week","Twice a year"], explain:"本文に \"Once a month, a local recycling company comes to pick up everything.\" とあります。" },
+      { q:"What did the school buy with the recycling money last year?", correct:"Soccer balls and basketballs", wrongs:["New computers","Books for the library","School uniforms"], explain:"本文に \"the school was able to buy ten new soccer balls and five basketballs\" とあります。" }
+    ] },
+  { type:"説明文", title:"Guide Dogs", text:
+`Guide dogs help people who cannot see well. These dogs go through special training for about a year before they can start working. During training, they learn to stop at stairs, avoid obstacles, and wait for traffic lights to change. After training, a dog is matched with a person who needs help. The dog and the person then train together for several weeks to build trust. Guide dogs wear a special harness so that people know they are working and should not pet them. Because of guide dogs, many people with poor eyesight can walk to work, go shopping, and travel more safely.`,
+    questions: [
+      { q:"How long does a guide dog train before starting work?", correct:"About a year", wrongs:["About a week","About a month","About five years"], explain:"本文に \"These dogs go through special training for about a year before they can start working.\" とあります。" },
+      { q:"What do guide dogs learn during training?", correct:"To stop at stairs and avoid obstacles", wrongs:["To bark at strangers","To carry bags","To open doors"], explain:"本文に \"they learn to stop at stairs, avoid obstacles, and wait for traffic lights\" とあります。" },
+      { q:"Why do guide dogs wear a special harness?", correct:"So people know not to pet them while working", wrongs:["To keep them warm","To help them run faster","To show they are still training"], explain:"本文に \"Guide dogs wear a special harness so that people know they are working and should not pet them.\" とあります。" }
+    ] },
+  { type:"物語文", title:"The Missing Notebook", text:
+`Yuji was very worried. It was Friday afternoon, and he could not find his math notebook anywhere. He needed it for homework over the weekend. He looked in his desk, his bag, and even his locker, but it was not there. Then he remembered that he had studied with his friend Sora in the library after school on Thursday. He decided to check the library before going home. When he got there, he asked the librarian if anyone had found a notebook. She smiled and took a blue notebook from a box under the counter. It was his! Yuji thanked her many times and promised to be more careful next time.`,
+    questions: [
+      { q:"What was Yuji looking for?", correct:"His math notebook", wrongs:["His pencil case","His school bag","His locker key"], explain:"本文の最初に \"he could not find his math notebook\" とあります。" },
+      { q:"Where did Yuji finally find it?", correct:"In the library", wrongs:["In his desk","In his bag","At Sora's house"], explain:"本文に \"he asked the librarian ... took a blue notebook from a box\" とあり、図書室で見つかったことがわかります。" },
+      { q:"How did Yuji probably feel at the end of the story?", correct:"Relieved", wrongs:["Angry","Confused","Bored"], explain:"ノートが見つかり \"Yuji thanked her many times\" とあるので、安心した（relieved）と考えられます。" }
+    ] },
+  { type:"物語文", title:"The Speech Contest", text:
+`Mei was chosen to give a speech at the school speech contest. She was very nervous because she had never spoken in front of so many people before. Every night after dinner, she practiced her speech in front of her little brother. At first, she made a lot of mistakes and even forgot some parts. Her brother always cheered her up and said, "You can do it!" On the day of the contest, Mei's hands were shaking, but she remembered her brother's words. She took a deep breath and started speaking slowly and clearly. When she finished, everyone clapped loudly. Mei didn't win first place, but she felt proud of herself for trying her best.`,
+    questions: [
+      { q:"Why was Mei nervous?", correct:"She had never spoken in front of so many people before", wrongs:["She forgot her speech at home","She didn't like her topic","She was sick that day"], explain:"本文に \"she had never spoken in front of so many people before\" とあります。" },
+      { q:"Who helped Mei practice her speech?", correct:"Her little brother", wrongs:["Her teacher","Her classmate","Her mother"], explain:"本文に \"she practiced her speech in front of her little brother\" とあります。" },
+      { q:"How did Mei feel after the contest?", correct:"Proud of herself", wrongs:["Angry at herself","Embarrassed","Disappointed in her brother"], explain:"本文に \"she felt proud of herself for trying her best\" とあります。" }
+    ] },
+  { type:"物語文", title:"The Missing Dog", text:
+`One evening, Daiki noticed that his dog, Pochi, was not in the yard. He looked everywhere in the house and garden, but Pochi was gone. Daiki and his father decided to walk around the neighborhood to look for him. They asked several neighbors if they had seen a small brown dog. Mrs. Sato, who lived two houses away, said she had seen a dog like that near the park an hour ago. Daiki and his father hurried to the park and called Pochi's name. After a few minutes, they heard a bark from behind a tree. It was Pochi! He was tired and hungry, but he was safe. Daiki hugged Pochi tightly and thanked Mrs. Sato the next day.`,
+    questions: [
+      { q:"What did Daiki and his father do first?", correct:"They walked around the neighborhood asking neighbors", wrongs:["They called the police","They searched the park first","They waited at home"], explain:"本文に \"Daiki and his father decided to walk around the neighborhood to look for him\" とあります。" },
+      { q:"Who gave Daiki and his father useful information?", correct:"Mrs. Sato", wrongs:["A police officer","Daiki's teacher","Pochi's owner"], explain:"本文に \"Mrs. Sato ... said she had seen a dog like that near the park\" とあります。" },
+      { q:"Where did they finally find Pochi?", correct:"Near a tree in the park", wrongs:["In the yard","At Mrs. Sato's house","At school"], explain:"本文に \"they heard a bark from behind a tree\" とあり、公園の木の後ろで見つかったことがわかります。" }
+    ] },
+  { type:"物語文", title:"A New Friend", text:
+`Rina moved to a new school in April. She didn't know anyone and felt lonely during the first week. One day at lunch, she sat alone at a table near the window. A classmate named Kota noticed her and walked over. "Can I sit here?" he asked with a smile. They talked about their favorite games and both loved the same soccer team. After that day, Kota introduced Rina to his other friends, and soon she had many people to talk to. A month later, Rina told her mother that moving to the new school wasn't so scary anymore, thanks to one kind classmate.`,
+    questions: [
+      { q:"How did Rina feel during her first week at the new school?", correct:"Lonely", wrongs:["Excited","Angry","Bored"], explain:"本文に \"She didn't know anyone and felt lonely during the first week.\" とあります。" },
+      { q:"What did Kota do for Rina?", correct:"He introduced her to his friends", wrongs:["He gave her his lunch","He walked her home","He lent her his notebook"], explain:"本文に \"Kota introduced Rina to his other friends\" とあります。" },
+      { q:"What did Rina and Kota have in common?", correct:"They liked the same soccer team", wrongs:["They lived in the same town","They had the same teacher","They played the same instrument"], explain:"本文に \"both loved the same soccer team\" とあります。" }
+    ] }
+];
+
+const OPINION_PHRASES = ["I think ~", "I want to ~", "I like ~ better than ~", "I have two reasons.", "First, ~", "Second, ~", "For example, ~"];
+const EMAIL_PHRASES = ["Yes, I can / do ~", "No, I can't / don't ~", "I think ~", "I want to ~ because ~", "It is because ~"];
+
+const OPINION_TASKS = [
+  { q:"What do you want to do during the next summer vacation?", models:[
+    "I want to go to the beach during summer vacation. I have two reasons. First, I can swim in the sea with my friends. Second, I can eat delicious ice cream there.",
+    "I want to visit my grandmother's house during summer vacation. I have two reasons. First, I can play with my cousins there. Second, her cooking is always delicious.",
+    "I want to study English during summer vacation. I have two reasons. First, I want to get better scores on tests. Second, I hope to talk with people from other countries someday." ] },
+  { q:"Which do you like better, studying at school or studying at home?", models:[
+    "I like studying at school better than studying at home. I have two reasons. First, I can ask my teacher questions easily. Second, I can study together with my friends.",
+    "I like studying at home better than studying at school. I have two reasons. First, I can study at my own pace. Second, it is quiet, so I can concentrate well.",
+    "I like studying at school better than studying at home. I have two reasons. First, I can use the library for research. Second, I don't get distracted by my phone or TV." ] },
+  { q:"What sport do you want to try in the future?", models:[
+    "I want to try tennis in the future. I have two reasons. First, tennis looks very exciting to watch. Second, I can play it with my family on weekends.",
+    "I want to try skiing in the future. I have two reasons. First, I have never seen snow mountains before. Second, my friends often talk about how fun it is.",
+    "I want to try swimming in the future. I have two reasons. First, it is good exercise for the whole body. Second, I can enjoy it even in summer." ] },
+  { q:"Where do you want to go on your next trip?", models:[
+    "I want to go to Okinawa on my next trip. I have two reasons. First, the sea there is very beautiful. Second, I want to eat delicious local food.",
+    "I want to go to Kyoto on my next trip. I have two reasons. First, I can visit many old temples there. Second, I want to eat traditional Japanese sweets.",
+    "I want to go to Hokkaido on my next trip. I have two reasons. First, I want to see beautiful snow scenery. Second, the seafood there is very famous." ] },
+  { q:"What do you usually do on weekends?", models:[
+    "I usually play soccer with my friends on weekends. I have two reasons. First, it is a lot of fun. Second, I can get good exercise every week.",
+    "I usually read books at the library on weekends. I have two reasons. First, it is quiet and comfortable there. Second, I can find many interesting stories.",
+    "I usually help my mother with cooking on weekends. I have two reasons. First, I can learn new recipes. Second, we can spend time together." ] },
+  { q:"Which season do you like the best?", models:[
+    "I like summer the best. I have two reasons. First, I can swim in the sea during summer. Second, I can enjoy delicious shaved ice with my family.",
+    "I like winter the best. I have two reasons. First, I can enjoy skiing with my family. Second, I love eating hot nabe dishes.",
+    "I like spring the best. I have two reasons. First, the cherry blossoms are very beautiful. Second, it is not too hot or too cold." ] },
+  { q:"What kind of food do you want to eat for your birthday?", models:[
+    "I want to eat pizza for my birthday. I have two reasons. First, pizza is my favorite food. Second, I can share it with my family and friends.",
+    "I want to eat sushi for my birthday. I have two reasons. First, sushi is a special treat for my family. Second, I love the taste of fresh fish.",
+    "I want to eat my mother's curry for my birthday. I have two reasons. First, it is my favorite dish. Second, it always makes me feel happy." ] },
+  { q:"What do you want to be in the future?", models:[
+    "I want to be an English teacher in the future. I have two reasons. First, I like talking with foreign people. Second, I want to help students learn English.",
+    "I want to be a nurse in the future. I have two reasons. First, I want to help sick people. Second, my mother is a nurse, and I respect her job.",
+    "I want to be a game designer in the future. I have two reasons. First, I love playing video games. Second, I want to create games that make people happy." ] }
+];
+
+const EMAIL_TASKS = [
+  { email:"Hi! I'm going to have a small party at my house next Saturday. <u>Can you come?</u> Also, <u>what food should I bring for the party?</u>", models:[
+    "Yes, I can come to your party. I'm looking forward to it. I think you should bring some snacks like chips and cookies. Everyone will enjoy them.",
+    "Yes, I would love to come to your party. Thank you for inviting me. I think bringing a cake would be nice, so I will buy one on the way.",
+    "I'm sorry, I can't come to your party because I have a family event that day. For the food, maybe some fruit or juice would be good for everyone." ] },
+  { email:"Hi! Our school trip is coming soon. <u>Which do you want to visit, the museum or the zoo?</u> And <u>what do you want to do there?</u>", models:[
+    "I want to visit the zoo. I have never seen a panda before, so I really want to see one. I also want to take a lot of pictures with my friends there.",
+    "I want to visit the museum. I am interested in history, so I want to see the old paintings there. I also want to buy a small gift at the museum shop.",
+    "I want to visit the zoo. I really like animals, especially lions. I also want to buy a stuffed animal as a souvenir for my little sister." ] },
+  { email:"Hi! I heard you started a new hobby. <u>What is it?</u> And <u>why do you like it?</u>", models:[
+    "I started playing the guitar last month. I like it because I can play many songs by my favorite singers. It also helps me relax after studying.",
+    "I started drawing pictures last month. I like it because I can express my feelings through art. It also makes me feel calm after a busy day.",
+    "I started running every morning. I like it because it makes me feel healthy and energetic. It also helps me sleep better at night." ] },
+  { email:"Hi! I'm thinking about getting a pet. <u>Do you have any pets?</u> <u>What is good about having a pet?</u>", models:[
+    "Yes, I have a dog at home. Having a pet is good because it makes our family happy every day. My dog also helps me feel less lonely when I'm sad.",
+    "No, I don't have any pets right now. Having a pet is good because it can be a good friend for you. It also teaches you how to take care of other living things.",
+    "Yes, I have two cats at home. Having a pet is good because they always make me smile when I feel sad. They also teach me to be responsible." ] }
+];
+
+// AI採点用（英作文アプリと同じGASウェブアプリURL）
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxhCBU9aZ5eymIXqsAhtQoUvgaGJwEEt67UAN_ysTeZGGSLc1gXvWP-tSZHvDopKITJmg/exec';
+
+// ================================================================
+// 模試の記録（1次はこのファイル、2次は英検3級_2次試験対策.htmlから
+// 同じキーに書き込むため、同一端末・同一ブラウザで両方の記録が合流する）
+// ================================================================
+const RECORDS_KEY = 'eiken_records_3kyu';
+const RECORDS_MAX = 50;
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; } catch(e) { return []; }
+}
+function addRecord(rec) {
+  try {
+    const list = loadRecords();
+    list.unshift(rec);
+    if (list.length > RECORDS_MAX) list.length = RECORDS_MAX;
+    localStorage.setItem(RECORDS_KEY, JSON.stringify(list));
+  } catch(e) {}
+}
+function formatRecordDate(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function verdictIcon(v) { return v === 'high' ? '🎉' : v === 'mid' ? '💪' : '📚'; }
+function renderRecords() {
+  const list = loadRecords();
+  const wrap = document.getElementById('records-list');
+  if (list.length === 0) {
+    wrap.innerHTML = '<div class="records-empty">まだ模試の記録がありません。<br>1次・2次の模試に挑戦してみましょう！</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(r => `
+    <div class="record-item">
+      <div class="record-top">
+        <span class="record-date">${escapeHtml(r.date)}</span>
+        <span class="record-type-badge ${r.examType === '1次' ? 't1' : 't2'}">${escapeHtml(r.examType)}試験模試</span>
+      </div>
+      <div class="record-verdict">
+        <span class="record-verdict-icon">${verdictIcon(r.verdict)}</span>
+        <span class="record-verdict-text ${r.verdict}">${escapeHtml(r.verdictLabel)}</span>
+        <span class="record-score">${r.scorePct}%</span>
+      </div>
+      <div class="record-detail">${escapeHtml(r.detail || '')}</div>
+    </div>
+  `).join('');
+}
+document.getElementById('btn-go-records').addEventListener('click', () => { renderRecords(); goPage('page-records'); });
+document.getElementById('btn-records-back').addEventListener('click', () => goPage('page-title'));
+document.getElementById('btn-records-clear').addEventListener('click', () => {
+  if (confirm('記録をすべて削除しますか？この操作は取り消せません。')) {
+    localStorage.removeItem(RECORDS_KEY);
+    renderRecords();
+  }
+});
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('btn-header-home').classList.toggle('show', id !== 'page-title');
+}
+
+const MOCK_QUIZ_PAGES = ['page-mock-grammar', 'page-mock-reading', 'page-mock-writing'];
+document.getElementById('btn-header-home').addEventListener('click', () => {
+  const currentPage = document.querySelector('.page.active');
+  const inProgress = currentPage && MOCK_QUIZ_PAGES.includes(currentPage.id);
+  if (inProgress && !confirm('模試を中断してホームに戻りますか？\nここまでの回答は保存されません。')) {
+    return;
+  }
+  goPage('page-title');
+});
+function countWords(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).filter(Boolean).length;
+}
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ================================================================
+// メニュー：カードクリック
+// ================================================================
+document.getElementById('btn-go-mock').addEventListener('click', () => goPage('page-mock-intro'));
+document.getElementById('btn-mock-back-title').addEventListener('click', () => goPage('page-title'));
+
+// ================================================================
+// 模試モード：状態
+// ================================================================
+const mock = {
+  grammarQueue: [], grammarIndex: 0, grammarCorrect: 0, grammarWrong: [], grammarAnswered: false,
+  readingQueue: [], readingIndex: 0, readingCorrect: 0, readingWrong: [], readingAnswered: false,
+  writingQueue: [], writingIndex: 0, writingAnswers: [], writingAIScores: []
+};
+
+function pickReadingPassages(n) {
+  const byCategory = {};
+  READING_PASSAGES.forEach((p, i) => { (byCategory[p.type] = byCategory[p.type] || []).push(i); });
+  Object.keys(byCategory).forEach(k => { byCategory[k] = shuffle(byCategory[k]); });
+  const cats = shuffle(Object.keys(byCategory));
+  const selected = [];
+  while (selected.length < n) {
+    let addedAny = false;
+    for (const cat of cats) {
+      if (selected.length >= n) break;
+      const arr = byCategory[cat];
+      if (arr.length > 0) { selected.push(arr.shift()); addedAny = true; }
+    }
+    if (!addedAny) break;
+  }
+  return selected.map(i => READING_PASSAGES[i]);
+}
+
+document.getElementById('btn-start-mock').addEventListener('click', () => {
+  // 文法 15問
+  mock.grammarQueue = shuffle(GRAMMAR_BANK).slice(0, 15);
+  mock.grammarIndex = 0; mock.grammarCorrect = 0; mock.grammarWrong = [];
+
+  // 長文 3文章分
+  const passages = pickReadingPassages(3);
+  mock.readingQueue = [];
+  passages.forEach(p => { p.questions.forEach((q, qi) => mock.readingQueue.push({ passage: p, qIndexInPassage: qi, question: q })); });
+  mock.readingIndex = 0; mock.readingCorrect = 0; mock.readingWrong = [];
+
+  // 英作文 意見1つ＋Eメール1つ
+  const opinion = shuffle(OPINION_TASKS)[0];
+  const email = shuffle(EMAIL_TASKS)[0];
+  mock.writingQueue = [{ type: '意見英作文', data: opinion }, { type: 'Eメール返信', data: email }];
+  mock.writingIndex = 0;
+  mock.writingAnswers = ['', ''];
+  mock.writingAIScores = [null, null];
+
+  goPage('page-mock-grammar');
+  showMockGrammar();
+});
+
+// ---------------- 文法パート ----------------
+function showMockGrammar() {
+  mock.grammarAnswered = false;
+  const q = mock.grammarQueue[mock.grammarIndex];
+  document.getElementById('mg-progress-text').textContent = `文法 問題 ${mock.grammarIndex + 1} / ${mock.grammarQueue.length}`;
+  document.getElementById('mg-progress-score').textContent = `正解 ${mock.grammarCorrect}`;
+  document.getElementById('mg-progress-bar').style.width = `${(mock.grammarIndex / mock.grammarQueue.length) * 100}%`;
+  document.getElementById('mg-question-en').innerHTML = q.en.replace('___', '<span class="blank">___</span>');
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('mg-choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectMockGrammar(btn, opt, q));
+    choicesEl.appendChild(btn);
+  });
+  document.getElementById('mg-feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('mg-btn-next').style.display = 'none';
+}
+function selectMockGrammar(btn, opt, q) {
+  if (mock.grammarAnswered) return;
+  mock.grammarAnswered = true;
+  const isCorrect = opt === q.correct;
+  document.querySelectorAll('#mg-choices .choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('mg-feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('mg-feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('mg-feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('mg-feedback-explain').textContent = q.explain;
+  if (isCorrect) mock.grammarCorrect++; else mock.grammarWrong.push(q);
+  document.getElementById('mg-progress-score').textContent = `正解 ${mock.grammarCorrect}`;
+  document.getElementById('mg-btn-next').style.display = 'inline-block';
+}
+document.getElementById('mg-btn-next').addEventListener('click', () => {
+  mock.grammarIndex++;
+  if (mock.grammarIndex < mock.grammarQueue.length) {
+    showMockGrammar();
+  } else {
+    goPage('page-mock-reading');
+    showMockReading();
+  }
+});
+
+// ---------------- 長文パート ----------------
+function showMockReading() {
+  mock.readingAnswered = false;
+  const item = mock.readingQueue[mock.readingIndex];
+  const passage = item.passage;
+  const q = item.question;
+  document.getElementById('mr-progress-text').textContent = `長文 問題 ${mock.readingIndex + 1} / ${mock.readingQueue.length}`;
+  document.getElementById('mr-progress-score').textContent = `正解 ${mock.readingCorrect}`;
+  document.getElementById('mr-progress-bar').style.width = `${(mock.readingIndex / mock.readingQueue.length) * 100}%`;
+  document.getElementById('mr-cat-badge').textContent = passage.type;
+  document.getElementById('mr-passage-title').textContent = passage.title;
+  document.getElementById('mr-passage-text').textContent = passage.text;
+  document.getElementById('mr-question-label').textContent = `Q${item.qIndexInPassage + 1}`;
+  document.getElementById('mr-question-en').textContent = q.q;
+
+  const options = shuffle([q.correct, ...q.wrongs]);
+  const choicesEl = document.getElementById('mr-choices');
+  choicesEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectMockReading(btn, opt, q, passage));
+    choicesEl.appendChild(btn);
+  });
+  document.getElementById('mr-feedback-box').classList.remove('show', 'correct', 'wrong');
+  document.getElementById('mr-btn-next').style.display = 'none';
+}
+function selectMockReading(btn, opt, q, passage) {
+  if (mock.readingAnswered) return;
+  mock.readingAnswered = true;
+  const isCorrect = opt === q.correct;
+  document.querySelectorAll('#mr-choices .choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('mr-feedback-box');
+  fb.classList.add('show', isCorrect ? 'correct' : 'wrong');
+  document.getElementById('mr-feedback-title').textContent = isCorrect ? '⭕ 正解！' : '❌ 不正解';
+  document.getElementById('mr-feedback-answer').textContent = `正解: ${q.correct}`;
+  document.getElementById('mr-feedback-explain').textContent = q.explain;
+  if (isCorrect) mock.readingCorrect++;
+  else mock.readingWrong.push({ passageTitle: passage.title, passageType: passage.type, q: q.q, correct: q.correct, explain: q.explain });
+  document.getElementById('mr-progress-score').textContent = `正解 ${mock.readingCorrect}`;
+  document.getElementById('mr-btn-next').style.display = 'inline-block';
+}
+document.getElementById('mr-btn-next').addEventListener('click', () => {
+  mock.readingIndex++;
+  if (mock.readingIndex < mock.readingQueue.length) {
+    showMockReading();
+  } else {
+    goPage('page-mock-writing');
+    showMockWriting();
+  }
+});
+
+// ---------------- 英作文パート ----------------
+function showMockWriting() {
+  const item = mock.writingQueue[mock.writingIndex];
+  const isOpinion = item.type === '意見英作文';
+  document.getElementById('mw-progress-text').textContent = `英作文 課題 ${mock.writingIndex + 1} / ${mock.writingQueue.length}`;
+  document.getElementById('mw-progress-bar').style.width = `${(mock.writingIndex / mock.writingQueue.length) * 100}%`;
+  document.getElementById('mw-prompt-label').textContent = isOpinion ? 'QUESTION' : 'E-MAIL';
+  document.getElementById('mw-prompt-text').innerHTML = isOpinion ? item.data.q : item.data.email;
+
+  document.getElementById('mw-tip-title').textContent = isOpinion ? '📝 書き方のヒント（意見英作文）' : '📝 書き方のヒント（Eメール返信）';
+  const tipList = document.getElementById('mw-tip-list');
+  tipList.innerHTML = '';
+  const tips = isOpinion
+    ? ["まず自分の意見をはっきり書く（I want to ~ / I like ~ better.）", "理由を2つ、First, / Second, を使って書く", "全体で25～35語を目安にする"]
+    : ["下線が引かれた2つの質問、両方に答える", "Yes/Noで答えられる質問には、まずYes/Noをはっきり書く", "全体で25～35語を目安にする"];
+  tips.forEach(t => { const li = document.createElement('li'); li.textContent = t; tipList.appendChild(li); });
+
+  const phraseTags = document.getElementById('mw-phrase-tags');
+  phraseTags.innerHTML = '';
+  (isOpinion ? OPINION_PHRASES : EMAIL_PHRASES).forEach(p => {
+    const span = document.createElement('span'); span.className = 'phrase-tag'; span.textContent = p; phraseTags.appendChild(span);
+  });
+
+  const textarea = document.getElementById('mw-answer-textarea');
+  textarea.value = mock.writingAnswers[mock.writingIndex] || '';
+  updateMockCounter();
+
+  document.querySelectorAll('#page-mock-writing .check-item input').forEach(cb => cb.checked = false);
+  document.getElementById('mw-model-box').classList.remove('show');
+  const modelList = document.getElementById('mw-model-list');
+  modelList.innerHTML = '';
+  item.data.models.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'model-item';
+    div.innerHTML = `<div class="mi-label">例${i + 1}</div><div class="mi-text">${m}</div><div class="mi-count">（${countWords(m)}語）</div>`;
+    modelList.appendChild(div);
+  });
+
+  const aiBox = document.getElementById('mw-ai-box');
+  aiBox.classList.remove('show');
+  aiBox.innerHTML = '';
+
+  document.getElementById('mw-btn-next').textContent = mock.writingIndex === mock.writingQueue.length - 1 ? '結果を見る' : '次へ';
+}
+function updateMockCounter() {
+  const text = document.getElementById('mw-answer-textarea').value;
+  const count = countWords(text);
+  const badge = document.getElementById('mw-counter-badge');
+  badge.textContent = `${count} 語`;
+  badge.className = 'counter-badge';
+  if (count === 0) badge.classList.add('empty');
+  else if (count >= 25 && count <= 35) badge.classList.add('good');
+  else if (count >= 18 && count <= 42) badge.classList.add('near');
+  else badge.classList.add('off');
+}
+document.getElementById('mw-answer-textarea').addEventListener('input', () => {
+  mock.writingAnswers[mock.writingIndex] = document.getElementById('mw-answer-textarea').value;
+  updateMockCounter();
+});
+document.getElementById('mw-btn-show-model').addEventListener('click', () => {
+  document.getElementById('mw-model-box').classList.toggle('show');
+});
+document.getElementById('mw-btn-ai-check').addEventListener('click', async () => {
+  const aiBox = document.getElementById('mw-ai-box');
+  const item = mock.writingQueue[mock.writingIndex];
+  const answer = document.getElementById('mw-answer-textarea').value.trim();
+
+  if (!GAS_WEB_APP_URL) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">AI採点機能が設定されていません。</div>';
+    return;
+  }
+  if (!answer) {
+    aiBox.classList.add('show');
+    aiBox.innerHTML = '<div class="ai-error">先に英文を入力してください。</div>';
+    return;
+  }
+  aiBox.classList.add('show');
+  aiBox.innerHTML = '<div class="ai-loading">🤖 AIが採点しています...（数秒かかります）</div>';
+
+  const isOpinion = item.type === '意見英作文';
+  const promptText = isOpinion ? item.data.q : item.data.email.replace(/<\/?u>/g, '');
+
+  try {
+    const res = await fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({ type: item.type, prompt: promptText, answer: answer })
+    });
+    const data = await res.json();
+    if (data.error) {
+      aiBox.innerHTML = `<div class="ai-error">エラー: ${escapeHtml(data.error)}</div>`;
+      return;
+    }
+    mock.writingAIScores[mock.writingIndex] = data.score || null;
+    aiBox.innerHTML = `
+      <h4>🤖 AIによる採点 <span class="ai-score-badge">評価: ${escapeHtml(data.score || '-')}</span></h4>
+      <div class="ai-section"><div class="as-label">👍 よくできている点</div><div class="as-text">${escapeHtml(data.good_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">✏️ 改善するとよい点</div><div class="as-text">${escapeHtml(data.improve_points || '')}</div></div>
+      <div class="ai-section"><div class="as-label">💡 自然な英語の例</div><div class="as-text">${escapeHtml(data.corrected_example || '')}</div></div>
+    `;
+  } catch (err) {
+    aiBox.innerHTML = '<div class="ai-error">AIとの通信に失敗しました。</div>';
+  }
+});
+document.getElementById('mw-btn-next').addEventListener('click', () => {
+  mock.writingIndex++;
+  if (mock.writingIndex < mock.writingQueue.length) {
+    showMockWriting();
+  } else {
+    showMockResult();
+  }
+});
+
+// ---------------- 結果・合格可能性判定 ----------------
+function computeWritingScore(index) {
+  const aiScore = mock.writingAIScores[index];
+  if (aiScore === 'A') return 100;
+  if (aiScore === 'B') return 75;
+  if (aiScore === 'C') return 50;
+  // AI未使用の場合は語数とセルフチェックからの簡易推定
+  const text = mock.writingAnswers[index] || '';
+  const count = countWords(text);
+  if (count === 0) return 0;
+  let score = 40; // 書いたこと自体の基礎点
+  if (count >= 25 && count <= 35) score += 40;
+  else if (count >= 18 && count <= 42) score += 20;
+  return Math.min(score, 90); // セルフチェックのみでは上限90
+}
+
+function showMockResult() {
+  goPage('page-mock-result');
+
+  const grammarTotal = mock.grammarQueue.length;
+  const readingTotal = mock.readingQueue.length;
+  const grammarPct = Math.round((mock.grammarCorrect / grammarTotal) * 100);
+  const readingPct = Math.round((mock.readingCorrect / readingTotal) * 100);
+
+  document.getElementById('score-grammar-text').textContent = `${mock.grammarCorrect} / ${grammarTotal}`;
+  document.getElementById('score-grammar-bar').style.width = `${grammarPct}%`;
+  document.getElementById('score-reading-text').textContent = `${mock.readingCorrect} / ${readingTotal}`;
+  document.getElementById('score-reading-bar').style.width = `${readingPct}%`;
+
+  const w0 = computeWritingScore(0);
+  const w1 = computeWritingScore(1);
+  const writingPct = Math.round((w0 + w1) / 2);
+  const usedAI = mock.writingAIScores[0] !== null || mock.writingAIScores[1] !== null;
+  document.getElementById('score-writing-text').textContent = usedAI ? `目安 ${writingPct}%` : `目安 ${writingPct}%（自己評価）`;
+  document.getElementById('score-writing-bar').style.width = `${writingPct}%`;
+
+  const mcAccuracy = ((mock.grammarCorrect + mock.readingCorrect) / (grammarTotal + readingTotal)) * 100;
+  const overall = Math.round(mcAccuracy * 0.65 + writingPct * 0.35);
+
+  const verdictBox = document.getElementById('verdict-box');
+  const verdictIcon = document.getElementById('verdict-icon');
+  const verdictTitle = document.getElementById('verdict-title');
+  verdictBox.className = 'verdict-box';
+  if (overall >= 75) {
+    verdictBox.classList.add('high');
+    verdictIcon.textContent = '🎉';
+    verdictTitle.textContent = '合格の可能性は高いです！';
+  } else if (overall >= 60) {
+    verdictBox.classList.add('mid');
+    verdictIcon.textContent = '💪';
+    verdictTitle.textContent = '合格ラインに近づいています！';
+  } else {
+    verdictBox.classList.add('low');
+    verdictIcon.textContent = '📚';
+    verdictTitle.textContent = 'もう少し対策を続けましょう';
+  }
+  document.getElementById('verdict-score').textContent = `総合スコア目安：${overall}%`;
+
+  addRecord({
+    ts: Date.now(),
+    date: formatRecordDate(Date.now()),
+    examType: '1次',
+    verdict: overall >= 75 ? 'high' : overall >= 60 ? 'mid' : 'low',
+    verdictLabel: verdictTitle.textContent,
+    scorePct: overall,
+    detail: `文法 ${mock.grammarCorrect}/${grammarTotal}・長文 ${mock.readingCorrect}/${readingTotal}・英作文 目安${writingPct}%`
+  });
+
+  // 復習リスト
+  const reviewWrap = document.getElementById('mock-review-wrap');
+  reviewWrap.innerHTML = '';
+
+  if (mock.grammarWrong.length > 0) {
+    const h = document.createElement('div');
+    h.className = 'review-section-title';
+    h.textContent = `📘 文法・語法の復習（${mock.grammarWrong.length}問）`;
+    reviewWrap.appendChild(h);
+    const list = document.createElement('div');
+    list.className = 'review-list';
+    mock.grammarWrong.forEach(q => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="rq">${q.en.replace('___', '＿＿＿')}</div><div class="ra">正解: ${q.correct}</div><div class="re">${q.explain}</div>`;
+      list.appendChild(div);
+    });
+    reviewWrap.appendChild(list);
+  }
+
+  if (mock.readingWrong.length > 0) {
+    const h = document.createElement('div');
+    h.className = 'review-section-title';
+    h.textContent = `📖 長文読解の復習（${mock.readingWrong.length}問）`;
+    reviewWrap.appendChild(h);
+    const list = document.createElement('div');
+    list.className = 'review-list';
+    mock.readingWrong.forEach(w => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="rp">${w.passageType}「${w.passageTitle}」</div><div class="rq">${w.q}</div><div class="ra">正解: ${w.correct}</div><div class="re">${w.explain}</div>`;
+      list.appendChild(div);
+    });
+    reviewWrap.appendChild(list);
+  }
+
+  const wh = document.createElement('div');
+  wh.className = 'review-section-title';
+  wh.textContent = '✏️ 英作文の振り返り';
+  reviewWrap.appendChild(wh);
+  mock.writingQueue.forEach((item, i) => {
+    const isOpinion = item.type === '意見英作文';
+    const mine = mock.writingAnswers[i] || '';
+    const div = document.createElement('div');
+    div.className = 'writing-review-item';
+    div.innerHTML = `
+      <div class="rp">${item.type}</div>
+      <div class="wr-q">${isOpinion ? item.data.q : item.data.email}</div>
+      <div class="wr-label" style="color:#5B6CF5;">あなたの解答（${countWords(mine)}語）</div>
+      <div class="wr-mine ${mine ? '' : 'empty'}">${mine ? mine.replace(/</g, '&lt;') : '（未記入）'}</div>
+    `;
+    reviewWrap.appendChild(div);
+  });
+}
+
+document.getElementById('btn-mock-retry').addEventListener('click', () => {
+  goPage('page-mock-intro');
+});
+</script>
+
+</body>
+</html>
