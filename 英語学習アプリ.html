@@ -30,32 +30,49 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
   }
   .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
   .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-btn {
+    color: #fff; font-size: 0.75em; font-weight: 700; font-family: inherit;
+    background: rgba(255,255,255,0.18); border: none; border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background 0.15s; cursor: pointer;
+  }
+  .hd-btn:hover { background: rgba(255,255,255,0.32); }
 
-  .page { padding: 24px 24px 32px; text-align: center; }
+  /* ===== 生徒情報バー ===== */
+  .student-bar {
+    display: none; align-items: center; gap: 10px;
+    background: #f8f9ff; border-bottom: 2px solid #e2e5f5;
+    padding: 10px 24px; font-size: 0.85em;
+  }
+  .student-bar.show { display: flex; }
+  .student-bar .sb-icon { font-size: 1.2em; }
+  .student-bar .sb-name { font-weight: 800; color: #5B6CF5; }
+  .student-bar .sb-edit {
+    margin-left: auto; background: none; border: none; font-family: inherit;
+    color: #999; font-size: 0.9em; cursor: pointer; text-decoration: underline;
+  }
+  .student-bar .sb-edit:hover { color: #5B6CF5; }
+
+  .page { display: none; padding: 24px 24px 32px; text-align: center; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
   .title-icon { font-size: 4.5em; margin-bottom: 10px; }
   .title-main { font-size: 1.7em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
   .title-sub  { font-size: 0.92em; color: #888; margin-bottom: 30px; }
 
-  .category-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
+  .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
   .category-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    background: #f8f9ff;
-    border: 2px solid #e2e5f5;
-    border-radius: 20px;
-    padding: 28px 16px;
-    text-decoration: none;
-    transition: all 0.15s;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 20px;
+    padding: 28px 16px; text-decoration: none; transition: all 0.15s;
   }
   .category-card:hover { border-color: #5B6CF5; transform: translateY(-3px); box-shadow: 0 10px 24px rgba(91,108,245,0.18); }
   .category-card .cc-icon {
@@ -69,6 +86,117 @@
   .category-card.vocab .cc-icon { background: linear-gradient(135deg,#43e97b,#38f9d7); }
   .category-card.eiken .cc-icon { background: linear-gradient(135deg,#f7971e,#ffd200); }
 
+  /* ===== 進捗カード（横長） ===== */
+  .progress-card {
+    display: flex; align-items: center; gap: 16px; width: 100%;
+    background: linear-gradient(135deg,#eef0ff,#f6f2ff);
+    border: 2px solid #d5daf8; border-radius: 20px;
+    padding: 18px 20px; margin-top: 16px; text-align: left;
+    cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .progress-card:hover { border-color: #5B6CF5; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(91,108,245,0.18); }
+  .progress-card .pc-icon {
+    width: 56px; height: 56px; border-radius: 16px; background: #fff; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.8em;
+  }
+  .progress-card .pc-title { font-size: 1.02em; font-weight: 900; color: #333; margin-bottom: 3px; }
+  .progress-card .pc-desc { font-size: 0.78em; color: #888; line-height: 1.5; }
+  .progress-card .pc-arrow { margin-left: auto; font-size: 1.3em; color: #5B6CF5; }
+
+  /* ===== 進捗ページ ===== */
+  .point-hero {
+    background: linear-gradient(135deg,#667eea,#764ba2); color: #fff;
+    border-radius: 20px; padding: 24px 20px; margin-bottom: 20px;
+  }
+  .point-hero .ph-label { font-size: 0.82em; opacity: 0.9; font-weight: 700; }
+  .point-hero .ph-value { font-size: 2.6em; font-weight: 900; line-height: 1.2; margin: 4px 0; }
+  .point-hero .ph-rank { font-size: 0.92em; font-weight: 700; opacity: 0.95; }
+
+  .sec-title {
+    font-size: 0.92em; font-weight: 900; color: #5B6CF5; text-align: left;
+    margin: 22px 0 10px; border-bottom: 2px solid #eef0ff; padding-bottom: 6px;
+  }
+
+  .bar-row { text-align: left; margin-bottom: 14px; }
+  .bar-row .br-top { display: flex; justify-content: space-between; font-size: 0.85em; font-weight: 800; color: #333; margin-bottom: 6px; }
+  .bar-bg { background: #eee; border-radius: 8px; height: 10px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 8px; background: linear-gradient(135deg,#667eea,#764ba2); transition: width 0.4s; }
+
+  .badge-row { display: flex; gap: 10px; margin-bottom: 6px; }
+  .badge-box {
+    flex: 1; background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 12px 8px; text-align: center;
+  }
+  .badge-box .bb-icon { font-size: 1.5em; }
+  .badge-box .bb-value { font-size: 1.1em; font-weight: 900; color: #333; margin-top: 2px; }
+  .badge-box .bb-label { font-size: 0.7em; color: #999; font-weight: 700; }
+
+  .info-box {
+    background: #f8f9ff; border-radius: 14px; padding: 14px 16px;
+    font-size: 0.85em; color: #555; line-height: 1.7; text-align: left;
+  }
+
+  /* ===== ランキング ===== */
+  .rank-item {
+    display: flex; align-items: center; gap: 12px;
+    background: #f8f9ff; border: 2px solid #e2e5f5; border-radius: 14px;
+    padding: 10px 14px; margin-bottom: 8px; text-align: left;
+  }
+  .rank-item.me { background: #eef0ff; border-color: #5B6CF5; }
+  .rank-item .ri-rank {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 0.9em; background: #fff; color: #888;
+  }
+  .rank-item.top1 .ri-rank { background: linear-gradient(135deg,#ffd700,#ffb300); color: #fff; }
+  .rank-item.top2 .ri-rank { background: linear-gradient(135deg,#d7d7d7,#b0b0b0); color: #fff; }
+  .rank-item.top3 .ri-rank { background: linear-gradient(135deg,#e0a06a,#c17d43); color: #fff; }
+  .rank-item .ri-name { font-weight: 800; color: #333; font-size: 0.9em; }
+  .rank-item .ri-num { font-size: 0.75em; color: #999; font-weight: 700; }
+  .rank-item .ri-pts { margin-left: auto; font-weight: 900; color: #5B6CF5; font-size: 0.95em; }
+  .rank-item .ri-me-tag {
+    font-size: 0.68em; font-weight: 800; color: #fff; background: #5B6CF5;
+    border-radius: 50px; padding: 2px 8px; margin-left: 6px;
+  }
+
+  .loading { text-align: center; color: #aaa; font-size: 0.88em; padding: 26px 10px; }
+
+  /* ===== ボタン ===== */
+  .btn {
+    display: inline-block; padding: 13px 28px; border-radius: 50px; border: none;
+    font-size: 0.95em; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-block   { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+  /* ===== 登録モーダル ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    z-index: 100; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 22px; width: 100%; max-width: 400px;
+    padding: 26px 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .modal h2 { font-size: 1.2em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; text-align: center; }
+  .modal .m-sub { font-size: 0.83em; color: #888; text-align: center; margin-bottom: 20px; line-height: 1.6; }
+  .field-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .field { flex: 1; text-align: left; }
+  .field label { display: block; font-size: 0.75em; font-weight: 800; color: #888; margin-bottom: 5px; }
+  .field select, .field input {
+    width: 100%; border: 2px solid #e2e5f5; border-radius: 12px; padding: 11px 12px;
+    font-size: 0.95em; font-family: inherit; background: #fff; color: #333;
+  }
+  .field select:focus, .field input:focus { outline: none; border-color: #5B6CF5; }
+  .modal-err { font-size: 0.82em; color: #d13a1f; margin-bottom: 12px; display: none; text-align: center; }
+  .modal-err.show { display: block; }
+  .modal-note { font-size: 0.75em; color: #aaa; line-height: 1.6; margin-top: 14px; text-align: center; }
+
   @media (max-width: 420px) {
     .category-grid { grid-template-columns: 1fr; }
   }
@@ -78,11 +206,21 @@
 
 <div class="app">
   <div class="app-header">
-    <div class="hd-title">英語学習アプリ</div>
-    <div class="hd-sub">English Learning App</div>
+    <div>
+      <div class="hd-title">英語学習アプリ</div>
+      <div class="hd-sub">English Learning App</div>
+    </div>
+    <button class="hd-btn" id="btn-header-home" style="display:none;">🏠 ホーム</button>
   </div>
 
-  <div class="page">
+  <div class="student-bar" id="student-bar">
+    <span class="sb-icon">🙋</span>
+    <span class="sb-name" id="sb-name"></span>
+    <button class="sb-edit" id="btn-edit-profile">変更</button>
+  </div>
+
+  <!-- ===== ホーム ===== -->
+  <div id="page-home" class="page active">
     <div class="title-icon">🎓</div>
     <div class="title-main">英語学習アプリ</div>
     <div class="title-sub">使いたいアプリを選んでください。どちらもブラウザだけで動きます。</div>
@@ -100,8 +238,281 @@
         <div class="cc-desc">級ごとの1次・2次試験対策</div>
       </a>
     </div>
+
+    <button class="progress-card" id="btn-go-progress">
+      <div class="pc-icon">📈</div>
+      <div>
+        <div class="pc-title">わたしの進捗</div>
+        <div class="pc-desc">これまでの取り組みとクラス内の順位を確認する</div>
+      </div>
+      <div class="pc-arrow">›</div>
+    </button>
+  </div>
+
+  <!-- ===== 進捗ページ ===== -->
+  <div id="page-progress" class="page">
+    <div class="title-icon">📈</div>
+    <div class="title-main">わたしの進捗</div>
+    <div class="title-sub" id="progress-sub">これまでの取り組みのまとめ</div>
+
+    <div class="point-hero">
+      <div class="ph-label">総合ポイント</div>
+      <div class="ph-value" id="ph-points">-</div>
+      <div class="ph-rank" id="ph-rank">読み込み中...</div>
+    </div>
+
+    <div class="sec-title">📚 単語学習</div>
+    <div id="vocab-detail">
+      <div class="bar-row">
+        <div class="br-top"><span>クイズ（意味）</span><span id="bar-qz-txt">0/0</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="bar-qz" style="width:0%"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="br-top"><span>タイピング（つづり）</span><span id="bar-ty-txt">0/0</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="bar-ty" style="width:0%"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="br-top"><span>英文完成</span><span id="bar-st-txt">0/0</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="bar-st" style="width:0%"></div></div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-box"><div class="bb-icon">🥈</div><div class="bb-value" id="bb-silver">0</div><div class="bb-label">銀トロフィー</div></div>
+        <div class="badge-box"><div class="bb-icon">🏅</div><div class="bb-value" id="bb-gold">0</div><div class="bb-label">金トロフィー</div></div>
+        <div class="badge-box"><div class="bb-icon">🏆</div><div class="bb-value" id="bb-boss">0</div><div class="bb-label">ボス撃破</div></div>
+      </div>
+    </div>
+
+    <div class="sec-title">🎯 英検対策</div>
+    <div class="info-box" id="eiken-detail">まだ模試の記録がありません。</div>
+
+    <div class="sec-title">🏅 クラス内ランキング（トップ10）</div>
+    <div id="ranking-list"><div class="loading">読み込み中...</div></div>
+
+    <div class="info-box" style="margin-top:16px;">
+      総合ポイントは「覚えた単語の数＋トロフィーやボス撃破＋英検模試の取り組み」で計算されます。
+      こつこつ取り組むほどポイントが増えます。
+    </div>
+
+    <div style="margin-top:20px;">
+      <button class="btn btn-gray btn-block" id="btn-progress-back">ホームに戻る</button>
+    </div>
   </div>
 </div>
+
+<!-- ===== 生徒情報の登録モーダル ===== -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal">
+    <h2 id="modal-title">はじめに、あなたのことを教えてください</h2>
+    <div class="m-sub">先生が学習の進み具合を確認するために使います。<br>一度入力すれば、次回からは入力不要です。</div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>学年</label>
+        <select id="in-grade">
+          <option value="1">1年</option>
+          <option value="2">2年</option>
+          <option value="3" selected>3年</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>組</label>
+        <select id="in-class"></select>
+      </div>
+      <div class="field">
+        <label>出席番号</label>
+        <input type="number" id="in-num" min="1" max="50" placeholder="15">
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:14px;">
+      <label>氏名</label>
+      <input type="text" id="in-name" placeholder="高橋 太郎" maxlength="20">
+    </div>
+
+    <div class="modal-err" id="modal-err"></div>
+
+    <button class="btn btn-primary btn-block" id="btn-save-profile">この内容で始める</button>
+    <button class="btn btn-gray btn-block" id="btn-cancel-profile" style="display:none;">キャンセル</button>
+
+    <div class="modal-note">入力した内容はこの端末に保存され、先生の集計表にも送られます。</div>
+  </div>
+</div>
+
+<script src="進捗同期.js"></script>
+<script>
+// ================================================================
+//  画面切り替え
+// ================================================================
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('btn-header-home').style.display = (id === 'page-home') ? 'none' : 'inline-block';
+}
+document.getElementById('btn-header-home').addEventListener('click', () => goPage('page-home'));
+document.getElementById('btn-progress-back').addEventListener('click', () => goPage('page-home'));
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ================================================================
+//  生徒情報の登録
+// ================================================================
+const classSelect = document.getElementById('in-class');
+for (let i = 1; i <= 10; i++) {
+  const op = document.createElement('option');
+  op.value = i; op.textContent = i + '組';
+  classSelect.appendChild(op);
+}
+
+const modal = document.getElementById('profile-modal');
+
+function openProfileModal(isEdit) {
+  const p = ProgressSync.getProfile();
+  document.getElementById('modal-title').textContent =
+    isEdit ? '登録内容の変更' : 'はじめに、あなたのことを教えてください';
+  document.getElementById('btn-cancel-profile').style.display = isEdit ? 'block' : 'none';
+  document.getElementById('modal-err').classList.remove('show');
+
+  if (p) {
+    // 「3年1組」の形から学年と組を取り出す
+    const m = String(p.cls).match(/^(\d+)年(\d+)組$/);
+    if (m) {
+      document.getElementById('in-grade').value = m[1];
+      classSelect.value = m[2];
+    }
+    document.getElementById('in-num').value = p.num;
+    document.getElementById('in-name').value = p.name || '';
+  }
+  modal.classList.add('show');
+}
+function closeProfileModal() { modal.classList.remove('show'); }
+
+document.getElementById('btn-save-profile').addEventListener('click', () => {
+  const grade = document.getElementById('in-grade').value;
+  const cls   = classSelect.value;
+  const num   = parseInt(document.getElementById('in-num').value, 10);
+  const name  = document.getElementById('in-name').value.trim();
+  const err   = document.getElementById('modal-err');
+
+  if (!Number.isInteger(num) || num < 1 || num > 50) {
+    err.textContent = '出席番号を1〜50の数字で入力してください。';
+    err.classList.add('show');
+    return;
+  }
+  if (!name) {
+    err.textContent = '氏名を入力してください。';
+    err.classList.add('show');
+    return;
+  }
+
+  ProgressSync.saveProfile(grade + '年' + cls + '組', num, name);
+  closeProfileModal();
+  renderStudentBar();
+  ProgressSync.sync(true);
+});
+
+document.getElementById('btn-cancel-profile').addEventListener('click', closeProfileModal);
+document.getElementById('btn-edit-profile').addEventListener('click', () => openProfileModal(true));
+
+function renderStudentBar() {
+  const p = ProgressSync.getProfile();
+  const bar = document.getElementById('student-bar');
+  if (!p) { bar.classList.remove('show'); return; }
+  document.getElementById('sb-name').textContent = p.cls + ' ' + p.num + '番　' + (p.name || '');
+  bar.classList.add('show');
+}
+
+// ================================================================
+//  進捗ページ
+// ================================================================
+document.getElementById('btn-go-progress').addEventListener('click', () => {
+  if (!ProgressSync.getProfile()) { openProfileModal(false); return; }
+  goPage('page-progress');
+  renderProgress();
+});
+
+function renderProgress() {
+  const data = ProgressSync.collect();
+  const v = data.vocab || {};
+  const e = data.eiken || {};
+
+  const setBar = (id, done, total) => {
+    const pct = total ? Math.round(done / total * 100) : 0;
+    document.getElementById('bar-' + id).style.width = pct + '%';
+    document.getElementById('bar-' + id + '-txt').textContent = done + '/' + total;
+  };
+  setBar('qz', v.qzMastered || 0, v.qzTotal || 0);
+  setBar('ty', v.tyMastered || 0, v.tyTotal || 0);
+  setBar('st', v.stMastered || 0, v.stTotal || 0);
+  document.getElementById('bb-silver').textContent = v.silver || 0;
+  document.getElementById('bb-gold').textContent   = v.gold || 0;
+  document.getElementById('bb-boss').textContent   = v.boss || 0;
+
+  const eikenBox = document.getElementById('eiken-detail');
+  if (e.mockCount) {
+    eikenBox.innerHTML =
+      '模試の受験回数：<b>' + e.mockCount + '回</b><br>' +
+      '最高スコア：<b>' + e.bestScore + '%</b>' +
+      (e.latestVerdict ? '<br>最新の記録：' + escapeHtml(e.latestVerdict) : '');
+  } else {
+    eikenBox.textContent = 'まだ模試の記録がありません。英検対策の模試に挑戦してみましょう。';
+  }
+
+  // サーバーに最新を送ってから順位を取得する
+  document.getElementById('ph-rank').textContent = '順位を確認しています...';
+  document.getElementById('ranking-list').innerHTML = '<div class="loading">読み込み中...</div>';
+
+  ProgressSync.sync(true)
+    .then(() => ProgressSync.fetchRanking())
+    .then(renderRanking)
+    .catch(() => renderRanking({ error: '通信できませんでした' }));
+}
+
+function renderRanking(res) {
+  const rankEl = document.getElementById('ph-rank');
+  const listEl = document.getElementById('ranking-list');
+
+  if (!res || res.error) {
+    document.getElementById('ph-points').textContent = '-';
+    rankEl.textContent = '順位を取得できませんでした';
+    listEl.innerHTML = '<div class="loading">ランキングを読み込めませんでした。<br>通信環境を確認してもう一度開いてください。</div>';
+    return;
+  }
+
+  document.getElementById('ph-points').textContent = (res.myPoints || 0) + ' pt';
+  rankEl.textContent = res.myRank
+    ? 'クラス内 ' + res.classTotal + '人中 ' + res.myRank + '位'
+    : 'まだ順位がつけられていません';
+
+  if (!res.top10 || res.top10.length === 0) {
+    listEl.innerHTML = '<div class="loading">まだランキングに載っている人がいません。</div>';
+    return;
+  }
+
+  listEl.innerHTML = res.top10.map(s => {
+    const topClass = s.rank <= 3 ? ' top' + s.rank : '';
+    return '<div class="rank-item' + topClass + (s.isMe ? ' me' : '') + '">' +
+      '<div class="ri-rank">' + s.rank + '</div>' +
+      '<div>' +
+        '<div class="ri-name">' + escapeHtml(s.name || '（名前なし）') +
+          (s.isMe ? '<span class="ri-me-tag">あなた</span>' : '') + '</div>' +
+        '<div class="ri-num">' + s.num + '番</div>' +
+      '</div>' +
+      '<div class="ri-pts">' + s.points + ' pt</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ================================================================
+//  起動時
+// ================================================================
+renderStudentBar();
+if (!ProgressSync.getProfile()) {
+  openProfileModal(false);
+}
+</script>
 
 </body>
 </html>

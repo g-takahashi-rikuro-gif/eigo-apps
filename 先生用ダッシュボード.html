@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>先生用ダッシュボード</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 1100px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, #5a3f8f 0%, #3f2d6b 100%);
+    color: white; padding: 16px 24px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .hd-link:hover { background: rgba(255,255,255,0.32); }
+
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; }
+
+  /* ===== ログイン ===== */
+  #page-login { text-align: center; padding: 50px 24px; }
+  .login-icon { font-size: 3.6em; margin-bottom: 12px; }
+  .login-title { font-size: 1.3em; font-weight: 900; color: #5B6CF5; margin-bottom: 8px; }
+  .login-sub { font-size: 0.88em; color: #888; margin-bottom: 26px; line-height: 1.6; }
+  .login-form { max-width: 320px; margin: 0 auto; }
+  .login-form input {
+    width: 100%; border: 2px solid #e2e5f5; border-radius: 12px; padding: 13px 14px;
+    font-size: 1em; font-family: inherit; margin-bottom: 12px; text-align: center;
+  }
+  .login-form input:focus { outline: none; border-color: #5B6CF5; }
+
+  /* ===== ツールバー ===== */
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    background: #f8f9ff; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
+  }
+  .toolbar label { font-size: 0.8em; font-weight: 800; color: #888; }
+  .toolbar select, .toolbar input[type="search"] {
+    border: 2px solid #e2e5f5; border-radius: 10px; padding: 8px 12px;
+    font-size: 0.88em; font-family: inherit; background: #fff; color: #333;
+  }
+  .toolbar select:focus, .toolbar input:focus { outline: none; border-color: #5B6CF5; }
+  .toolbar .spacer { margin-left: auto; }
+
+  /* ===== 統計 ===== */
+  .stat-row { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .stat-box {
+    flex: 1; min-width: 130px; background: linear-gradient(135deg,#eef0ff,#f6f2ff);
+    border: 2px solid #d5daf8; border-radius: 16px; padding: 14px 16px;
+  }
+  .stat-box .sb-label { font-size: 0.75em; color: #888; font-weight: 800; }
+  .stat-box .sb-value { font-size: 1.5em; font-weight: 900; color: #5B6CF5; margin-top: 2px; }
+
+  /* ===== テーブル ===== */
+  .table-wrap { overflow-x: auto; border: 2px solid #eef0ff; border-radius: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85em; white-space: nowrap; }
+  thead th {
+    background: #eef0ff; color: #5B6CF5; font-weight: 800; text-align: left;
+    padding: 11px 12px; cursor: pointer; user-select: none; position: sticky; top: 0;
+    border-bottom: 2px solid #d5daf8;
+  }
+  thead th:hover { background: #e0e4ff; }
+  thead th .arrow { font-size: 0.8em; opacity: 0.5; margin-left: 3px; }
+  thead th.sorted .arrow { opacity: 1; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f5; color: #333; }
+  tbody tr:hover { background: #fafbff; }
+  tbody tr:last-child td { border-bottom: none; }
+  .rank-cell { font-weight: 900; color: #999; }
+  .rank-cell.top1 { color: #d4a017; }
+  .rank-cell.top2 { color: #9a9a9a; }
+  .rank-cell.top3 { color: #c17d43; }
+  .name-cell { font-weight: 800; }
+  .pts-cell { font-weight: 900; color: #5B6CF5; }
+  .mini-bar-bg { background: #eee; border-radius: 6px; height: 7px; width: 70px; overflow: hidden; display: inline-block; vertical-align: middle; }
+  .mini-bar-fill { height: 100%; background: linear-gradient(135deg,#667eea,#764ba2); }
+  .dim { color: #bbb; }
+
+  .empty { text-align: center; color: #aaa; font-size: 0.9em; padding: 40px 20px; line-height: 1.8; }
+  .err-msg { font-size: 0.85em; color: #d13a1f; background: #fff0ee; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; display: none; }
+  .err-msg.show { display: block; }
+
+  .btn {
+    display: inline-block; padding: 12px 26px; border-radius: 50px; border: none;
+    font-size: 0.92em; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-outline { background: #fff; color: #5B6CF5; border: 2px solid #5B6CF5; padding: 8px 18px; font-size: 0.82em; }
+  .btn-block { display: block; width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">先生用ダッシュボード</div>
+      <div class="hd-sub">生徒の学習進捗の確認</div>
+    </div>
+    <a class="hd-link" href="英語学習アプリ.html">アプリに戻る</a>
+  </div>
+
+  <!-- ===== ログイン ===== -->
+  <div id="page-login" class="page active">
+    <div class="login-icon">🔑</div>
+    <div class="login-title">合言葉を入力してください</div>
+    <div class="login-sub">生徒の情報を表示するため、先生用の合言葉が必要です。</div>
+    <div class="login-form">
+      <div class="err-msg" id="login-err"></div>
+      <input type="password" id="in-passcode" placeholder="合言葉" autocomplete="current-password">
+      <button class="btn btn-primary btn-block" id="btn-login">表示する</button>
+    </div>
+  </div>
+
+  <!-- ===== 一覧 ===== -->
+  <div id="page-list" class="page">
+    <div class="stat-row">
+      <div class="stat-box"><div class="sb-label">登録人数</div><div class="sb-value" id="stat-count">-</div></div>
+      <div class="stat-box"><div class="sb-label">単語達成率の平均</div><div class="sb-value" id="stat-rate">-</div></div>
+      <div class="stat-box"><div class="sb-label">模試を受けた人数</div><div class="sb-value" id="stat-mock">-</div></div>
+      <div class="stat-box"><div class="sb-label">総合ポイント平均</div><div class="sb-value" id="stat-pts">-</div></div>
+    </div>
+
+    <div class="toolbar">
+      <label for="filter-class">クラス</label>
+      <select id="filter-class"><option value="">すべて</option></select>
+
+      <label for="search-name">氏名で検索</label>
+      <input type="search" id="search-name" placeholder="名前の一部">
+
+      <span class="spacer"></span>
+      <a class="btn btn-outline" id="link-sheet" href="#" target="_blank" rel="noopener">スプレッドシートを開く</a>
+      <button class="btn btn-outline" id="btn-reload">再読み込み</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-key="rank">順位<span class="arrow">↓</span></th>
+            <th data-key="cls">クラス<span class="arrow">↕</span></th>
+            <th data-key="num">出席番号<span class="arrow">↕</span></th>
+            <th data-key="name">氏名<span class="arrow">↕</span></th>
+            <th data-key="points">総合pt<span class="arrow">↕</span></th>
+            <th data-key="rate">単語達成率<span class="arrow">↕</span></th>
+            <th data-key="gold">🏅金<span class="arrow">↕</span></th>
+            <th data-key="boss">🏆ボス<span class="arrow">↕</span></th>
+            <th data-key="mockCount">模試回数<span class="arrow">↕</span></th>
+            <th data-key="bestScore">模試最高<span class="arrow">↕</span></th>
+            <th data-key="updated">最終更新<span class="arrow">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="empty-msg" style="display:none;"></div>
+  </div>
+</div>
+
+<script src="進捗同期.js"></script>
+<script>
+let allStudents = [];
+let sortKey = 'points';
+let sortAsc = false;   // 総合ポイントは大きい順から始める
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ================================================================
+//  ログイン
+// ================================================================
+document.getElementById('btn-login').addEventListener('click', login);
+document.getElementById('in-passcode').addEventListener('keydown', e => {
+  if (e.key === 'Enter') login();
+});
+
+function login() {
+  const pass = document.getElementById('in-passcode').value.trim();
+  const err = document.getElementById('login-err');
+  const btn = document.getElementById('btn-login');
+  if (!pass) {
+    err.textContent = '合言葉を入力してください。';
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = '読み込み中...';
+
+  ProgressSync.fetchAll(pass).then(res => {
+    btn.disabled = false;
+    btn.textContent = '表示する';
+    if (!res || res.error) {
+      err.textContent = res && res.error ? res.error : '読み込みに失敗しました。';
+      err.classList.add('show');
+      return;
+    }
+    // 合言葉は画面を開いている間だけ保持する（再読み込み用）
+    sessionStorage.setItem('teacher_pass', pass);
+    applyData(res);
+    goPage('page-list');
+  });
+}
+
+document.getElementById('btn-reload').addEventListener('click', () => {
+  const pass = sessionStorage.getItem('teacher_pass');
+  if (!pass) { goPage('page-login'); return; }
+  const btn = document.getElementById('btn-reload');
+  btn.disabled = true; btn.textContent = '更新中...';
+  ProgressSync.fetchAll(pass).then(res => {
+    btn.disabled = false; btn.textContent = '再読み込み';
+    if (res && !res.error) applyData(res);
+  });
+});
+
+// ================================================================
+//  データ適用
+// ================================================================
+function applyData(res) {
+  allStudents = res.students || [];
+  if (res.sheetUrl) document.getElementById('link-sheet').href = res.sheetUrl;
+
+  // クラスの絞り込み候補を作る
+  const sel = document.getElementById('filter-class');
+  const current = sel.value;
+  const classes = Array.from(new Set(allStudents.map(s => s.cls))).sort();
+  sel.innerHTML = '<option value="">すべて</option>' +
+    classes.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('');
+  sel.value = current;
+
+  render();
+}
+
+document.getElementById('filter-class').addEventListener('change', render);
+document.getElementById('search-name').addEventListener('input', render);
+
+document.querySelectorAll('thead th').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.key;
+    if (sortKey === key) {
+      sortAsc = !sortAsc;
+    } else {
+      sortKey = key;
+      // 数値の列は「多い順」、文字やクラス・番号は「小さい順」から始める
+      sortAsc = ['cls', 'num', 'name'].indexOf(key) >= 0;
+    }
+    render();
+  });
+});
+
+function render() {
+  const clsFilter = document.getElementById('filter-class').value;
+  const nameQuery = document.getElementById('search-name').value.trim();
+
+  // 順位は「絞り込み前の全体」ではなく、表示中の母集団の中で付ける
+  let list = allStudents.slice();
+  if (clsFilter) list = list.filter(s => s.cls === clsFilter);
+
+  // 総合ポイント順に並べて順位を確定させる
+  const ranked = list.slice().sort((a, b) => b.points - a.points);
+  const rankMap = {};
+  ranked.forEach((s, i) => { rankMap[s.id] = i + 1; });
+  list.forEach(s => { s.rank = rankMap[s.id]; });
+
+  if (nameQuery) list = list.filter(s => (s.name || '').indexOf(nameQuery) >= 0);
+
+  // 並べ替え
+  list.sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (sortKey === 'cls' || sortKey === 'name' || sortKey === 'updated') {
+      av = String(av || ''); bv = String(bv || '');
+      return sortAsc ? av.localeCompare(bv, 'ja') : bv.localeCompare(av, 'ja');
+    }
+    av = Number(av) || 0; bv = Number(bv) || 0;
+    return sortAsc ? av - bv : bv - av;
+  });
+
+  // 見出しの矢印
+  document.querySelectorAll('thead th').forEach(th => {
+    const isSorted = th.dataset.key === sortKey;
+    th.classList.toggle('sorted', isSorted);
+    th.querySelector('.arrow').textContent = isSorted ? (sortAsc ? '↑' : '↓') : '↕';
+  });
+
+  // 統計
+  const base = clsFilter ? allStudents.filter(s => s.cls === clsFilter) : allStudents;
+  document.getElementById('stat-count').textContent = base.length + '人';
+  const avgRate = base.length ? Math.round(base.reduce((a, s) => a + s.rate, 0) / base.length) : 0;
+  document.getElementById('stat-rate').textContent = avgRate + '%';
+  document.getElementById('stat-mock').textContent = base.filter(s => s.mockCount > 0).length + '人';
+  const avgPts = base.length ? Math.round(base.reduce((a, s) => a + s.points, 0) / base.length) : 0;
+  document.getElementById('stat-pts').textContent = avgPts + ' pt';
+
+  // 表
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('empty-msg');
+  if (list.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    empty.textContent = allStudents.length === 0
+      ? 'まだ生徒の記録がありません。生徒がアプリで学習すると、ここに自動で表示されます。'
+      : '条件に合う生徒がいません。';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = list.map(s => {
+    const rankCls = s.rank <= 3 ? ' top' + s.rank : '';
+    return '<tr>' +
+      '<td class="rank-cell' + rankCls + '">' + s.rank + '</td>' +
+      '<td>' + escapeHtml(s.cls) + '</td>' +
+      '<td>' + s.num + '</td>' +
+      '<td class="name-cell">' + escapeHtml(s.name || '（名前なし）') + '</td>' +
+      '<td class="pts-cell">' + s.points + '</td>' +
+      '<td><span class="mini-bar-bg"><span class="mini-bar-fill" style="width:' + s.rate + '%"></span></span> ' + s.rate + '%</td>' +
+      '<td>' + (s.gold || '<span class="dim">0</span>') + '</td>' +
+      '<td>' + (s.boss || '<span class="dim">0</span>') + '</td>' +
+      '<td>' + (s.mockCount || '<span class="dim">0</span>') + '</td>' +
+      '<td>' + (s.mockCount ? s.bestScore + '%' : '<span class="dim">-</span>') + '</td>' +
+      '<td class="dim">' + escapeHtml(s.updated) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+</script>
+
+</body>
+</html>

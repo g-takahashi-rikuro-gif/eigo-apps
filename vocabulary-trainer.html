@@ -1697,6 +1697,7 @@ function init() {
   loadUnitState();
   renderUnitSelector();
   go('home');
+  saveVocabSummary();
 }
 
 function selectUnit(i) {
@@ -1859,6 +1860,28 @@ function computeUnitStats(u) {
     bossBestRank: localStorage.getItem(lsFor(u.id, 'boss_best_rank')),
   };
 }
+// 全Unitの到達状況を要約して localStorage に保存する。
+// トップページや先生用ダッシュボードは、この要約だけを読めば
+// 単語学習の進み具合が分かる（単語データ本体を読む必要がない）。
+function saveVocabSummary() {
+  try {
+    const agg = realUnits().reduce((a, u) => {
+      const s = computeUnitStats(u);
+      a.qzMastered += s.qzMastered; a.qzTotal += s.qzTotal;
+      a.tyMastered += s.tyMastered; a.tyTotal += s.tyTotal;
+      a.stMastered += s.stMastered; a.stTotal += s.stTotal;
+      if (s.silver) a.silver++;
+      if (s.gold) a.gold++;
+      if (s.bossCleared) a.boss++;
+      return a;
+    }, { qzMastered:0, qzTotal:0, tyMastered:0, tyTotal:0, stMastered:0, stTotal:0, silver:0, gold:0, boss:0 });
+    agg.unitCount = realUnits().length;
+    localStorage.setItem('vocab_summary', JSON.stringify(agg));
+  } catch(e) {}
+  // 要約が更新されたらサーバーにも送る（未登録なら何もしない）
+  if (window.ProgressSync) window.ProgressSync.sync(false);
+}
+
 function renderOverview() {
   const unitsReal = realUnits();
   const summaryUnit = UNITS.find(u => u.isSummary);
@@ -2097,6 +2120,7 @@ function save() {
   localStorage.setItem(ls('tys'), typingScore);
   localStorage.setItem(ls('sts'), sentenceScore);
   localStorage.setItem(ls('streak'), allTimeMaxStreak);
+  saveVocabSummary();
 }
 
 // Custom in-page confirm dialog — the browser's native confirm()/alert() is
@@ -2239,6 +2263,7 @@ function checkTrophy() {
   if (!goldTrophyEarned && qzMastered===qzTotal && tyMastered===tyTotal && stMastered===stTotal) {
     goldTrophyEarned = true;
     localStorage.setItem(ls('trophy_gold'), '1');
+    saveVocabSummary();
     setTimeout(() => showTrophyAnimation('gold'), 600);
     return;
   }
@@ -2249,6 +2274,7 @@ function checkTrophy() {
     if (qzOk && tyOk && stOk) {
       silverTrophyEarned = true;
       localStorage.setItem(ls('trophy_silver'), '1');
+      saveVocabSummary();
       setTimeout(() => showTrophyAnimation('silver'), 600);
     }
   }
@@ -3523,7 +3549,7 @@ function finishBoss(won) {
   if (bsFWTickId) { clearInterval(bsFWTickId); bsFWTickId = null; }
   const bstrInput = document.getElementById('bstr-input');
   if (bstrInput) bstrInput.disabled = true;
-  if (won) localStorage.setItem(ls('boss_cleared'), '1');
+  if (won) { localStorage.setItem(ls('boss_cleared'), '1'); saveVocabSummary(); }
   document.getElementById('boss-result-emoji').textContent = won ? '🏆' : '💀';
   document.getElementById('boss-result-title').textContent = won ? 'ボス撃破！' : 'やられた…';
   document.getElementById('boss-result-msg').textContent = won
@@ -3600,6 +3626,12 @@ function notif(msg, type='ok') {
 //  START
 // ══════════════════════════════════════════
 init();
+</script>
+<!-- 進捗をサーバーへ送るための共通モジュール（生徒登録が済んでいる場合のみ働く） -->
+<script src="進捗同期.js"></script>
+<script>
+  // 上のモジュールが読み込まれた時点で、すでに作られている要約を送信する
+  if (window.ProgressSync) window.ProgressSync.sync(false);
 </script>
 </body>
 </html>

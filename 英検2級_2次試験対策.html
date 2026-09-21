@@ -453,6 +453,8 @@ function addRecord(rec) {
     if (list.length > 50) list.length = 50;
     localStorage.setItem(RECORDS_KEY, JSON.stringify(list));
   } catch(e) {}
+  // 先生用の集計にも反映させる（生徒登録が済んでいる場合のみ）
+  if (window.ProgressSync) window.ProgressSync.sync(false);
 }
 function formatRecordDate(ts) {
   const d = new Date(ts);
@@ -742,6 +744,7 @@ if (new URLSearchParams(location.search).get('mode') === 'mock') {
   startPractice();
 }
 </script>
+<script src="進捗同期.js"></script>
 
 </body>
 </html>
