@@ -285,7 +285,7 @@
     <div class="sec-title">🎯 英検対策</div>
     <div class="info-box" id="eiken-detail">まだ模試の記録がありません。</div>
 
-    <div class="sec-title">🏅 クラス内ランキング（トップ10）</div>
+    <div class="sec-title" id="ranking-title">🏅 学年全体ランキング（トップ10）</div>
     <div id="ranking-list"><div class="loading">読み込み中...</div></div>
 
     <div class="info-box" style="margin-top:16px;">
@@ -509,13 +509,24 @@ function renderRanking(res) {
 
   document.getElementById('ph-points').textContent = (res.myPoints || 0) + ' pt';
   rankEl.textContent = res.myRank
-    ? 'クラス内 ' + res.classTotal + '人中 ' + res.myRank + '位'
+    ? (res.grade ? res.grade + '年生 ' : '学年 ') + res.gradeTotal + '人中 ' + res.myRank + '位'
     : 'まだ順位がつけられていません';
+
+  if (res.grade) {
+    document.getElementById('ranking-title').textContent =
+      '🏅 ' + res.grade + '年生の学年ランキング（トップ10）';
+  }
 
   if (!res.top10 || res.top10.length === 0) {
     listEl.innerHTML = '<div class="loading">まだランキングに載っている人がいません。</div>';
     return;
   }
+
+  // 学年全体なので、何組の生徒かも分かるように表示する（「3年2組」→「2組」）
+  const shortClass = cls => {
+    const m = String(cls || '').match(/^\d+年(\d+組)$/);
+    return m ? m[1] : String(cls || '');
+  };
 
   listEl.innerHTML = res.top10.map(s => {
     const topClass = s.rank <= 3 ? ' top' + s.rank : '';
@@ -524,7 +535,7 @@ function renderRanking(res) {
       '<div>' +
         '<div class="ri-name">' + escapeHtml(s.name || '（名前なし）') +
           (s.isMe ? '<span class="ri-me-tag">あなた</span>' : '') + '</div>' +
-        '<div class="ri-num">' + s.num + '番</div>' +
+        '<div class="ri-num">' + escapeHtml(shortClass(s.cls)) + ' ' + s.num + '番</div>' +
       '</div>' +
       '<div class="ri-pts">' + s.points + ' pt</div>' +
     '</div>';

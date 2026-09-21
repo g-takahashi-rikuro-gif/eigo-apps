@@ -150,7 +150,7 @@
     </div>
 
     <div class="toolbar">
-      <label for="filter-class">クラス</label>
+      <label for="filter-class">表示範囲</label>
       <select id="filter-class"><option value="">すべて</option></select>
 
       <label for="search-name">氏名で検索</label>
@@ -190,6 +190,18 @@
 let allStudents = [];
 let sortKey = 'points';
 let sortAsc = false;   // 総合ポイントは大きい順から始める
+
+/** 「3年2組」から学年の「3」を取り出す */
+function extractGrade(cls) {
+  const m = String(cls || '').match(/^(\d+)年/);
+  return m ? m[1] : '';
+}
+/** 絞り込み条件に合うか判定する（'' は全員、'grade:3' は3年全体、それ以外はクラス名） */
+function matchFilter(s, filter) {
+  if (!filter) return true;
+  if (filter.indexOf('grade:') === 0) return extractGrade(s.cls) === filter.slice(6);
+  return s.cls === filter;
+}
 
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
@@ -254,12 +266,18 @@ function applyData(res) {
   allStudents = res.students || [];
   if (res.sheetUrl) document.getElementById('link-sheet').href = res.sheetUrl;
 
-  // クラスの絞り込み候補を作る
+  // 絞り込み候補を作る。「○年（学年全体）」を選べば、
+  // 生徒側のランキングと同じ範囲・同じ順位で確認できる。
   const sel = document.getElementById('filter-class');
   const current = sel.value;
-  const classes = Array.from(new Set(allStudents.map(s => s.cls))).sort();
-  sel.innerHTML = '<option value="">すべて</option>' +
-    classes.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('');
+  const grades = Array.from(new Set(allStudents.map(s => extractGrade(s.cls)))).sort();
+  sel.innerHTML = '<option value="">すべて</option>' + grades.map(g => {
+    const classes = Array.from(new Set(
+      allStudents.filter(s => extractGrade(s.cls) === g).map(s => s.cls)
+    )).sort();
+    return '<option value="grade:' + escapeHtml(g) + '">' + escapeHtml(g) + '年（学年全体）</option>' +
+      classes.map(c => '<option value="' + escapeHtml(c) + '">　' + escapeHtml(c) + '</option>').join('');
+  }).join('');
   sel.value = current;
 
   render();
@@ -287,8 +305,7 @@ function render() {
   const nameQuery = document.getElementById('search-name').value.trim();
 
   // 順位は「絞り込み前の全体」ではなく、表示中の母集団の中で付ける
-  let list = allStudents.slice();
-  if (clsFilter) list = list.filter(s => s.cls === clsFilter);
+  let list = allStudents.filter(s => matchFilter(s, clsFilter));
 
   // 総合ポイント順に並べて順位を確定させる
   const ranked = list.slice().sort((a, b) => b.points - a.points);
@@ -317,7 +334,7 @@ function render() {
   });
 
   // 統計
-  const base = clsFilter ? allStudents.filter(s => s.cls === clsFilter) : allStudents;
+  const base = allStudents.filter(s => matchFilter(s, clsFilter));
   document.getElementById('stat-count').textContent = base.length + '人';
   const avgRate = base.length ? Math.round(base.reduce((a, s) => a + s.rate, 0) / base.length) : 0;
   document.getElementById('stat-rate').textContent = avgRate + '%';
