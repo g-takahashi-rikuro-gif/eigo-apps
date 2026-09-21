@@ -309,9 +309,10 @@
       <div class="field">
         <label>学年</label>
         <select id="in-grade">
+          <option value="">選択</option>
           <option value="1">1年</option>
           <option value="2">2年</option>
-          <option value="3" selected>3年</option>
+          <option value="3">3年</option>
         </select>
       </div>
       <div class="field">
@@ -320,7 +321,7 @@
       </div>
       <div class="field">
         <label>出席番号</label>
-        <input type="number" id="in-num" min="1" max="50" placeholder="15">
+        <select id="in-num"></select>
       </div>
     </div>
 
@@ -360,11 +361,20 @@ function escapeHtml(str) {
 //  生徒情報の登録
 // ================================================================
 const classSelect = document.getElementById('in-class');
-for (let i = 1; i <= 10; i++) {
-  const op = document.createElement('option');
-  op.value = i; op.textContent = i + '組';
-  classSelect.appendChild(op);
+const numSelect   = document.getElementById('in-num');
+
+// プルダウンの選択肢を作る。初期値は空にして、
+// 選び忘れたまま登録してしまうのを防ぐ。
+function fillSelect(sel, max, suffix) {
+  sel.innerHTML = '<option value="">選択</option>';
+  for (let i = 1; i <= max; i++) {
+    const op = document.createElement('option');
+    op.value = i; op.textContent = i + suffix;
+    sel.appendChild(op);
+  }
 }
+fillSelect(classSelect, 10, '組');
+fillSelect(numSelect, 40, '番');
 
 const modal = document.getElementById('profile-modal');
 
@@ -382,8 +392,14 @@ function openProfileModal(isEdit) {
       document.getElementById('in-grade').value = m[1];
       classSelect.value = m[2];
     }
-    document.getElementById('in-num').value = p.num;
+    numSelect.value = p.num;
     document.getElementById('in-name').value = p.name || '';
+  } else {
+    // 新規登録のときは、すべて未選択の状態から始める
+    document.getElementById('in-grade').value = '';
+    classSelect.value = '';
+    numSelect.value = '';
+    document.getElementById('in-name').value = '';
   }
   modal.classList.add('show');
 }
@@ -392,12 +408,22 @@ function closeProfileModal() { modal.classList.remove('show'); }
 document.getElementById('btn-save-profile').addEventListener('click', () => {
   const grade = document.getElementById('in-grade').value;
   const cls   = classSelect.value;
-  const num   = parseInt(document.getElementById('in-num').value, 10);
+  const num   = parseInt(numSelect.value, 10);
   const name  = document.getElementById('in-name').value.trim();
   const err   = document.getElementById('modal-err');
 
-  if (!Number.isInteger(num) || num < 1 || num > 50) {
-    err.textContent = '出席番号を1〜50の数字で入力してください。';
+  if (!grade) {
+    err.textContent = '学年を選んでください。';
+    err.classList.add('show');
+    return;
+  }
+  if (!cls) {
+    err.textContent = '組を選んでください。';
+    err.classList.add('show');
+    return;
+  }
+  if (!Number.isInteger(num)) {
+    err.textContent = '出席番号を選んでください。';
     err.classList.add('show');
     return;
   }
