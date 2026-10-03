@@ -52,7 +52,14 @@
   // 単語学習側は vocabulary-trainer.html が VOCAB_KEY にスナップショットを
   // 保存してくれるので、ここではそれを読むだけでよい。
   function collect() {
-    var vocab = readJSON(VOCAB_KEY) || {};
+    // 2年生用と3年生用のアプリは別々に要約を保存するので、ここで合算する
+    var vocab = {};
+    [VOCAB_KEY, VOCAB_KEY + '_g2'].forEach(function (key) {
+      var part = readJSON(key);
+      if (!part) return;
+      ['qzMastered','qzTotal','tyMastered','tyTotal','stMastered','stTotal','silver','gold','boss','unitCount']
+        .forEach(function (f) { vocab[f] = (vocab[f] || 0) + (Number(part[f]) || 0); });
+    });
 
     var mockCount = 0, bestScore = 0, latestTs = 0, latestVerdict = '';
     Object.keys(EIKEN_LEVELS).forEach(function (key) {
