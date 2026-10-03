@@ -103,6 +103,12 @@
   .progress-card .pc-desc { font-size: 0.78em; color: #888; line-height: 1.5; }
   .progress-card .pc-arrow { margin-left: auto; font-size: 1.3em; color: #5B6CF5; }
 
+  .update-link {
+    display: block; margin: 16px auto 0; background: none; border: none;
+    color: #aaa; font-size: 0.78em; font-family: inherit; cursor: pointer; text-decoration: underline;
+  }
+  .update-link:hover { color: #5B6CF5; }
+
   /* ===== 進捗ページ ===== */
   .point-hero {
     background: linear-gradient(135deg,#667eea,#764ba2); color: #fff;
@@ -247,6 +253,8 @@
       </div>
       <div class="pc-arrow">›</div>
     </button>
+
+    <button class="update-link" onclick="if(window.AppUpdates) AppUpdates.showAll();">🆕 更新のお知らせを見る</button>
   </div>
 
   <!-- ===== 進捗ページ ===== -->
@@ -340,6 +348,7 @@
 </div>
 
 <script src="進捗同期.js"></script>
+<script src="お知らせ.js"></script>
 <script>
 // ================================================================
 //  画面切り替え
