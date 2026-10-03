@@ -226,6 +226,17 @@
   .ov-summary-final-label { font-weight: 800; font-size: .88rem; }
   .ov-summary-final-status { font-size: .8rem; font-weight: 700; color: var(--ink-soft); }
   .ov-summary-final-status.cleared { color: var(--good); }
+  /* 「まだ習得していない単語だけ出題する」のスイッチ */
+  .only-unmastered {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 11px 14px; margin-bottom: 12px;
+  }
+  .only-unmastered input { width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--seal); cursor: pointer; }
+  .only-unmastered .ou-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .only-unmastered .ou-title { font-size: .85rem; font-weight: 700; }
+  .only-unmastered .ou-sub { font-size: .72rem; color: var(--ink-soft); }
+
   .ov-weak-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 2px; border-top: 1px solid var(--border); gap: 10px; }
   .ov-weak-row:first-child { border-top: none; }
   .ov-weak-main { min-width: 0; }
@@ -553,6 +564,13 @@
   </div>
 
   <div class="sec-title">学習モードを選ぼう</div>
+  <label class="only-unmastered" id="only-unmastered-row">
+    <input type="checkbox" id="only-unmastered" onchange="toggleOnlyUnmastered()">
+    <span class="ou-text">
+      <span class="ou-title">まだ習得していない単語だけ出題する</span>
+      <span class="ou-sub" id="only-unmastered-sub"></span>
+    </span>
+  </label>
   <div class="mode-grid">
     <div class="mode-card" onclick="go('learn')">
       <div class="mode-icon">📖</div>
@@ -1690,6 +1708,7 @@ function loadUnitState() {
 }
 
 function init() {
+  migrateToStreak();   // 以前の記録を新しい判定に合わせて変換（初回のみ）
   let saved = 0;
   try { saved = parseInt(localStorage.getItem('wscroll_last_unit')); } catch(e) { saved = 0; }
   if (!Number.isInteger(saved) || saved < 0 || saved >= UNITS.length) saved = 0;
@@ -1761,9 +1780,9 @@ function isSummaryUnit() {
 function updateHome() {
   document.getElementById('core-modes-section').style.display = isSummaryUnit() ? 'none' : '';
   const typingWords = words.filter(w => w.productive);
-  const qzMastered = words.filter(w => memQuiz(w) >= 80).length;
-  const tyMastered = typingWords.filter(w => memTyping(w) >= 80).length;
-  const stMastered = words.filter(w => memSentence(w) >= 80).length;
+  const qzMastered = words.filter(masteredQuiz).length;
+  const tyMastered = typingWords.filter(masteredTyping).length;
+  const stMastered = words.filter(masteredSentence).length;
 
   const qzTotal = words.length, tyTotal = typingWords.length, stTotal = words.length;
   const qzPct = qzTotal ? Math.round(qzMastered/qzTotal*100) : 0;
@@ -1775,6 +1794,17 @@ function updateHome() {
   document.getElementById('trophy-qz-txt').textContent = qzMastered+'/'+qzTotal;
   document.getElementById('trophy-ty-txt').textContent = tyMastered+'/'+tyTotal;
   document.getElementById('trophy-st-txt').textContent = stMastered+'/'+stTotal;
+
+  // 「まだ習得していない単語だけ出題する」スイッチの状態と残り語数
+  const ouBox = document.getElementById('only-unmastered');
+  if (ouBox) {
+    ouBox.checked = onlyUnmastered();
+    const left = { 'Quiz': qzTotal - qzMastered, 'Typing': tyTotal - tyMastered, 'Sentence': stTotal - stMastered };
+    const parts = Object.keys(left).filter(k => left[k] > 0).map(k => k + ' ' + left[k] + '語');
+    document.getElementById('only-unmastered-sub').textContent = parts.length
+      ? '未習得：' + parts.join('／')
+      : 'この単元はすべて習得済みです 🎉';
+  }
 
   if (silverTrophyEarned) {
     const s = document.getElementById('slot-silver');
@@ -1835,6 +1865,51 @@ function memTyping(w)   { return memOf(typingProgress, w); }
 function memSentence(w) { return memOf(sentenceProgress, w); }
 
 // ══════════════════════════════════════════
+//  習得の判定
+//  「直近◯回連続で正解できたら習得」という考え方。
+//  以前は「これまでの通算正答率80%以上」で判定していたが、それだと
+//  一度間違えた記録がいつまでも残り、全問正解を何度繰り返しても
+//  達成率が動かないことがあったため、連続正解で判定するようにした。
+//  間違えると連続回数は0に戻る。
+// ══════════════════════════════════════════
+const MASTERY_STREAK = 2;
+function streakOf(dict, w) {
+  const p = dict[w.en];
+  return p && p.streak ? p.streak : 0;
+}
+function isMastered(dict, w)   { return streakOf(dict, w) >= MASTERY_STREAK; }
+function masteredQuiz(w)       { return isMastered(quizProgress, w); }
+function masteredTyping(w)     { return isMastered(typingProgress, w); }
+function masteredSentence(w)   { return isMastered(sentenceProgress, w); }
+
+// 以前の記録（連続正解の回数を持っていないもの）を、新しい判定に合わせて一度だけ変換する。
+// これまでに習得扱いだった単語はそのまま習得のままにし、
+// 正解したことがある単語は「あと1回で習得」の状態から再開できるようにする。
+const STREAK_MIGRATION_KEY = 'wscroll_streak_migrated';
+function migrateToStreak() {
+  try {
+    if (localStorage.getItem(STREAK_MIGRATION_KEY) === '1') return;
+    UNITS.forEach(u => ['qzp', 'typ', 'stp'].forEach(kind => {
+      const key = lsFor(u.id, kind);
+      let dict = null;
+      try { dict = JSON.parse(localStorage.getItem(key)); } catch(e) {}
+      if (!dict || typeof dict !== 'object') return;
+      let changed = false;
+      Object.keys(dict).forEach(en => {
+        const p = dict[en];
+        if (!p || typeof p.streak === 'number') return;
+        const total = (p.correct || 0) + (p.wrong || 0);
+        const acc = total ? (p.correct || 0) / total * 100 : 0;
+        p.streak = acc >= 80 ? MASTERY_STREAK : ((p.correct || 0) > 0 ? 1 : 0);
+        changed = true;
+      });
+      if (changed) localStorage.setItem(key, JSON.stringify(dict));
+    }));
+    localStorage.setItem(STREAK_MIGRATION_KEY, '1');
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
 //  OVERVIEW (all-Units learning status)
 // ══════════════════════════════════════════
 // Reads a real Unit's stats straight from localStorage (not the live
@@ -1847,9 +1922,9 @@ function computeUnitStats(u) {
   try { typ = JSON.parse(localStorage.getItem(lsFor(u.id, 'typ'))) || {}; } catch(e) {}
   try { stp = JSON.parse(localStorage.getItem(lsFor(u.id, 'stp'))) || {}; } catch(e) {}
   const typingWords = u.words.filter(w => w.productive);
-  const qzMastered = u.words.filter(w => memOf(qzp, w) >= 80).length;
-  const tyMastered = typingWords.filter(w => memOf(typ, w) >= 80).length;
-  const stMastered = u.words.filter(w => memOf(stp, w) >= 80).length;
+  const qzMastered = u.words.filter(w => isMastered(qzp, w)).length;
+  const tyMastered = typingWords.filter(w => isMastered(typ, w)).length;
+  const stMastered = u.words.filter(w => isMastered(stp, w)).length;
   return {
     qzMastered, qzTotal: u.words.length,
     tyMastered, tyTotal: typingWords.length,
@@ -1965,12 +2040,12 @@ function collectWeakWords(limit) {
       const wrong = q.wrong + t.wrong + s.wrong;
       const correct = q.correct + t.correct + s.correct;
       const accuracy = (correct + wrong) ? Math.round(correct/(correct+wrong)*100) : 0;
-      // Only surface words still below the app's own "mastered" bar (80%,
-      // same threshold as the trophy/mastery bars elsewhere) — once enough
-      // correct practice brings a word's accuracy back up, it naturally
-      // drops off this list instead of staying flagged forever just
-      // because it was missed once, long ago.
-      if (wrong > 0 && accuracy < 80) {
+      // 間違えたことがあり、まだどこかのモードで習得できていない単語だけを出す。
+      // 連続正解で習得になればこの一覧から自然に外れるので、
+      // 昔1回間違えただけの単語がいつまでも残り続けることはない。
+      const notMasteredYet = !isMastered(qzp, w) || !isMastered(stp, w) ||
+                             (w.productive && !isMastered(typ, w));
+      if (wrong > 0 && notMasteredYet) {
         out.push({ word: w, unitId: u.id, unitTitle: u.title, wrong, correct, accuracy });
       }
     });
@@ -2011,8 +2086,10 @@ function recordWWProgress(unitId, en, ok) {
   const key = lsFor(unitId, 'qzp');
   let dict = {};
   try { dict = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) {}
-  if (!dict[en]) dict[en] = { correct: 0, wrong: 0 };
-  if (ok) dict[en].correct++; else dict[en].wrong++;
+  if (!dict[en]) dict[en] = { correct: 0, wrong: 0, streak: 0 };
+  const p = dict[en];
+  if (typeof p.streak !== 'number') p.streak = 0;
+  if (ok) { p.correct++; p.streak++; } else { p.wrong++; p.streak = 0; }
   localStorage.setItem(key, JSON.stringify(dict));
   // Keep the in-memory quizProgress in sync too when the word's own Unit
   // happens to also be the one currently selected, so that Unit's own home
@@ -2098,9 +2175,16 @@ function finishWW() {
 
 function record(w, ok) {
   let dict = currentMode === 'quiz' ? quizProgress : currentMode === 'typing' ? typingProgress : sentenceProgress;
-  if (!dict[w.en]) dict[w.en] = {correct:0, wrong:0};
-  if (ok) { dict[w.en].correct++; mStreak++; if (mStreak > mMaxStreak) mMaxStreak = mStreak; }
-  else    { dict[w.en].wrong++;   mStreak = 0; }
+  if (!dict[w.en]) dict[w.en] = {correct:0, wrong:0, streak:0};
+  const p = dict[w.en];
+  if (typeof p.streak !== 'number') p.streak = 0;
+  if (ok) {
+    p.correct++; p.streak++;                       // 連続正解を1つ進める
+    mStreak++; if (mStreak > mMaxStreak) mMaxStreak = mStreak;
+  } else {
+    p.wrong++; p.streak = 0;                       // 間違えたら連続正解はやり直し
+    mStreak = 0;
+  }
 }
 
 function addPts(pts) {
@@ -2255,9 +2339,9 @@ function resetProgress() {
 // ══════════════════════════════════════════
 function checkTrophy() {
   const typingWords = words.filter(w => w.productive);
-  const qzMastered = words.filter(w => memQuiz(w) >= 80).length;
-  const tyMastered = typingWords.filter(w => memTyping(w) >= 80).length;
-  const stMastered = words.filter(w => memSentence(w) >= 80).length;
+  const qzMastered = words.filter(masteredQuiz).length;
+  const tyMastered = typingWords.filter(masteredTyping).length;
+  const stMastered = words.filter(masteredSentence).length;
   const qzTotal = words.length, tyTotal = typingWords.length, stTotal = words.length;
 
   if (!goldTrophyEarned && qzMastered===qzTotal && tyMastered===tyTotal && stMastered===stTotal) {
@@ -2339,9 +2423,14 @@ function flipCard() {
 function renderList() {
   const wrap = document.getElementById('wl-body');
   wrap.innerHTML = '';
-  const dot = m => m>=80 ? 'var(--good)' : m>=50 ? 'var(--warn)' : 'var(--border-strong)';
+  // 連続正解の回数で「習得」が決まるので、残り何回で習得かが分かるように表示する
+  const color = s => s >= MASTERY_STREAK ? 'var(--good)' : s > 0 ? 'var(--warn)' : 'var(--border-strong)';
+  const mark  = s => s >= MASTERY_STREAK ? '習得' : s > 0 ? 'あと1回' : '未';
   words.forEach(w => {
-    const qm = memQuiz(w), tm = w.productive ? memTyping(w) : null, sm = memSentence(w);
+    const qs = streakOf(quizProgress, w);
+    const ts = w.productive ? streakOf(typingProgress, w) : null;
+    const ss = streakOf(sentenceProgress, w);
+    const tip = (label, m) => `${label} 正答率${m}%`;
     const badge = w.phrase ? '<span class="wl-badge phrase">表現</span>' : (w.productive ? '<span class="wl-badge prod">発信</span>' : '');
     const row = document.createElement('div');
     row.className = 'wl-row';
@@ -2349,9 +2438,9 @@ function renderList() {
       <div class="wl-head"><span class="wl-en">${w.en}</span>${badge}</div>
       <div class="wl-ja">${w.ja}</div>
       <div class="wl-meters">
-        <div class="wl-meter"><span class="dot" style="background:${dot(qm)}"></span>🎯${qm}%</div>
-        <div class="wl-meter"><span class="dot" style="background:${tm===null?'var(--border)':dot(tm)}"></span>⌨️${tm===null?'—':tm+'%'}</div>
-        <div class="wl-meter"><span class="dot" style="background:${dot(sm)}"></span>📝${sm}%</div>
+        <div class="wl-meter" title="${tip('Quiz', memQuiz(w))}"><span class="dot" style="background:${color(qs)}"></span>🎯${mark(qs)}</div>
+        <div class="wl-meter" title="${ts===null?'発信語彙ではありません':tip('Typing', memTyping(w))}"><span class="dot" style="background:${ts===null?'var(--border)':color(ts)}"></span>⌨️${ts===null?'—':mark(ts)}</div>
+        <div class="wl-meter" title="${tip('Sentence', memSentence(w))}"><span class="dot" style="background:${color(ss)}"></span>📝${mark(ss)}</div>
       </div>`;
     wrap.appendChild(row);
   });
@@ -2360,13 +2449,44 @@ function renderList() {
 // ══════════════════════════════════════════
 //  MODE START / END (Quiz, Typing, Sentence)
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  「まだ習得していない単語だけ出題する」設定
+//  すでに覚えた単語を解き直さずに済むようにするためのもの。
+//  設定は端末に保存され、Quiz / Typing / Sentence のすべてに効く。
+// ══════════════════════════════════════════
+const ONLY_UNMASTERED_KEY = 'wscroll_only_unmastered';
+function onlyUnmastered() {
+  try { return localStorage.getItem(ONLY_UNMASTERED_KEY) === '1'; } catch(e) { return false; }
+}
+function toggleOnlyUnmastered() {
+  const on = document.getElementById('only-unmastered').checked;
+  try { localStorage.setItem(ONLY_UNMASTERED_KEY, on ? '1' : '0'); } catch(e) {}
+  updateHome();
+}
+/** 出題する単語を絞り込む。全部習得済みのときは、いつもどおり全単語から出す。 */
+function pickPool(pool, dict) {
+  if (!onlyUnmastered()) return pool;
+  const rest = pool.filter(w => !isMastered(dict, w));
+  if (rest.length === 0) {
+    notif('✅ すべて習得済みです。全単語から出題します', 'ok');
+    return pool;
+  }
+  return rest;
+}
+
 function startMode(mode) {
   if (mode === 'quiz' && words.length < 4) { notif('クイズには4語以上必要です', 'err'); return; }
   currentMode = mode;
   idx = 0; mOk = 0; mNg = 0; mScore = 0; mStreak = 0; mMaxStreak = 0;
 
-  if (mode === 'quiz')     { queue = [...words].sort(() => Math.random()-.5); go('quiz'); startQZ(); }
-  if (mode === 'sentence') { queue = [...words].sort(() => Math.random()-.5); go('sentence'); startST(); }
+  if (mode === 'quiz') {
+    queue = pickPool(words, quizProgress).slice().sort(() => Math.random()-.5);
+    go('quiz'); startQZ();
+  }
+  if (mode === 'sentence') {
+    queue = pickPool(words, sentenceProgress).slice().sort(() => Math.random()-.5);
+    go('sentence'); startST();
+  }
 }
 
 function startTY(m) {
@@ -2375,7 +2495,7 @@ function startTY(m) {
   idx = 0; mOk = 0; mNg = 0; mScore = 0; mStreak = 0; mMaxStreak = 0;
   const pool = words.filter(w => w.productive);
   if (pool.length === 0) { notif('発信語彙がありません', 'err'); return; }
-  queue = pool.sort(() => Math.random()-.5);
+  queue = pickPool(pool, typingProgress).slice().sort(() => Math.random()-.5);
   go('typing'); loadTY();
 }
 
