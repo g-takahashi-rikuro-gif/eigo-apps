@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>せつめいチャレンジ(関係代名詞)</title>
+<style>
+  :root {
+    --bg: #fffaf0; --ink: #3b3b4f; --main: #ff8fab; --main-dark: #e86a8d;
+    --blue: #6ec6ff; --green: #7ed9a0; --yellow: #ffd45e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Meiryo", sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.5;
+  }
+  .screen { display: none; max-width: 900px; margin: 0 auto; padding: 20px 16px 40px; }
+  .screen.active { display: block; }
+  h1 { text-align: center; font-size: clamp(1.5rem, 5vw, 2.2rem); margin: 8px 0; color: var(--main-dark); }
+  .lead { text-align: center; margin: 0 0 20px; font-size: 1.05rem; }
+
+  button { font-family: inherit; cursor: pointer; border: none; }
+  .btn {
+    font-size: 1.2rem; font-weight: bold; padding: 16px 22px; min-height: 56px;
+    border-radius: 18px; color: #fff; box-shadow: 0 5px 0 rgba(0,0,0,.18);
+    transition: transform .08s, box-shadow .08s;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.18); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-pink { background: var(--main); }
+  .btn-blue { background: #4aa8e8; }
+  .btn-green { background: #3fbf79; }
+  .btn-gray { background: #9a9ab0; }
+  .btn-orange { background: #f5a623; }
+
+  /* モード切りかえ */
+  .modes { display: flex; gap: 12px; justify-content: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .mode {
+    flex: 1 1 200px; max-width: 300px; padding: 14px; border-radius: 18px; background: #fff;
+    border: 4px solid #e4e4ee; font-size: 1.1rem; font-weight: bold; color: var(--ink);
+  }
+  .mode small { display: block; font-weight: normal; font-size: .85rem; margin-top: 2px; }
+  .mode.selected { border-color: var(--main); background: #fff0f4; }
+  .step { font-weight: bold; text-align: center; margin: 18px 0 10px; font-size: 1.1rem; }
+
+  /* テーマカード */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .card {
+    border-radius: 22px; padding: 18px 8px; text-align: center; color: var(--ink);
+    box-shadow: 0 5px 0 rgba(0,0,0,.12); transition: transform .08s;
+  }
+  .card:active { transform: translateY(3px); }
+  .card .icon { font-size: 2.6rem; display: block; }
+  .card .name { font-weight: bold; font-size: 1.1rem; margin-top: 4px; display: block; }
+  .card .count { font-size: .95rem; display: block; margin-top: 2px; }
+
+  /* 練習画面 */
+  .topbar { display: flex; justify-content: space-between; align-items: center; min-height: 40px; margin-bottom: 8px; }
+  .badge { background: var(--yellow); border-radius: 999px; padding: 6px 16px; font-weight: bold; }
+  .topic-box {
+    background: #fff; border-radius: 28px; padding: 24px 12px; text-align: center;
+    box-shadow: 0 6px 0 rgba(0,0,0,.1); border: 4px solid #ffe0ea;
+  }
+  .topic-pic { font-size: clamp(6rem, 28vw, 10rem); line-height: 1.1; }
+  .topic-pic img { max-width: 70%; max-height: 220px; object-fit: contain; }
+  .topic-name { font-size: clamp(1.8rem, 8vw, 3rem); font-weight: bold; margin-top: 4px; }
+  .topic-en { font-size: clamp(1.3rem, 6vw, 2rem); color: #e86a8d; font-weight: bold; margin-top: 2px; }
+  .theme-tag { font-size: .95rem; color: #777; }
+  .task { text-align: center; margin: 14px 0; font-weight: bold; }
+  .hint-area { min-height: 64px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 10px 0 16px; }
+  .hint-chip {
+    background: #d9f3ff; border: 3px solid #8fd3f4; border-radius: 16px; padding: 8px 18px;
+    font-size: 1.5rem; font-weight: bold; animation: pop .25s;
+  }
+  @keyframes pop { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .actions .wide { grid-column: 1 / -1; }
+  .home-link { background: none; color: #777; font-size: 1rem; text-decoration: underline; padding: 8px; }
+
+  /* お題一覧 */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px; }
+  .filter { padding: 10px 16px; border-radius: 999px; background: #fff; border: 3px solid #e4e4ee; font-weight: bold; font-size: 1rem; color: var(--ink); }
+  .filter.selected { border-color: var(--main); background: #fff0f4; }
+  .table-wrap { background: #fff; border-radius: 18px; box-shadow: 0 5px 0 rgba(0,0,0,.1); overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f0e6e0; }
+  th { background: #ffe3ea; position: sticky; top: 0; }
+  td.emo { font-size: 1.8rem; text-align: center; padding: 6px; }
+  td.emo img { width: 36px; height: 36px; object-fit: contain; }
+
+  /* 終了画面 */
+  .finish { text-align: center; padding-top: 40px; }
+  .finish .big { font-size: 5rem; }
+  .finish .row { display: flex; flex-direction: column; gap: 14px; max-width: 360px; margin: 24px auto 0; }
+
+  @media (min-width: 600px) { .actions { grid-template-columns: repeat(3, 1fr); } .actions .wide { grid-column: auto; } }
+</style>
+</head>
+<body>
+
+<!-- ホーム画面 -->
+<section id="home" class="screen active">
+  <h1>🗣️ せつめいチャレンジ</h1>
+
+  <div class="step">① モードをえらぼう</div>
+  <div class="modes">
+    <button class="mode selected" data-mode="random">🎲 ランダムモード<small>お題がランダムに出るよ</small></button>
+    <button class="mode" data-mode="order">🔢 順番モード<small>決まった順番で出るよ</small></button>
+  </div>
+
+  <div class="step">② テーマをえらぼう</div>
+  <div class="cards" id="cards"></div>
+
+  <div style="text-align:center; margin-top:28px;">
+    <button class="btn btn-blue" id="listBtn">📋 お題の一覧をみる</button>
+  </div>
+</section>
+
+<!-- お題一覧画面 -->
+<section id="list" class="screen">
+  <div class="topbar">
+    <button class="home-link" id="listHomeBtn">🏠 ホームにもどる</button>
+  </div>
+  <h1>📋 お題の一覧</h1>
+  <div class="filters" id="filters"></div>
+  <div class="table-wrap">
+    <table id="topicTable">
+      <thead><tr><th>テーマ</th><th></th><th>日本語</th><th>English</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 練習画面 -->
+<section id="practice" class="screen">
+  <div class="topbar">
+    <button class="home-link" id="homeBtn">🏠 ホームにもどる</button>
+    <span class="badge" id="progress"></span>
+  </div>
+  <div class="topic-box">
+    <div class="theme-tag" id="themeTag"></div>
+    <div class="topic-pic" id="pic"></div>
+    <div class="topic-name" id="nameJa"></div>
+    <div class="topic-en" id="nameEn"></div>
+  </div>
+  <div class="hint-area" id="hintArea"></div>
+  <div class="actions">
+    <button class="btn btn-orange" id="hintBtn">💡 ヒント</button>
+    <button class="btn btn-gray" id="skipBtn">⏭️ スキップ</button>
+    <button class="btn btn-pink wide" id="nextBtn">次へ ▶</button>
+  </div>
+</section>
+
+<!-- 終了画面(順番モード) -->
+<section id="finish" class="screen">
+  <div class="finish">
+    <div class="big">🎉</div>
+    <h1>ぜんぶ終わったよ!</h1>
+    <p class="lead" id="finishText"></p>
+    <div class="row">
+      <button class="btn btn-green" id="retryBtn">🔁 もう一度</button>
+      <button class="btn btn-blue" id="finishHomeBtn">🏠 ホームにもどる</button>
+    </div>
+  </div>
+</section>
+
+<script src="data.js"></script>
+<script>
+  const ALL = "ぜんぶ";
+  let mode = "random";
+  let pool = [];        // 今回の出題対象
+  let queue = [];       // まだ出ていないお題
+  let index = 0;        // 順番モードの現在位置
+  let current = null;
+  let hintCount = 0;
+  let currentTheme = ALL;
+
+  const $ = id => document.getElementById(id);
+  function show(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    $(id).classList.add("active");
+    window.scrollTo(0, 0);
+  }
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // ホーム画面のカードを作る
+  function buildCards() {
+    const box = $("cards");
+    box.innerHTML = "";
+    const make = (icon, name, count, color, theme) => {
+      const b = document.createElement("button");
+      b.className = "card";
+      b.style.background = color;
+      b.innerHTML = `<span class="icon">${icon}</span><span class="name">${name}</span><span class="count">${count}問</span>`;
+      b.addEventListener("click", () => start(theme));
+      box.appendChild(b);
+    };
+    make("🌈", "ぜんぶ", TOPICS.length, "#ffe3f1", ALL);
+    THEMES.forEach(t => {
+      const n = TOPICS.filter(x => x.theme === t.name).length;
+      if (n > 0) make(t.icon, t.name, n, t.color, t.name);
+    });
+  }
+
+  document.querySelectorAll(".mode").forEach(b => {
+    b.addEventListener("click", () => {
+      mode = b.dataset.mode;
+      document.querySelectorAll(".mode").forEach(x => x.classList.toggle("selected", x === b));
+    });
+  });
+
+  function start(theme) {
+    currentTheme = theme;
+    pool = theme === ALL ? TOPICS.slice() : TOPICS.filter(t => t.theme === theme);
+    if (pool.length === 0) return;
+    index = 0;
+    if (mode === "random") queue = shuffle(pool);
+    show("practice");
+    nextTopic();
+  }
+
+  // 順番モード:データの順に出す / ランダムモード:シャッフルしたお題を1回ずつ出す(重複なし)
+  function nextTopic() {
+    if (mode === "order") {
+      if (index >= pool.length) { finish(); return; }
+      current = pool[index];
+      index++;
+      $("progress").textContent = `${index} / ${pool.length}`;
+    } else {
+      if (queue.length === 0) { finish(); return; }
+      current = queue.shift();
+      index++;
+      $("progress").textContent = `${index} / ${pool.length}`;
+    }
+    render();
+  }
+
+  function render() {
+    hintCount = 0;
+    $("hintArea").innerHTML = "";
+    $("hintBtn").disabled = false;
+    $("themeTag").textContent = current.theme;
+    $("nameJa").textContent = current.nameJa;
+    $("nameEn").textContent = current.nameEn ? `(${current.nameEn})` : "";
+    const pic = $("pic");
+    if (current.image) {
+      pic.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = current.image;
+      img.alt = current.nameJa;
+      img.onerror = () => { pic.textContent = current.emoji || "❓"; };
+      pic.appendChild(img);
+    } else {
+      pic.textContent = current.emoji || "❓";
+    }
+  }
+
+  $("hintBtn").addEventListener("click", () => {
+    const hints = (current.hints || []).slice(0, 3); // 最大3つまで
+    if (hintCount >= hints.length) return;
+    const chip = document.createElement("span");
+    chip.className = "hint-chip";
+    chip.textContent = hints[hintCount];
+    $("hintArea").appendChild(chip);
+    hintCount++;
+    if (hintCount >= hints.length) $("hintBtn").disabled = true;
+  });
+
+  $("nextBtn").addEventListener("click", nextTopic);
+  $("skipBtn").addEventListener("click", nextTopic);
+  $("homeBtn").addEventListener("click", () => show("home"));
+  $("finishHomeBtn").addEventListener("click", () => show("home"));
+  $("retryBtn").addEventListener("click", () => start(currentTheme));
+
+  function finish() {
+    $("finishText").textContent = `「${currentTheme}」の ${pool.length}問、おつかれさま!`;
+    show("finish");
+  }
+
+  // お題一覧(表)
+  function buildList(theme) {
+    const fbox = $("filters");
+    fbox.innerHTML = "";
+    [ALL, ...THEMES.map(t => t.name)].forEach(name => {
+      const b = document.createElement("button");
+      b.className = "filter" + (name === theme ? " selected" : "");
+      b.textContent = name;
+      b.addEventListener("click", () => buildList(name));
+      fbox.appendChild(b);
+    });
+    const body = document.querySelector("#topicTable tbody");
+    body.innerHTML = "";
+    TOPICS.filter(t => theme === ALL || t.theme === theme).forEach(t => {
+      const tr = document.createElement("tr");
+      const cells = [t.theme, null, t.nameJa, t.nameEn || ""];
+      cells.forEach((text, i) => {
+        const td = document.createElement("td");
+        if (i === 1) {
+          td.className = "emo";
+          if (t.image) {
+            const img = document.createElement("img");
+            img.src = t.image; img.alt = t.nameJa;
+            img.onerror = () => { td.textContent = t.emoji || ""; };
+            td.appendChild(img);
+          } else td.textContent = t.emoji || "";
+        } else td.textContent = text;
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }
+  $("listBtn").addEventListener("click", () => { buildList(ALL); show("list"); });
+  $("listHomeBtn").addEventListener("click", () => show("home"));
+
+  buildCards();
+</script>
+</body>
+</html>
