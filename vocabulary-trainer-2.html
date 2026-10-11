@@ -1763,6 +1763,11 @@ function loadUnitState() {
   allTimeMaxStreak   = parseInt(localStorage.getItem(ls('streak'))) || 0;
   silverTrophyEarned = localStorage.getItem(ls('trophy_silver')) === '1';
   goldTrophyEarned   = localStorage.getItem(ls('trophy_gold'))   === '1';
+  // 以前の不具合で金だけ獲得して銀が付いていない記録を、開いたときに直す
+  if (goldTrophyEarned && !silverTrophyEarned) {
+    silverTrophyEarned = true;
+    try { localStorage.setItem(ls('trophy_silver'), '1'); } catch(e) {}
+  }
   lcIdx = 0;
 }
 
@@ -2412,6 +2417,12 @@ function checkTrophy() {
   if (!goldTrophyEarned && qzMastered===qzTotal && tyMastered===tyTotal && stMastered===stTotal) {
     goldTrophyEarned = true;
     localStorage.setItem(ls('trophy_gold'), '1');
+    // 金の条件（全モード100%）を満たしていれば銀の条件（80%）も満たしているので、
+    // 1回目で満点を取った場合でも銀を取りそこねないように、ここで一緒に獲得にする
+    if (!silverTrophyEarned) {
+      silverTrophyEarned = true;
+      localStorage.setItem(ls('trophy_silver'), '1');
+    }
     saveVocabSummary();
     setTimeout(() => showTrophyAnimation('gold'), 600);
     return;
@@ -2671,8 +2682,9 @@ function qzAns(i) {
 // ══════════════════════════════════════════
 function checkAnswer(w, ans) {
   const a = ans.trim().toLowerCase();
-  const accepted = w.accept || [w.en.toLowerCase()];
-  return accepted.includes(a);
+  const accepted = w.accept || [w.en];
+  // 正解候補にMrs.のような大文字が含まれていても正しく判定できるよう、両方を小文字にして比べる
+  return accepted.some(function (x) { return String(x).trim().toLowerCase() === a; });
 }
 // The canonical spelling a student should actually type — accept[0] strips
 // dictionary notation like "(s)"/"(ed)" that w.en carries for display only.
