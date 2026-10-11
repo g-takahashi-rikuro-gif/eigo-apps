@@ -1547,7 +1547,9 @@ const UNITS = [
   { id: "g1_unit6", title: "Unit 6", words: G1_U6_WORDS },
   { id: "g1_unit7", title: "Unit 7", words: G1_U7_WORDS },
   { id: "g1_unit8", title: "Unit 8", words: G1_U8_WORDS },
-  { id: "g1_summary", title: "まとめ", words: G1_SUMMARY_WORDS, isSummary: true },
+  // 「まとめ」はまだ出さない。1年生は未収録のUnitが残っているため、
+  // 全Unitを入れ終わってから下の行の // を外すこと（G1_SUMMARY_WORDS の中身も自動で増える）。
+  // { id: "g1_summary", title: "まとめ", words: G1_SUMMARY_WORDS, isSummary: true },
 ];
 
 // ══════════════════════════════════════════
@@ -3690,8 +3692,8 @@ function notif(msg, type='ok') {
 init();
 </script>
 <!-- 進捗をサーバーへ送るための共通モジュール（生徒登録が済んでいる場合のみ働く） -->
-<script src="進捗同期.js?v=20261012"></script>
-<script src="お知らせ.js?v=20261012"></script>
+<script src="進捗同期.js?v=20261012b"></script>
+<script src="お知らせ.js?v=20261012b"></script>
 <script>
   // 上のモジュールが読み込まれた時点で、すでに作られている要約を送信する
   if (window.ProgressSync) window.ProgressSync.sync(false);
