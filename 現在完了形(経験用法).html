@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>現在完了形（経験用法）学習アプリ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px 16px 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .app {
+      background: #fff;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 680px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    /* ===== ヘッダー ===== */
+    .app-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 24px;
+    }
+    .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+    .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+
+    /* ===== ページ管理 ===== */
+    .page { display: none; padding: 24px; }
+    .page.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ===== ボタン共通 ===== */
+    .btn {
+      display: inline-block;
+      padding: 13px 28px;
+      border-radius: 50px;
+      border: none;
+      font-size: 0.95em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary   { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+    .btn-green     { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+    .btn-orange    { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+    .btn-red       { background: linear-gradient(135deg,#ff416c,#ff4b2b); color:#fff; }
+    .btn-gray      { background: #f0f0f0; color:#555; }
+    .btn-block     { display: block; width: 100%; margin-bottom: 10px; text-align: center; }
+
+    /* ===== タイトルページ ===== */
+    #page-title { text-align: center; padding-top: 36px; }
+    .title-icon  { font-size: 5em; margin-bottom: 12px; }
+    .title-main  { font-size: 1.7em; font-weight: 900; color: #5B6CF5; margin-bottom: 6px; }
+    .title-sub   { font-size: 0.95em; color: #888; margin-bottom: 32px; }
+    .title-tagline {
+      display: inline-block;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: white;
+      border-radius: 50px;
+      padding: 6px 18px;
+      font-size: 0.85em;
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+
+    /* ===== 文法説明ページ ===== */
+    .grammar-section {
+      background: #f8f9ff;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .grammar-section h3 {
+      font-size: 1em;
+      font-weight: 800;
+      color: #5B6CF5;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .formula-box {
+      background: #5B6CF5;
+      color: white;
+      border-radius: 12px;
+      padding: 13px 18px;
+      font-size: 1em;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    .formula-box span { opacity: 0.75; font-weight: 400; font-size: 0.85em; }
+    .example-row {
+      background: white;
+      border-left: 4px solid #43e97b;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+    }
+    .example-row .en { font-weight: 700; color: #333; font-size: 0.95em; }
+    .example-row .en em { color: #5B6CF5; font-style: normal; }
+    .example-row .ja { color: #777; font-size: 0.83em; margin-top: 3px; }
+    .kw-table { width: 100%; border-collapse: collapse; font-size: 0.88em; margin-top: 8px; }
+    .kw-table th { background:#5B6CF5; color:#fff; padding:7px 12px; text-align:left; }
+    .kw-table td { padding:7px 12px; border-bottom:1px solid #eee; }
+    .kw-table tr:last-child td { border-bottom:none; }
+    .kw { background:#fff3cd; border-radius:4px; padding:2px 7px; font-weight:700; color:#856404; }
+    .notice {
+      background:#fff9c4;
+      border:1px solid #ffe082;
+      border-radius:10px;
+      padding:10px 14px;
+      font-size:0.85em;
+      color:#6d4c00;
+      margin-top: 16px;
+    }
+    .notice strong { color:#5B6CF5; }
+
+    /* ===== メニューページ ===== */
+    .menu-title { font-size:1.15em; font-weight:800; color:#333; margin-bottom:8px; }
+    .menu-sub   { font-size:0.88em; color:#888; margin-bottom:22px; }
+    .menu-grid  { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    .menu-card {
+      border: 2.5px solid #e8e8e8;
+      border-radius: 16px;
+      padding: 20px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.18s;
+      background: white;
+    }
+    .menu-card:hover { border-color:#5B6CF5; background:#f8f9ff; transform:translateY(-2px); box-shadow:0 6px 20px rgba(91,108,245,0.15); }
+    .menu-card.full-width { grid-column: 1 / -1; }
+    .menu-card .mc-icon  { font-size:2.2em; margin-bottom:8px; }
+    .menu-card .mc-title { font-weight:800; color:#333; margin-bottom:3px; font-size:0.95em; }
+    .menu-card .mc-count { font-size:0.78em; color:#aaa; margin-bottom:4px; }
+    .menu-card .mc-desc  { font-size:0.78em; color:#888; }
+    .menu-card.full-width .mc-icon { font-size:1.8em; }
+    .menu-card.full-width { border-color:#f7971e; background:linear-gradient(135deg,#fff9f0,#fff); }
+    .menu-card.full-width:hover { border-color:#f7971e; background:linear-gradient(135deg,#fff3e0,#fff); }
+    .mc-achievement {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 800;
+      background: #f0f0f0;
+      color: #bbb;
+    }
+    .mc-achievement.low    { background:#fff0f3; color:#e05; }
+    .mc-achievement.mid    { background:#fff9c4; color:#856404; }
+    .mc-achievement.high   { background:#e8fff5; color:#1a7a45; }
+    .mc-achievement.perfect{ background:linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+
+    /* ===== プログレスバー ===== */
+    .progress-area { margin-bottom:18px; }
+    .progress-info { display:flex; justify-content:space-between; font-size:0.8em; color:#888; margin-bottom:6px; }
+    .progress-bar-bg { background:#e8e8e8; border-radius:10px; height:7px; overflow:hidden; }
+    .progress-bar-fill { background:linear-gradient(90deg,#667eea,#764ba2); height:100%; border-radius:10px; transition:width 0.4s ease; }
+
+    /* ===== 問題ヘッダー ===== */
+    .quiz-header { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+    .back-btn { background:none; border:none; font-size:1.4em; cursor:pointer; color:#bbb; padding:2px; line-height:1; }
+    .back-btn:hover { color:#5B6CF5; }
+    .quiz-header-title { font-size:1em; font-weight:800; color:#333; }
+    .quiz-type-badge {
+      margin-left: auto;
+      background: #f0f2ff;
+      color: #5B6CF5;
+      font-size: 0.75em;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* ===== 問題カード ===== */
+    .q-card { background:#f8f9ff; border-radius:16px; padding:18px 20px; margin-bottom:16px; }
+    .q-label { font-size:0.75em; font-weight:700; color:#5B6CF5; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+    .q-text  { font-size:1.05em; font-weight:700; color:#333; line-height:1.6; }
+    .q-text em { color:#5B6CF5; font-style:normal; border-bottom:2px solid #5B6CF5; }
+    .q-ja    { font-size:0.85em; color:#888; margin-top:6px; }
+
+    /* ===== 並べ替え ===== */
+    .sort-area-label { font-size:0.78em; color:#888; margin-bottom:5px; }
+    .answer-area {
+      display:flex; flex-wrap:wrap; gap:7px;
+      padding:14px;
+      background:#fff9e6;
+      border-radius:12px;
+      border:2px dashed #ffc107;
+      min-height:54px;
+      margin-bottom:10px;
+    }
+    .word-bank {
+      display:flex; flex-wrap:wrap; gap:7px;
+      padding:14px;
+      background:white;
+      border-radius:12px;
+      border:2px dashed #ddd;
+      min-height:54px;
+      margin-bottom:14px;
+    }
+    .word-chip {
+      background:#5B6CF5;
+      color:white;
+      border:none;
+      border-radius:20px;
+      padding:7px 14px;
+      font-size:0.9em;
+      font-weight:700;
+      cursor:pointer;
+      transition:all 0.12s;
+      user-select:none;
+    }
+    .word-chip:hover:not(:disabled) { background:#4a5bd4; transform:scale(1.05); }
+    .word-chip.in-answer { background:#f7971e; }
+    .word-chip.in-answer:hover:not(:disabled) { background:#e08810; }
+    .word-chip:disabled { cursor:not-allowed; }
+
+    /* ===== 選択問題 ===== */
+    .choice-list { display:grid; gap:9px; margin-bottom:14px; }
+    .choice-btn {
+      display:block; width:100%;
+      padding:13px 16px;
+      background:white;
+      border:2px solid #ddd;
+      border-radius:12px;
+      text-align:left;
+      font-size:0.92em;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.12s;
+      color:#333;
+    }
+    .choice-btn:hover:not(:disabled) { border-color:#5B6CF5; background:#f0f2ff; }
+    .choice-btn.correct { border-color:#43e97b!important; background:#e8fff5!important; color:#1a7a45!important; }
+    .choice-btn.wrong   { border-color:#ff416c!important; background:#fff0f3!important; color:#c0392b!important; }
+    .choice-btn.reveal  { border-color:#43e97b!important; background:#e8fff5!important; color:#1a7a45!important; }
+    .choice-mark { float:right; font-size:1.1em; }
+
+    /* ===== フィードバック ===== */
+    .feedback {
+      border-radius:12px;
+      padding:12px 16px;
+      margin-bottom:14px;
+      font-weight:700;
+      font-size:0.92em;
+      line-height:1.5;
+      display:none;
+    }
+    .feedback.correct { background:#e8fff5; color:#1a7a45; border-left:4px solid #43e97b; display:block; }
+    .feedback.wrong   { background:#fff0f3; color:#c0392b; border-left:4px solid #ff416c; display:block; }
+
+    /* ===== ヒント ===== */
+    .hint-area { margin-bottom:12px; }
+    .hint-box {
+      background:#fffbee;
+      border:1.5px dashed #ffc107;
+      border-radius:12px;
+      padding:11px 14px;
+      font-size:0.87em;
+      color:#6d4c00;
+      margin-top:8px;
+      display:none;
+    }
+    .hint-box.visible { display:block; }
+    .hint-label { font-weight:700; color:#f59e0b; margin-bottom:3px; font-size:0.9em; }
+
+    /* ===== 会話練習 ===== */
+    .speech-q-box {
+      text-align:center;
+      background:linear-gradient(135deg,#f0f2ff,#e8eaff);
+      border-radius:16px;
+      padding:22px 20px;
+      margin-bottom:18px;
+    }
+    .speech-q-box .sq-label { font-size:0.78em; font-weight:700; color:#5B6CF5; letter-spacing:1px; margin-bottom:8px; }
+    .speech-q-box .sq-text  { font-size:1.2em; font-weight:800; color:#333; margin-bottom:6px; }
+    .speech-q-box .sq-ja    { font-size:0.85em; color:#888; }
+
+    .accepted-box { background:#f8f9ff; border-radius:12px; padding:12px 16px; margin-bottom:14px; }
+    .accepted-box .ac-label { font-size:0.78em; color:#888; margin-bottom:6px; font-weight:700; }
+    .accepted-chip {
+      display:inline-block;
+      background:white;
+      border:1.5px solid #ddd;
+      border-radius:20px;
+      padding:4px 12px;
+      font-size:0.82em;
+      font-weight:700;
+      color:#333;
+      margin:3px;
+    }
+
+    .mic-btn {
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      width:100%; padding:16px;
+      border-radius:50px;
+      border:none;
+      font-size:1em; font-weight:700;
+      cursor:pointer;
+      transition:all 0.2s;
+      margin-bottom:10px;
+    }
+    .mic-btn.ready     { background:linear-gradient(135deg,#667eea,#764ba2); color:white; }
+    .mic-btn.listening { background:linear-gradient(135deg,#ff416c,#ff4b2b); color:white; animation:pulse 1s infinite; }
+    .mic-btn.done      { background:#e0e0e0; color:#888; cursor:not-allowed; }
+    @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.015);} }
+    .mic-btn .mic-icon { font-size:1.3em; }
+
+    .speech-result {
+      text-align:center;
+      border-radius:12px;
+      padding:12px 14px;
+      font-weight:700;
+      margin-bottom:12px;
+      display:none;
+    }
+    .speech-result.correct { background:#e8fff5; color:#1a7a45; border-left:4px solid #43e97b; display:block; text-align:left; }
+    .speech-result.wrong   { background:#fff0f3; color:#c0392b; border-left:4px solid #ff416c; display:block; text-align:left; }
+
+    .recognized-text {
+      font-size:0.82em;
+      color:#aaa;
+      text-align:center;
+      margin-bottom:8px;
+      min-height:20px;
+    }
+
+    .no-speech-notice {
+      background:#fff3e0;
+      border:1.5px dashed #ffb300;
+      border-radius:12px;
+      padding:12px 16px;
+      font-size:0.85em;
+      color:#6d4c00;
+      margin-bottom:14px;
+      display:none;
+    }
+
+    /* ===== ナビゲーションボタン ===== */
+    .nav-area { display:flex; gap:10px; justify-content:flex-end; align-items:center; }
+    .nav-area .hint-toggle-btn {
+      background:none;
+      border:2px solid #ffc107;
+      border-radius:50px;
+      padding:9px 16px;
+      font-size:0.85em;
+      font-weight:700;
+      color:#856404;
+      cursor:pointer;
+      transition:all 0.15s;
+    }
+    .nav-area .hint-toggle-btn:hover { background:#fff9c4; }
+    .nav-spacer { flex:1; }
+
+    /* ===== 結果ページ ===== */
+    .result-circle {
+      width:130px; height:130px;
+      border-radius:50%;
+      background:linear-gradient(135deg,#667eea,#764ba2);
+      color:white;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      margin:0 auto 22px;
+      box-shadow:0 8px 28px rgba(102,126,234,0.45);
+    }
+    .result-circle .rc-num   { font-size:2.6em; font-weight:900; line-height:1; }
+    .result-circle .rc-denom { font-size:0.8em; opacity:0.85; }
+    .result-message { text-align:center; font-size:1.05em; font-weight:700; color:#333; margin-bottom:20px; }
+
+    .result-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:22px; }
+    .stat-card { background:#f8f9ff; border-radius:12px; padding:14px; text-align:center; }
+    .stat-card .sc-num   { font-size:1.55em; font-weight:900; color:#5B6CF5; }
+    .stat-card .sc-label { font-size:0.73em; color:#888; margin-top:3px; }
+
+    .wrong-section h3 { font-size:0.95em; font-weight:800; color:#ff416c; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .wrong-item {
+      background:#fff0f3;
+      border-left:4px solid #ff416c;
+      border-radius:10px;
+      padding:11px 14px;
+      margin-bottom:9px;
+    }
+    .wrong-item .wi-label { font-size:0.75em; color:#aaa; margin-bottom:3px; }
+    .wrong-item .wi-correct { font-weight:700; color:#333; font-size:0.92em; }
+    .wrong-item .wi-yours   { font-size:0.82em; color:#c0392b; margin-top:4px; }
+
+    .all-correct-msg {
+      text-align:center;
+      background:linear-gradient(135deg,#e8fff5,#f0fff8);
+      border-radius:16px;
+      padding:22px;
+      color:#1a7a45;
+      font-weight:700;
+      font-size:1em;
+      margin-bottom:22px;
+    }
+    .all-correct-msg .ac-icon { font-size:2.5em; margin-bottom:8px; }
+
+    .divider { height:1px; background:#eee; margin:18px 0; }
+    .page-subtitle { font-size:1.1em; font-weight:800; color:#333; margin-bottom:6px; }
+    .page-sub-desc  { font-size:0.88em; color:#888; margin-bottom:20px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ヘッダー -->
+  <div class="app-header">
+    <div class="hd-title">🌟 現在完了形（経験用法）</div>
+    <div class="hd-sub">中学3年生 英語学習アプリ</div>
+  </div>
+
+  <!-- ===== タイトル ===== -->
+  <div class="page active" id="page-title">
+    <div style="text-align:center; padding-top:30px;">
+      <div class="title-icon">📚</div>
+      <div class="title-main">現在完了形を<br>マスターしよう！</div>
+      <div class="title-sub">経験用法 — Have you ever ...?</div>
+      <div class="title-tagline">中3英語 ・ 全15問</div>
+      <br>
+      <button class="btn btn-primary" style="width:200px;" onclick="showPage('page-grammar')">
+        はじめる →
+      </button>
+      <br><br>
+      <button class="btn btn-gray" style="width:200px;" onclick="showPage('page-menu')">
+        説明をスキップ
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 文法説明 ===== -->
+  <div class="page" id="page-grammar">
+    <div class="page-subtitle">文法の確認</div>
+    <div class="page-sub-desc">現在完了形（経験用法）のポイントをおさえよう！</div>
+
+    <div class="grammar-section">
+      <h3>📌 基本の形</h3>
+      <div class="formula-box">
+        主語 + <span>have / has</span> + 過去分詞 <span>（+ ...）</span>
+      </div>
+      <div class="example-row">
+        <div class="en">I <em>have visited</em> Kyoto before.</div>
+        <div class="ja">私は以前、京都を訪れたことがあります。</div>
+      </div>
+      <div class="example-row">
+        <div class="en">She <em>has seen</em> this movie twice.</div>
+        <div class="ja">彼女はこの映画を2回見たことがある。</div>
+      </div>
+    </div>
+
+    <div class="grammar-section">
+      <h3>❓ 疑問文</h3>
+      <div class="formula-box">
+        <em>Have / Has</em> + 主語 + <em>ever</em> + 過去分詞 ...?
+      </div>
+      <div class="example-row">
+        <div class="en"><em>Have you ever</em> eaten sushi?</div>
+        <div class="ja">あなたは今までに寿司を食べたことがありますか？</div>
+      </div>
+      <div class="example-row">
+        <div class="en"><em>Has he ever</em> visited London?</div>
+        <div class="ja">彼はロンドンを訪れたことがありますか？</div>
+      </div>
+    </div>
+
+    <div class="grammar-section">
+      <h3>🚫 否定文</h3>
+      <div class="formula-box">
+        主語 + have / has + <em>never</em> + 過去分詞
+      </div>
+      <div class="example-row">
+        <div class="en">I have <em>never</em> seen snow.</div>
+        <div class="ja">私は一度も雪を見たことがありません。</div>
+      </div>
+    </div>
+
+    <div class="grammar-section">
+      <h3>🔑 キーワード一覧</h3>
+      <table class="kw-table">
+        <thead>
+          <tr><th>キーワード</th><th>意味</th><th>使う場面</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="kw">ever</span></td><td>今までに</td><td>疑問文</td></tr>
+          <tr><td><span class="kw">never</span></td><td>一度も〜ない</td><td>否定文</td></tr>
+          <tr><td><span class="kw">once</span></td><td>1回</td><td>肯定文</td></tr>
+          <tr><td><span class="kw">twice</span></td><td>2回</td><td>肯定文</td></tr>
+          <tr><td><span class="kw">〜 times</span></td><td>〜回</td><td>肯定文</td></tr>
+          <tr><td><span class="kw">before</span></td><td>以前に</td><td>肯定文</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grammar-section">
+      <h3>📝 よく使う不規則動詞</h3>
+      <table class="kw-table">
+        <thead>
+          <tr><th>原形</th><th>過去分詞</th><th>意味</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>go</td><td><span class="kw">been (to)</span></td><td>行く</td></tr>
+          <tr><td>see</td><td><span class="kw">seen</span></td><td>見る</td></tr>
+          <tr><td>eat</td><td><span class="kw">eaten</span></td><td>食べる</td></tr>
+          <tr><td>read</td><td><span class="kw">read</span></td><td>読む</td></tr>
+          <tr><td>visit</td><td><span class="kw">visited</span></td><td>訪れる</td></tr>
+          <tr><td>play</td><td><span class="kw">played</span></td><td>する・弾く</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:8px;">
+      <button class="btn btn-primary" onclick="showPage('page-menu')">問題に進む →</button>
+    </div>
+  </div>
+
+  <!-- ===== メニュー ===== -->
+  <div class="page" id="page-menu">
+    <div class="page-subtitle">練習メニュー</div>
+    <div class="page-sub-desc">やりたい練習を選んでね！</div>
+
+    <div class="menu-grid">
+      <div class="menu-card" onclick="startQuiz('sort')">
+        <div class="mc-icon">🔀</div>
+        <div class="mc-title">並べ替え問題</div>
+        <div class="mc-count">5問</div>
+        <div class="mc-desc">単語を正しい順番に</div>
+        <div class="mc-achievement" id="ach-sort">未挑戦</div>
+      </div>
+      <div class="menu-card" onclick="startQuiz('choice')">
+        <div class="mc-icon">✅</div>
+        <div class="mc-title">選択問題</div>
+        <div class="mc-count">5問</div>
+        <div class="mc-desc">4択から正解を選ぶ</div>
+        <div class="mc-achievement" id="ach-choice">未挑戦</div>
+      </div>
+      <div class="menu-card" onclick="startQuiz('speech')">
+        <div class="mc-icon">🎤</div>
+        <div class="mc-title">会話練習</div>
+        <div class="mc-count">5問</div>
+        <div class="mc-desc">マイクで発音チェック</div>
+        <div class="mc-achievement" id="ach-speech">未挑戦</div>
+      </div>
+      <div class="menu-card full-width" onclick="startQuiz('all')">
+        <div class="mc-icon">🚀</div>
+        <div class="mc-title">全部チャレンジ！</div>
+        <div class="mc-count">15問</div>
+        <div class="mc-desc">並べ替え・選択・会話の全問題に挑戦</div>
+        <div class="mc-achievement" id="ach-all">未挑戦</div>
+      </div>
+    </div>
+
+    <button class="btn btn-gray btn-block" onclick="showPage('page-grammar')">← 文法説明に戻る</button>
+  </div>
+
+  <!-- ===== 並べ替え問題ページ ===== -->
+  <div class="page" id="page-sort">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="confirmBack()">←</button>
+      <div class="quiz-header-title">並べ替え問題</div>
+      <div class="quiz-type-badge">🔀 SORT</div>
+    </div>
+
+    <div class="progress-area">
+      <div class="progress-info">
+        <span id="sort-q-label">問題 1 / 5</span>
+        <span id="sort-score-label">スコア: 0</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="sort-progress" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label">日本語を英語に直してみよう</div>
+      <div class="q-text" id="sort-q-ja"></div>
+    </div>
+
+    <div class="sort-area-label">👆 タップして並べ替えよう</div>
+    <div class="answer-area" id="sort-answer-area"></div>
+    <div class="sort-area-label">単語バンク</div>
+    <div class="word-bank" id="sort-word-bank"></div>
+
+    <div class="hint-area">
+      <div class="hint-box" id="sort-hint-box">
+        <div class="hint-label">💡 ヒント</div>
+        <div id="sort-hint-text"></div>
+      </div>
+    </div>
+
+    <div class="feedback" id="sort-feedback"></div>
+
+    <div class="nav-area">
+      <button class="hint-toggle-btn" id="sort-hint-btn" onclick="toggleHint('sort')">💡 ヒント</button>
+      <span class="nav-spacer"></span>
+      <button class="btn btn-gray" id="sort-reset-btn" onclick="resetSortAnswer()">リセット</button>
+      <button class="btn btn-primary" id="sort-check-btn" onclick="checkSort()">答え合わせ</button>
+      <button class="btn btn-green" id="sort-next-btn" style="display:none;" onclick="nextQuestion('sort')">次へ →</button>
+    </div>
+  </div>
+
+  <!-- ===== 選択問題ページ ===== -->
+  <div class="page" id="page-choice">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="confirmBack()">←</button>
+      <div class="quiz-header-title">選択問題</div>
+      <div class="quiz-type-badge">✅ CHOICE</div>
+    </div>
+
+    <div class="progress-area">
+      <div class="progress-info">
+        <span id="choice-q-label">問題 1 / 5</span>
+        <span id="choice-score-label">スコア: 0</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="choice-progress" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label">（　）に入る最も適切な語を選ぼう</div>
+      <div class="q-text" id="choice-q-text"></div>
+      <div class="q-ja" id="choice-q-ja"></div>
+    </div>
+
+    <div class="choice-list" id="choice-list"></div>
+
+    <div class="hint-area">
+      <div class="hint-box" id="choice-hint-box">
+        <div class="hint-label">💡 ヒント</div>
+        <div id="choice-hint-text"></div>
+      </div>
+    </div>
+
+    <div class="feedback" id="choice-feedback"></div>
+
+    <div class="nav-area">
+      <button class="hint-toggle-btn" id="choice-hint-btn" onclick="toggleHint('choice')">💡 ヒント</button>
+      <span class="nav-spacer"></span>
+      <button class="btn btn-green" id="choice-next-btn" style="display:none;" onclick="nextQuestion('choice')">次へ →</button>
+    </div>
+  </div>
+
+  <!-- ===== 会話練習ページ ===== -->
+  <div class="page" id="page-speech">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="confirmBack()">←</button>
+      <div class="quiz-header-title">会話練習</div>
+      <div class="quiz-type-badge">🎤 SPEAK</div>
+    </div>
+
+    <div class="progress-area">
+      <div class="progress-info">
+        <span id="speech-q-label">問題 1 / 5</span>
+        <span id="speech-score-label">スコア: 0</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="speech-progress" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="speech-q-box">
+      <div class="sq-label">先生の質問に答えよう！</div>
+      <div class="sq-text" id="speech-q-text"></div>
+      <div class="sq-ja" id="speech-q-ja"></div>
+    </div>
+
+    <div class="accepted-box">
+      <div class="ac-label">✅ 正解となる答え</div>
+      <div id="speech-accepted-chips"></div>
+    </div>
+
+    <div class="no-speech-notice" id="no-speech-notice">
+      ⚠️ このブラウザでは音声認識が使えません。<b>Google Chrome</b> で開いてください。<br>
+      または下のボタンでテキスト入力できます。
+    </div>
+
+    <button class="mic-btn ready" id="mic-btn" onclick="toggleMic()">
+      <span class="mic-icon" id="mic-icon">🎤</span>
+      <span id="mic-text">マイクをタップして話す</span>
+    </button>
+
+    <div class="recognized-text" id="recognized-text">認識結果がここに表示されます</div>
+
+    <div class="hint-area">
+      <div class="hint-box" id="speech-hint-box">
+        <div class="hint-label">💡 ヒント</div>
+        <div id="speech-hint-text"></div>
+      </div>
+    </div>
+
+    <div class="speech-result" id="speech-result"></div>
+
+    <div class="nav-area">
+      <button class="hint-toggle-btn" id="speech-hint-btn" onclick="toggleHint('speech')">💡 ヒント</button>
+      <span class="nav-spacer"></span>
+      <button class="btn btn-gray" id="speech-skip-btn" onclick="skipSpeech()">スキップ</button>
+      <button class="btn btn-green" id="speech-next-btn" style="display:none;" onclick="nextQuestion('speech')">次へ →</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果ページ ===== -->
+  <div class="page" id="page-result">
+    <div class="result-circle">
+      <div class="rc-num" id="result-score-num">0</div>
+      <div class="rc-denom" id="result-score-denom">/ 5問</div>
+    </div>
+
+    <div class="result-message" id="result-message"></div>
+
+    <div class="result-stats">
+      <div class="stat-card">
+        <div class="sc-num" id="stat-correct">0</div>
+        <div class="sc-label">正解</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num" id="stat-wrong">0</div>
+        <div class="sc-label">不正解</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num" id="stat-rate">0%</div>
+        <div class="sc-label">正答率</div>
+      </div>
+    </div>
+
+    <!-- ボタンを間違えリストより上に配置 -->
+    <div style="margin-bottom:16px;">
+      <button class="btn btn-primary btn-block" onclick="retryQuiz()">🔄 もう一度挑戦</button>
+      <button class="btn btn-gray btn-block" onclick="showPage('page-menu')">📊 メニュー・達成率を見る</button>
+    </div>
+
+    <div id="wrong-section-wrapper">
+      <div class="divider"></div>
+      <div class="wrong-section">
+        <h3>❌ 間違えた問題</h3>
+        <div id="wrong-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// =============================================
+//  問題データ
+// =============================================
+const sortQuestions = [
+  {
+    ja: "私は以前、京都を訪れたことがあります。",
+    words: ["I", "have", "visited", "Kyoto", "before", "."],
+    answer: "I have visited Kyoto before .",
+    hint: "「have + 過去分詞」の形にしよう。visit の過去分詞は visited だよ。"
+  },
+  {
+    ja: "あなたは今までに寿司を食べたことがありますか？",
+    words: ["Have", "you", "ever", "eaten", "sushi", "?"],
+    answer: "Have you ever eaten sushi ?",
+    hint: "疑問文は「Have you ever + 過去分詞 ...?」の語順。eat の過去分詞は eaten だよ。"
+  },
+  {
+    ja: "彼女は一度も雪を見たことがない。",
+    words: ["She", "has", "never", "seen", "snow", "."],
+    answer: "She has never seen snow .",
+    hint: "「一度も〜ない」は never を使う。see の過去分詞は seen だよ。"
+  },
+  {
+    ja: "私は一度ロンドンに行ったことがあります。",
+    words: ["I", "have", "been", "to", "London", "once", "."],
+    answer: "I have been to London once .",
+    hint: "「〜に行ったことがある」は have been to ~ の形。once = 1回 だよ。"
+  },
+  {
+    ja: "あなたはこの本を読んだことがありますか？",
+    words: ["Have", "you", "ever", "read", "this", "book", "?"],
+    answer: "Have you ever read this book ?",
+    hint: "read（読む）の過去分詞も read（発音：レッド）。「Have you ever + 過去分詞?」の形にしよう。"
+  }
+];
+
+const choiceQuestions = [
+  {
+    question: "I have ( ) visited Paris before.",
+    ja: "私はパリを一度も訪れたことがありません。",
+    options: ["never", "ever", "already", "just"],
+    correctIndex: 0,
+    hint: "「一度も〜ない」という否定の意味のキーワードはどれかな？"
+  },
+  {
+    question: "( ) you ever eaten Indian food?",
+    ja: "インド料理を食べたことがありますか？",
+    options: ["Have", "Has", "Did", "Do"],
+    correctIndex: 0,
+    hint: "主語が you（あなた）の場合、have か has どちらを使う？"
+  },
+  {
+    question: "She has never ( ) to America.",
+    ja: "彼女はアメリカに一度も行ったことがない。",
+    options: ["go", "going", "went", "been"],
+    correctIndex: 3,
+    hint: "現在完了形なので過去分詞が必要！「行ったことがある」は have been to ~ の形だよ。"
+  },
+  {
+    question: "I have visited Osaka ( ).",
+    ja: "私は大阪を2回訪れたことがあります。",
+    options: ["twice", "two", "second", "double"],
+    correctIndex: 0,
+    hint: "「2回」を1語で表す英語は？（1回 = once、2回 = ?）"
+  },
+  {
+    question: "( ) he ever played tennis?",
+    ja: "彼はテニスをしたことがありますか？",
+    options: ["Has", "Have", "Did", "Does"],
+    correctIndex: 0,
+    hint: "主語が he（彼）の場合、have か has どちらを使う？"
+  }
+];
+
+const speechQuestions = [
+  {
+    question: "Have you ever visited Tokyo?",
+    ja: "東京に行ったことがありますか？",
+    accepted: ["yes i have", "no i haven't", "no i have not", "yes i have.", "no i haven't."],
+    hint: "「はい」なら Yes, I have. 「いいえ」なら No, I haven't. と答えよう！"
+  },
+  {
+    question: "Have you ever eaten sushi?",
+    ja: "寿司を食べたことがありますか？",
+    accepted: ["yes i have", "no i haven't", "no i have not"],
+    hint: "「はい」なら Yes, I have. 「いいえ」なら No, I haven't. と答えよう！"
+  },
+  {
+    question: "Have you ever played soccer?",
+    ja: "サッカーをしたことがありますか？",
+    accepted: ["yes i have", "no i haven't", "no i have not"],
+    hint: "「はい」なら Yes, I have. 「いいえ」なら No, I haven't. と答えよう！"
+  },
+  {
+    question: "Have you ever seen a rainbow?",
+    ja: "虹を見たことがありますか？",
+    accepted: ["yes i have", "no i haven't", "no i have not"],
+    hint: "「はい」なら Yes, I have. 「いいえ」なら No, I haven't. と答えよう！"
+  },
+  {
+    question: "Have you ever read manga in English?",
+    ja: "英語でマンガを読んだことがありますか？",
+    accepted: ["yes i have", "no i haven't", "no i have not"],
+    hint: "「はい」なら Yes, I have. 「いいえ」なら No, I haven't. と答えよう！"
+  }
+];
+
+// =============================================
+//  アプリ状態
+// =============================================
+const state = {
+  quizType: null,      // 'sort' | 'choice' | 'speech' | 'all'
+  allQueue: [],        // all モード用の問題キュー
+  currentSection: null,// 現在のセクション
+  currentIndex: 0,     // セクション内インデックス
+  score: { sort:0, choice:0, speech:0 },
+  wrongAnswers: [],
+  hintUsed: { sort:false, choice:false, speech:false },
+  answered: false,
+  transitioning: false,// 二重クリック防止フラグ
+  recognition: null,
+  micListening: false,
+  // ランダム化した問題配列
+  shuffledSort: [],
+  shuffledChoice: [],
+  shuffledSpeech: []
+};
+
+// =============================================
+//  達成率（localStorage）
+// =============================================
+function saveAchievement(type, correct, total) {
+  const key = `ach_${type}`;
+  const rate = Math.round((correct / total) * 100);
+  const prev = parseInt(localStorage.getItem(key) || '-1');
+  if (rate > prev) localStorage.setItem(key, rate);
+}
+
+function updateMenuAchievements() {
+  ['sort', 'choice', 'speech', 'all'].forEach(type => {
+    const el = document.getElementById(`ach-${type}`);
+    if (!el) return;
+    const val = localStorage.getItem(`ach_${type}`);
+    if (val === null) {
+      el.textContent = '未挑戦';
+      el.className = 'mc-achievement';
+    } else {
+      const rate = parseInt(val);
+      el.textContent = `最高 ${rate}%`;
+      if (rate === 100)     el.className = 'mc-achievement perfect';
+      else if (rate >= 80)  el.className = 'mc-achievement high';
+      else if (rate >= 50)  el.className = 'mc-achievement mid';
+      else                  el.className = 'mc-achievement low';
+    }
+  });
+}
+
+// =============================================
+//  ページ切替
+// =============================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'page-menu') updateMenuAchievements();
+  window.scrollTo(0, 0);
+}
+
+// =============================================
+//  クイズ開始
+// =============================================
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+// 現在の問題が最後かどうか判定
+function isLastQuestion() {
+  if (state.quizType === 'all') {
+    return state.currentIndex >= state.allQueue.length - 1;
+  }
+  const total = state.quizType === 'sort'   ? state.shuffledSort.length
+              : state.quizType === 'choice' ? state.shuffledChoice.length
+              :                               state.shuffledSpeech.length;
+  return state.currentIndex >= total - 1;
+}
+
+// 次へボタンのラベルを状況に応じて更新
+function updateNextBtnLabel(section) {
+  const btn = document.getElementById(`${section}-next-btn`);
+  if (!btn) return;
+  btn.textContent = isLastQuestion() ? '📊 結果を見る' : '次へ →';
+}
+
+function startQuiz(type) {
+  state.quizType = type;
+  state.score = { sort:0, choice:0, speech:0 };
+  state.wrongAnswers = [];
+  state.hintUsed = { sort:false, choice:false, speech:false };
+  state.answered = false;
+  state.transitioning = false;
+  state.currentIndex = 0;
+
+  // 毎回問題をシャッフル
+  state.shuffledSort   = shuffle(sortQuestions);
+  state.shuffledChoice = shuffle(choiceQuestions);
+  state.shuffledSpeech = shuffle(speechQuestions);
+
+  if (type === 'all') {
+    state.allQueue = [
+      ...state.shuffledSort.map((_,i) => ({ section:'sort', index:i })),
+      ...state.shuffledChoice.map((_,i) => ({ section:'choice', index:i })),
+      ...state.shuffledSpeech.map((_,i) => ({ section:'speech', index:i }))
+    ];
+    loadAllQuestion(0);
+  } else {
+    state.currentSection = type;
+    loadQuestion(type, 0);
+  }
+}
+
+// =============================================
+//  問題読み込み（単体モード）
+// =============================================
+function loadQuestion(type, index) {
+  state.answered = false;
+  state.hintUsed[type] = false;
+
+  const total = type === 'sort' ? sortQuestions.length
+              : type === 'choice' ? choiceQuestions.length
+              : speechQuestions.length;
+
+  updateProgress(type, index, total);
+
+  if (type === 'sort') {
+    showPage('page-sort');
+    loadSortQuestion(index);
+  } else if (type === 'choice') {
+    showPage('page-choice');
+    loadChoiceQuestion(index);
+  } else {
+    showPage('page-speech');
+    loadSpeechQuestion(index);
+  }
+}
+
+// 全問モード
+function loadAllQuestion(queueIndex) {
+  if (queueIndex >= state.allQueue.length) {
+    showResult('all');
+    return;
+  }
+  const { section, index } = state.allQueue[queueIndex];
+  state.currentSection = section;
+  state.answered = false;
+  state.hintUsed[section] = false;
+
+  const total = state.allQueue.length;
+  updateProgressAll(queueIndex, total, section);
+
+  if (section === 'sort') {
+    showPage('page-sort');
+    loadSortQuestion(index);
+  } else if (section === 'choice') {
+    showPage('page-choice');
+    loadChoiceQuestion(index);
+  } else {
+    showPage('page-speech');
+    loadSpeechQuestion(index);
+  }
+}
+
+function updateProgress(type, index, total) {
+  const pct = (index / total) * 100;
+  document.getElementById(`${type}-progress`).style.width = pct + '%';
+  document.getElementById(`${type}-q-label`).textContent = `問題 ${index+1} / ${total}`;
+
+  const sc = state.score[type] || 0;
+  document.getElementById(`${type}-score-label`).textContent = `スコア: ${sc}`;
+}
+
+function updateProgressAll(queueIndex, total, section) {
+  const type = section;
+  const pct = (queueIndex / total) * 100;
+  document.getElementById(`${type}-progress`).style.width = pct + '%';
+  document.getElementById(`${type}-q-label`).textContent = `問題 ${queueIndex+1} / ${total}`;
+  const sc = (state.score.sort + state.score.choice + state.score.speech);
+  document.getElementById(`${type}-score-label`).textContent = `スコア: ${sc}`;
+}
+
+// =============================================
+//  並べ替え問題
+// =============================================
+let sortSelectedAnswer = [];
+let sortShuffledWords = [];
+
+function loadSortQuestion(index) {
+  const q = state.shuffledSort[index];
+  sortSelectedAnswer = [];
+  // シャッフル
+  sortShuffledWords = [...q.words].sort(() => Math.random() - 0.5);
+
+  document.getElementById('sort-q-ja').textContent = q.ja;
+  document.getElementById('sort-hint-text').textContent = q.hint;
+  document.getElementById('sort-hint-box').classList.remove('visible');
+  document.getElementById('sort-feedback').className = 'feedback';
+  document.getElementById('sort-feedback').textContent = '';
+  document.getElementById('sort-check-btn').style.display = '';
+  document.getElementById('sort-next-btn').style.display = 'none';
+  document.getElementById('sort-reset-btn').style.display = '';
+  document.getElementById('sort-hint-btn').style.display = '';
+
+  renderSortWords();
+}
+
+function renderSortWords() {
+  const bank = document.getElementById('sort-word-bank');
+  const ansArea = document.getElementById('sort-answer-area');
+  bank.innerHTML = '';
+  ansArea.innerHTML = '';
+
+  // 答えエリア
+  sortSelectedAnswer.forEach((word, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'word-chip in-answer';
+    btn.textContent = word;
+    btn.disabled = state.answered;
+    btn.onclick = () => {
+      if (state.answered) return;
+      sortShuffledWords.push(word);
+      sortSelectedAnswer.splice(i, 1);
+      renderSortWords();
+    };
+    ansArea.appendChild(btn);
+  });
+
+  // 単語バンク（答えエリアにない単語）
+  sortShuffledWords.forEach((word, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'word-chip';
+    btn.textContent = word;
+    btn.disabled = state.answered;
+    btn.onclick = () => {
+      if (state.answered) return;
+      sortSelectedAnswer.push(word);
+      sortShuffledWords.splice(i, 1);
+      renderSortWords();
+    };
+    bank.appendChild(btn);
+  });
+}
+
+function resetSortAnswer() {
+  if (state.answered) return;
+  const q = state.shuffledSort[state.quizType === 'all' ? state.allQueue[state.currentIndex].index : state.currentIndex];
+  sortShuffledWords = [...q.words].sort(() => Math.random() - 0.5);
+  sortSelectedAnswer = [];
+  renderSortWords();
+}
+
+function checkSort() {
+  if (sortSelectedAnswer.length === 0) {
+    alert('単語を選んで並べてね！');
+    return;
+  }
+  const idx = state.quizType === 'all' ? state.allQueue[state.currentIndex].index : state.currentIndex;
+  const q = state.shuffledSort[idx];
+  const userAnswer = sortSelectedAnswer.join(' ');
+  const correct = userAnswer === q.answer;
+
+  state.answered = true;
+  renderSortWords(); // disable chips
+
+  const fb = document.getElementById('sort-feedback');
+  if (correct) {
+    state.score.sort++;
+    fb.className = 'feedback correct';
+    fb.textContent = '✅ 正解！すばらしい！';
+  } else {
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `❌ 不正解…<br>正しい答え：<strong>${q.answer}</strong>`;
+    state.wrongAnswers.push({
+      type: '並べ替え',
+      question: q.ja,
+      correct: q.answer,
+      yours: userAnswer
+    });
+  }
+
+  if (state.quizType === 'all') {
+    const sc = state.score.sort + state.score.choice + state.score.speech;
+    document.getElementById('sort-score-label').textContent = `スコア: ${sc}`;
+  } else {
+    document.getElementById('sort-score-label').textContent = `スコア: ${state.score.sort}`;
+  }
+
+  document.getElementById('sort-check-btn').style.display = 'none';
+  document.getElementById('sort-reset-btn').style.display = 'none';
+  document.getElementById('sort-hint-btn').style.display = 'none';
+  document.getElementById('sort-next-btn').style.display = '';
+  updateNextBtnLabel('sort');
+}
+
+// =============================================
+//  選択問題
+// =============================================
+function loadChoiceQuestion(index) {
+  const q = state.shuffledChoice[index];
+  document.getElementById('choice-q-text').innerHTML = q.question.replace('( )', '<em>（　）</em>');
+  document.getElementById('choice-q-ja').textContent = q.ja;
+  document.getElementById('choice-hint-text').textContent = q.hint;
+  document.getElementById('choice-hint-box').classList.remove('visible');
+  document.getElementById('choice-feedback').className = 'feedback';
+  document.getElementById('choice-feedback').textContent = '';
+  document.getElementById('choice-next-btn').style.display = 'none';
+  document.getElementById('choice-hint-btn').style.display = '';
+
+  const list = document.getElementById('choice-list');
+  list.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = `${String.fromCharCode(65+i)}. ${opt}`;
+    btn.onclick = () => checkChoice(i);
+    list.appendChild(btn);
+  });
+}
+
+function checkChoice(selectedIndex) {
+  if (state.answered) return;
+  state.answered = true;
+
+  const idx = state.quizType === 'all' ? state.allQueue[state.currentIndex].index : state.currentIndex;
+  const q = state.shuffledChoice[idx];
+  const correct = selectedIndex === q.correctIndex;
+  const btns = document.querySelectorAll('#choice-list .choice-btn');
+
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correctIndex) {
+      btn.classList.add('correct');
+      btn.innerHTML += ' <span class="choice-mark">✅</span>';
+    } else if (i === selectedIndex && !correct) {
+      btn.classList.add('wrong');
+      btn.innerHTML += ' <span class="choice-mark">❌</span>';
+    }
+  });
+
+  const fb = document.getElementById('choice-feedback');
+  if (correct) {
+    state.score.choice++;
+    fb.className = 'feedback correct';
+    fb.textContent = '✅ 正解！すばらしい！';
+  } else {
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `❌ 不正解…<br>正しい答え：<strong>${q.options[q.correctIndex]}</strong>`;
+    state.wrongAnswers.push({
+      type: '選択問題',
+      question: q.question,
+      correct: q.options[q.correctIndex],
+      yours: q.options[selectedIndex]
+    });
+  }
+
+  if (state.quizType === 'all') {
+    const sc = state.score.sort + state.score.choice + state.score.speech;
+    document.getElementById('choice-score-label').textContent = `スコア: ${sc}`;
+  } else {
+    document.getElementById('choice-score-label').textContent = `スコア: ${state.score.choice}`;
+  }
+
+  document.getElementById('choice-hint-btn').style.display = 'none';
+  document.getElementById('choice-next-btn').style.display = '';
+  updateNextBtnLabel('choice');
+}
+
+// =============================================
+//  会話練習（音声認識）
+// =============================================
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const hasSpeech = !!SpeechRecognition;
+
+function loadSpeechQuestion(index) {
+  const q = state.shuffledSpeech[index];
+  document.getElementById('speech-q-text').textContent = q.question;
+  document.getElementById('speech-q-ja').textContent = q.ja;
+  document.getElementById('speech-hint-text').textContent = q.hint;
+  document.getElementById('speech-hint-box').classList.remove('visible');
+  document.getElementById('speech-result').className = 'speech-result';
+  document.getElementById('speech-result').textContent = '';
+  document.getElementById('speech-next-btn').style.display = 'none';
+  document.getElementById('speech-skip-btn').style.display = '';
+  document.getElementById('speech-hint-btn').style.display = '';
+  document.getElementById('recognized-text').textContent = '認識結果がここに表示されます';
+
+  // 正解チップ表示
+  const chipsDiv = document.getElementById('speech-accepted-chips');
+  chipsDiv.innerHTML = '';
+  ['Yes, I have.', "No, I haven't."].forEach(ans => {
+    const chip = document.createElement('span');
+    chip.className = 'accepted-chip';
+    chip.textContent = ans;
+    chipsDiv.appendChild(chip);
+  });
+
+  // マイクボタンリセット
+  const micBtn = document.getElementById('mic-btn');
+  micBtn.className = 'mic-btn ready';
+  document.getElementById('mic-icon').textContent = '🎤';
+  document.getElementById('mic-text').textContent = 'マイクをタップして話す';
+  micBtn.disabled = false;
+  state.micListening = false;
+
+  if (!hasSpeech) {
+    document.getElementById('no-speech-notice').style.display = 'block';
+  } else {
+    document.getElementById('no-speech-notice').style.display = 'none';
+  }
+}
+
+function toggleMic() {
+  if (state.answered) return;
+
+  if (!hasSpeech) {
+    // 音声認識非対応：テキスト入力にフォールバック
+    const input = prompt('答えを入力してください（例：Yes, I have. または No, I haven\'t.）');
+    if (input !== null) processSpeechResult(input);
+    return;
+  }
+
+  if (state.micListening) return;
+
+  state.micListening = true;
+  const micBtn = document.getElementById('mic-btn');
+  micBtn.className = 'mic-btn listening';
+  document.getElementById('mic-icon').textContent = '🔴';
+  document.getElementById('mic-text').textContent = '聞き取り中… 話してください';
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+  state.recognition = recognition;
+
+  recognition.onresult = (event) => {
+    let best = '';
+    for (let i = 0; i < event.results[0].length; i++) {
+      const alt = event.results[0][i].transcript.trim();
+      if (!best) best = alt;
+    }
+    document.getElementById('recognized-text').textContent = `認識：「${best}」`;
+    processSpeechResult(best);
+  };
+
+  recognition.onerror = (e) => {
+    resetMicBtn();
+    if (e.error === 'no-speech') {
+      alert('音声が認識されませんでした。もう一度試してね！');
+    } else if (e.error === 'not-allowed') {
+      alert('マイクへのアクセスが許可されていません。ブラウザの設定を確認してください。');
+    } else {
+      alert('エラーが発生しました: ' + e.error);
+    }
+  };
+
+  recognition.onend = () => {
+    resetMicBtn();
+  };
+
+  recognition.start();
+}
+
+function resetMicBtn() {
+  state.micListening = false;
+  if (!state.answered) {
+    const micBtn = document.getElementById('mic-btn');
+    micBtn.className = 'mic-btn ready';
+    document.getElementById('mic-icon').textContent = '🎤';
+    document.getElementById('mic-text').textContent = 'マイクをタップして話す';
+  }
+}
+
+function processSpeechResult(text) {
+  const idx = state.quizType === 'all' ? state.allQueue[state.currentIndex].index : state.currentIndex;
+  const q = state.shuffledSpeech[idx];
+  const normalized = text.toLowerCase().replace(/[.,!?]/g, '').trim();
+  const isCorrect = q.accepted.some(a => {
+    const na = a.toLowerCase().replace(/[.,!?]/g, '').trim();
+    return normalized === na || normalized.includes(na) || na.includes(normalized);
+  });
+
+  state.answered = true;
+
+  const micBtn = document.getElementById('mic-btn');
+  micBtn.className = 'mic-btn done';
+  micBtn.disabled = true;
+  document.getElementById('mic-icon').textContent = '✓';
+  document.getElementById('mic-text').textContent = '認識完了';
+
+  const resultDiv = document.getElementById('speech-result');
+  if (isCorrect) {
+    state.score.speech++;
+    resultDiv.className = 'speech-result correct';
+    resultDiv.textContent = '✅ 正解！上手に言えました！';
+  } else {
+    resultDiv.className = 'speech-result wrong';
+    resultDiv.innerHTML = `❌ もう少し！<br>正しい答え例：<strong>Yes, I have.</strong> または <strong>No, I haven't.</strong>`;
+    state.wrongAnswers.push({
+      type: '会話練習',
+      question: q.question,
+      correct: "Yes, I have. / No, I haven't.",
+      yours: text || '（未回答）'
+    });
+  }
+
+  if (state.quizType === 'all') {
+    const sc = state.score.sort + state.score.choice + state.score.speech;
+    document.getElementById('speech-score-label').textContent = `スコア: ${sc}`;
+  } else {
+    document.getElementById('speech-score-label').textContent = `スコア: ${state.score.speech}`;
+  }
+
+  document.getElementById('speech-skip-btn').style.display = 'none';
+  document.getElementById('speech-hint-btn').style.display = 'none';
+  document.getElementById('speech-next-btn').style.display = '';
+  updateNextBtnLabel('speech');
+}
+
+function skipSpeech() {
+  const idx = state.quizType === 'all' ? state.allQueue[state.currentIndex].index : state.currentIndex;
+  const q = state.shuffledSpeech[idx];
+  state.answered = true;
+  state.wrongAnswers.push({
+    type: '会話練習',
+    question: q.question,
+    correct: "Yes, I have. / No, I haven't.",
+    yours: '（スキップ）'
+  });
+
+  const resultDiv = document.getElementById('speech-result');
+  resultDiv.className = 'speech-result wrong';
+  resultDiv.innerHTML = `スキップしました。<br>正しい答え例：<strong>Yes, I have.</strong> または <strong>No, I haven't.</strong>`;
+
+  document.getElementById('speech-skip-btn').style.display = 'none';
+  document.getElementById('speech-hint-btn').style.display = 'none';
+  document.getElementById('speech-next-btn').style.display = '';
+  updateNextBtnLabel('speech');
+
+  const micBtn = document.getElementById('mic-btn');
+  micBtn.className = 'mic-btn done';
+  micBtn.disabled = true;
+}
+
+// =============================================
+//  次の問題へ
+// =============================================
+function nextQuestion(type) {
+  // 二重クリック・連打防止
+  if (state.transitioning) return;
+  state.transitioning = true;
+
+  // 次へボタンを即座に非表示（連打対策）
+  const nextBtn = document.getElementById(`${type}-next-btn`);
+  if (nextBtn) nextBtn.style.display = 'none';
+
+  if (state.quizType === 'all') {
+    state.currentIndex++;
+    if (state.currentIndex >= state.allQueue.length) {
+      state.transitioning = false;
+      showResult('all');
+    } else {
+      loadAllQuestion(state.currentIndex);
+      state.transitioning = false;
+    }
+    return;
+  }
+
+  const total = type === 'sort'   ? state.shuffledSort.length
+              : type === 'choice' ? state.shuffledChoice.length
+              :                     state.shuffledSpeech.length;
+
+  state.currentIndex++;
+  if (state.currentIndex >= total) {
+    state.transitioning = false;
+    showResult(type);
+  } else {
+    loadQuestion(type, state.currentIndex);
+    state.transitioning = false;
+  }
+}
+
+// =============================================
+//  ヒント
+// =============================================
+function toggleHint(type) {
+  const box = document.getElementById(`${type}-hint-box`);
+  box.classList.toggle('visible');
+  if (box.classList.contains('visible')) {
+    state.hintUsed[type] = true;
+  }
+}
+
+// =============================================
+//  結果表示
+// =============================================
+function showResult(type) {
+  let total, correct;
+  if (type === 'sort') {
+    total = sortQuestions.length;
+    correct = state.score.sort;
+  } else if (type === 'choice') {
+    total = choiceQuestions.length;
+    correct = state.score.choice;
+  } else if (type === 'speech') {
+    total = speechQuestions.length;
+    correct = state.score.speech;
+  } else {
+    total = sortQuestions.length + choiceQuestions.length + speechQuestions.length;
+    correct = state.score.sort + state.score.choice + state.score.speech;
+  }
+
+  const wrong = total - correct;
+  const rate = Math.round((correct / total) * 100);
+  saveAchievement(type, correct, total);
+
+  document.getElementById('result-score-num').textContent = correct;
+  document.getElementById('result-score-denom').textContent = `/ ${total}問`;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-rate').textContent = rate + '%';
+
+  let msg = '';
+  if (rate === 100) msg = '🎉 パーフェクト！完璧です！';
+  else if (rate >= 80) msg = '👏 とてもよくできました！';
+  else if (rate >= 60) msg = '😊 あと少し！もう一度挑戦してみよう';
+  else msg = '📚 もう一度文法を確認してから挑戦しよう！';
+  document.getElementById('result-message').textContent = msg;
+
+  // 間違えた問題リスト（wrapper.innerHTML を必ず上書きするので wrongList の null チェック不要）
+  const wrapper = document.getElementById('wrong-section-wrapper');
+
+  if (state.wrongAnswers.length === 0) {
+    wrapper.innerHTML = `<div class="all-correct-msg"><div class="ac-icon">🎊</div>全問正解！素晴らしい！！</div>`;
+  } else {
+    wrapper.innerHTML = `
+      <div class="divider"></div>
+      <div class="wrong-section">
+        <h3>❌ 間違えた問題（${state.wrongAnswers.length}問）</h3>
+        <div id="wrong-list"></div>
+      </div>`;
+    const wl = document.getElementById('wrong-list');
+    state.wrongAnswers.forEach(w => {
+      const item = document.createElement('div');
+      item.className = 'wrong-item';
+      item.innerHTML = `
+        <div class="wi-label">[${w.type}] ${w.question}</div>
+        <div class="wi-correct">✅ 正解：${w.correct}</div>
+        <div class="wi-yours">あなたの答え：${w.yours}</div>
+      `;
+      wl.appendChild(item);
+    });
+  }
+
+  state._lastType = type;
+  showPage('page-result');
+}
+
+function retryQuiz() {
+  startQuiz(state._lastType || state.quizType);
+}
+
+// =============================================
+//  戻るボタン
+// =============================================
+function confirmBack() {
+  if (state.answered || !state.answered) {
+    if (confirm('メニューに戻りますか？（現在の進捗は失われます）')) {
+      if (state.recognition) { try { state.recognition.stop(); } catch(e){} }
+      showPage('page-menu');
+    }
+  }
+}
+
+// 初期表示時にメニューの達成率を更新
+updateMenuAchievements();
+</script>
+</body>
+</html>
