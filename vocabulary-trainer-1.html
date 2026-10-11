@@ -1,0 +1,3700 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Trainer 1年</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;800&family=Zen+Maru+Gothic:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper: #f6f0df;
+    --paper2: #ede0c2;
+    --surface: #fffbf2;
+    --surface2: #f4e9cf;
+    --ink: #241f18;
+    --ink-soft: #6e6350;
+    --border: #d9c9a0;
+    --border-strong: #241f18;
+    --seal: #b23b2c;
+    --seal-soft: rgba(178,59,44,.12);
+    --indigo: #33526e;
+    --indigo-soft: rgba(51,82,110,.12);
+    --good: #3f7d4c;
+    --good-soft: rgba(63,125,76,.14);
+    --warn: #b3791f;
+    --warn-soft: rgba(179,121,31,.14);
+    --bad: #af3b2c;
+    --bad-soft: rgba(175,59,44,.14);
+    --rank-s: #a8790a;
+    --rank-s-soft: rgba(168,121,10,.14);
+    --rank-silver: #6f6f6f;
+    --rank-silver-soft: rgba(111,111,111,.14);
+    --rank-bronze: #8a5a2b;
+    --rank-bronze-soft: rgba(138,90,43,.14);
+    --shadow: 3px 3px 0 rgba(36,31,24,.18);
+    --shadow-sm: 2px 2px 0 rgba(36,31,24,.16);
+    --font-display: 'Shippori Mincho B1', 'Hiragino Mincho ProN', serif;
+    --font-body: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171310;
+      --paper2: #1e1811;
+      --surface: #231c15;
+      --surface2: #2c2318;
+      --ink: #f3ead9;
+      --ink-soft: #b6a98d;
+      --border: #46392a;
+      --border-strong: #f3ead9;
+      --seal: #e0755a;
+      --seal-soft: rgba(224,117,90,.16);
+      --indigo: #7fa3c7;
+      --indigo-soft: rgba(127,163,199,.16);
+      --good: #74c084;
+      --good-soft: rgba(116,192,132,.16);
+      --warn: #e0b355;
+      --warn-soft: rgba(224,179,85,.16);
+      --bad: #e0755a;
+      --bad-soft: rgba(224,117,90,.16);
+      --rank-s: #f0c454;
+      --rank-s-soft: rgba(240,196,84,.16);
+      --rank-silver: #b9b9b9;
+      --rank-silver-soft: rgba(185,185,185,.16);
+      --rank-bronze: #c98a52;
+      --rank-bronze-soft: rgba(201,138,82,.16);
+      --shadow: 3px 3px 0 rgba(0,0,0,.5);
+      --shadow-sm: 2px 2px 0 rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #171310;
+    --paper2: #1e1811;
+    --surface: #231c15;
+    --surface2: #2c2318;
+    --ink: #f3ead9;
+    --ink-soft: #b6a98d;
+    --border: #46392a;
+    --border-strong: #f3ead9;
+    --seal: #e0755a;
+    --seal-soft: rgba(224,117,90,.16);
+    --indigo: #7fa3c7;
+    --indigo-soft: rgba(127,163,199,.16);
+    --good: #74c084;
+    --good-soft: rgba(116,192,132,.16);
+    --warn: #e0b355;
+    --warn-soft: rgba(224,179,85,.16);
+    --bad: #e0755a;
+    --bad-soft: rgba(224,117,90,.16);
+    --rank-s: #f0c454;
+    --rank-s-soft: rgba(240,196,84,.16);
+    --rank-silver: #b9b9b9;
+    --rank-silver-soft: rgba(185,185,185,.16);
+    --rank-bronze: #c98a52;
+    --rank-bronze-soft: rgba(201,138,82,.16);
+    --shadow: 3px 3px 0 rgba(0,0,0,.5);
+    --shadow-sm: 2px 2px 0 rgba(0,0,0,.45);
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-body);
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 8%, var(--paper2) 0%, transparent 45%),
+      radial-gradient(circle at 85% 92%, var(--paper2) 0%, transparent 40%);
+    min-height: 100vh; color: var(--ink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+
+  .container { max-width: 560px; margin: 0 auto; padding: 18px 16px 40px; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 4px 12px; position: relative;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-text .logo {
+    font-family: var(--font-display); font-weight: 800; font-size: 1.28rem;
+    letter-spacing: .02em; line-height: 1.1;
+  }
+
+  /* ── UNIT SELECTOR ──
+     Wraps onto as many rows as needed instead of scrolling horizontally,
+     so every Unit stays visible at once and none is ever cut off at the
+     edge of the screen — important since more Units keep getting added. */
+  .unit-selector {
+    display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 2px 10px;
+    margin-bottom: 12px;
+  }
+  .unit-chip-btn {
+    padding: 7px 16px; border-radius: 20px;
+    border: 2px solid var(--border-strong); background: var(--surface);
+    font-weight: 800; font-size: .82rem; cursor: pointer; color: var(--ink-soft);
+    white-space: nowrap; font-family: var(--font-body); transition: background .15s, color .15s;
+  }
+  .unit-chip-btn.active { background: var(--seal); color: #fdf6e6; }
+  .unit-chip-btn:focus-visible { outline: 3px solid var(--indigo); outline-offset: 1px; }
+
+  /* ── PANEL (manga-panel card) ── */
+  .panel {
+    background: var(--surface); border: 2px solid var(--border-strong);
+    border-radius: 12px; padding: 16px; margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 13px 20px; border-radius: 10px; border: 2px solid var(--border-strong);
+    cursor: pointer; font-family: var(--font-body); font-size: .95rem; font-weight: 700;
+    transition: transform .12s, box-shadow .12s; text-align: center;
+    background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm);
+  }
+  .btn:active { transform: translate(2px,2px); box-shadow: none; }
+  .btn:focus-visible { outline: 3px solid var(--indigo); outline-offset: 2px; }
+  .btn-block { display: flex; width: 100%; margin-bottom: 10px; }
+  .btn-primary { background: var(--seal); color: #fdf6e6; border-color: var(--border-strong); }
+  .btn-success { background: var(--good); color: #fdf6e6; }
+  .btn-danger  { background: var(--bad);  color: #fdf6e6; }
+  .btn-warn    { background: var(--warn); color: #2a2016; }
+  .btn-ghost   { background: var(--surface); color: var(--ink); }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--ink-soft); cursor: pointer; font-size: .86rem; font-weight: 700;
+    background: none; border: none; padding: 4px 0; margin-bottom: 14px;
+    font-family: var(--font-body);
+  }
+  .back-btn:hover { color: var(--ink); }
+
+  /* ── STAT CARDS (used on Result screen) ── */
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 4px; text-align: center; }
+  .stat-num { font-family: var(--font-display); font-size: 1.35rem; font-weight: 800; color: var(--seal); font-variant-numeric: tabular-nums; }
+  .stat-num.stat-num-sm { font-size: .82rem; line-height: 1.3; }
+  .stat-label { font-size: .62rem; color: var(--ink-soft); margin-top: 4px; font-weight: 700; }
+
+  /* ── TROPHY ── */
+  .trophy-progress { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
+  .trophy-progress .tp-label { font-size: .62rem; color: var(--ink-soft); margin-bottom: 3px; font-weight: 700; }
+  .trophy-progress .tp-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+  .trophy-progress .tp-fill { height: 100%; border-radius: 3px; transition: width .5s; }
+  .trophy-progress .tp-txt { font-size: .6rem; color: var(--ink-soft); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .trophy-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .trophy-slot { text-align: center; padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); transition: all .4s; }
+  .trophy-slot .t-icon { font-size: 1.9rem; transition: all .4s; }
+  .trophy-slot .t-name { font-size: .74rem; font-weight: 800; margin-top: 4px; color: var(--ink-soft); }
+  .trophy-slot .t-cond { font-size: .63rem; color: var(--ink-soft); margin-top: 2px; }
+
+  /* ── OVERVIEW (all-Units learning status) ── */
+  .ov-open-btn {
+    padding: 8px 12px; border-radius: 10px; border: 2px solid var(--border-strong);
+    background: var(--surface); color: var(--ink); font-weight: 800; font-size: .74rem;
+    cursor: pointer; font-family: var(--font-body); white-space: nowrap; box-shadow: var(--shadow-sm);
+  }
+  .ov-open-btn:active { transform: translate(2px,2px); box-shadow: none; }
+  .header-btns { display: flex; align-items: center; gap: 8px; }
+  .home-link-btn {
+    display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 10px;
+    border: 2px solid var(--border-strong); background: var(--surface); color: var(--ink);
+    font-weight: 800; font-size: .74rem; text-decoration: none; font-family: var(--font-body);
+    white-space: nowrap; box-shadow: var(--shadow-sm);
+  }
+  .home-link-btn:active { transform: translate(2px,2px); box-shadow: none; }
+  .ov-summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 4px; }
+  .ov-summary-tile { text-align: center; padding: 12px 6px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); }
+  .ov-summary-num { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; color: var(--seal); font-variant-numeric: tabular-nums; }
+  .ov-summary-label { font-size: .64rem; color: var(--ink-soft); margin-top: 2px; font-weight: 700; }
+  .ov-unit-panel { padding: 14px; }
+  .ov-unit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+  .ov-unit-title { font-family: var(--font-display); font-weight: 800; font-size: .95rem; }
+  .ov-unit-badges { display: flex; gap: 6px; flex-shrink: 0; }
+  .ov-badge { font-size: 1.15rem; opacity: .3; filter: grayscale(1); transition: all .3s; }
+  .ov-badge.earned { opacity: 1; filter: none; }
+  .ov-summary-final { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+  .ov-summary-final-label { font-weight: 800; font-size: .88rem; }
+  .ov-summary-final-status { font-size: .8rem; font-weight: 700; color: var(--ink-soft); }
+  .ov-summary-final-status.cleared { color: var(--good); }
+  /* 「まだ習得していない単語だけ出題する」のスイッチ */
+  .only-unmastered {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 11px 14px; margin-bottom: 12px;
+  }
+  .only-unmastered input { width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--seal); cursor: pointer; }
+  .only-unmastered .ou-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .only-unmastered .ou-title { font-size: .85rem; font-weight: 700; }
+  .only-unmastered .ou-sub { font-size: .72rem; color: var(--ink-soft); }
+
+  .ov-weak-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 2px; border-top: 1px solid var(--border); gap: 10px; }
+  .ov-weak-row:first-child { border-top: none; }
+  .ov-weak-main { min-width: 0; }
+  .ov-weak-en { font-family: var(--font-mono); font-weight: 700; font-size: .88rem; }
+  .ov-weak-ja { font-size: .72rem; color: var(--ink-soft); margin-top: 1px; }
+  .ov-weak-meta { text-align: right; flex-shrink: 0; }
+  .ov-weak-unit { font-size: .62rem; color: var(--indigo); font-weight: 700; }
+  .ov-weak-stat { font-size: .68rem; color: var(--bad); font-weight: 700; margin-top: 1px; font-variant-numeric: tabular-nums; }
+
+  /* ── MODE GRID ── */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+  .mode-card {
+    background: var(--surface); border: 2px solid var(--border-strong); border-radius: 14px;
+    padding: 18px 12px; text-align: center; cursor: pointer;
+    transition: transform .15s, box-shadow .15s; box-shadow: var(--shadow);
+  }
+  .mode-card:hover { transform: translateY(-2px); }
+  .mode-card:active { transform: translate(2px,2px); box-shadow: none; }
+  .mode-icon { font-size: 1.9rem; margin-bottom: 6px; }
+  .mode-name { font-family: var(--font-display); font-size: 1rem; font-weight: 800; }
+  .mode-desc { font-size: .68rem; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
+  .mode-card.game-soon { opacity: .42; cursor: default; pointer-events: none; }
+
+  /* ── OPEN MATCH (Play) ── */
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .match-col { display: flex; flex-direction: column; gap: 8px; }
+  .match-item {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 10px;
+    padding: 11px 8px; text-align: center; cursor: pointer;
+    font-family: var(--font-body); font-weight: 700; font-size: .8rem; line-height: 1.25;
+    color: var(--ink); word-break: break-word; transition: transform .1s, background .15s, border-color .15s, opacity .15s;
+    box-shadow: var(--shadow-sm);
+  }
+  .match-item.match-mono { font-family: var(--font-mono); }
+  .match-item:active:not(.matched) { transform: translate(1px,1px); box-shadow: none; }
+  .match-item.selected { border-color: var(--indigo); background: var(--indigo-soft); }
+  .match-item.matched { background: var(--good-soft); border-color: var(--good); color: var(--good); cursor: default; opacity: .75; }
+  .match-item.wrong { border-color: var(--bad); background: var(--bad-soft); }
+  @media (max-width: 380px) { .match-item { font-size: .72rem; padding: 9px 6px; } }
+
+  /* ── WORD HUNT (Play) ── */
+  .hunt-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+  .hunt-item {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 10px;
+    padding: 14px 6px; text-align: center; cursor: pointer;
+    font-family: var(--font-mono); font-size: .82rem; font-weight: 700; color: var(--ink);
+    word-break: break-word; transition: all .15s; box-shadow: var(--shadow-sm);
+  }
+  .hunt-item:hover:not(:disabled) { background: var(--surface2); border-color: var(--indigo); }
+  .hunt-item:active:not(:disabled) { transform: translate(1px,1px); box-shadow: none; }
+  .hunt-item.correct { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+  .hunt-item.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); opacity: .55; }
+  .hunt-item:disabled { cursor: default; }
+  @media (max-width: 380px) { .hunt-item { font-size: .72rem; padding: 11px 4px; } }
+
+  /* ── FALLING WORDS (Play) ── */
+  .fall-area {
+    position: relative; height: 340px; overflow: hidden;
+    background: var(--surface2);
+    background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+    background-size: 14px 14px;
+    border: 2px solid var(--border-strong); border-radius: 14px; margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .fall-item {
+    position: absolute; width: 32%;
+    background: var(--surface); border: 2px solid var(--border-strong); border-radius: 8px;
+    padding: 8px 4px; text-align: center; cursor: pointer; touch-action: manipulation;
+    font-family: var(--font-mono); font-size: .78rem; font-weight: 700; color: var(--ink);
+    word-break: break-word; box-shadow: var(--shadow-sm); transition: background .1s, border-color .1s;
+  }
+  .fall-item:active { transform: translate(1px,1px); }
+  .fall-item.caught    { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+  .fall-item.wrong-tap { background: var(--bad-soft);  border-color: var(--bad);  color: var(--bad); }
+  @media (max-width: 380px) { .fall-item { font-size: .66rem; padding: 6px 3px; } }
+
+  /* ── FOLD DIVIDER ── */
+  .fold-title {
+    font-size: .72rem; font-weight: 800; color: var(--ink-soft); text-transform: uppercase;
+    letter-spacing: .1em; margin: 18px 0 10px; padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  /* ── PROGRESS ROW (in-session) ── */
+  .prog-row { display: flex; align-items: center; gap: 10px; font-size: .8rem; color: var(--ink-soft); margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  .prog-bar { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+  .prog-fill { height: 100%; background: var(--seal); border-radius: 3px; transition: width .3s; }
+  .streak-row { text-align: center; font-size: .85rem; color: var(--ink-soft); min-height: 22px; margin-bottom: 8px; font-weight: 700; }
+
+  /* ── LEARN: TOGGLE TABS ── */
+  .tab-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .tab-btn {
+    padding: 10px; text-align: center; border-radius: 10px; border: 2px solid var(--border-strong);
+    background: var(--surface); font-weight: 800; font-size: .88rem; cursor: pointer; color: var(--ink-soft);
+  }
+  .tab-btn.active { background: var(--seal); color: #fdf6e6; }
+
+  /* ── FLASHCARD ── */
+  .flashcard {
+    background: var(--surface2);
+    background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+    background-size: 14px 14px;
+    border: 2px solid var(--border-strong); border-radius: 18px;
+    padding: 40px 24px; text-align: center; min-height: 190px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform .15s; user-select: none; margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .fc-back { display: none; }
+  .flashcard.flipped .fc-front { display: none; }
+  .flashcard.flipped .fc-back  { display: block; }
+  .fc-word { font-family: var(--font-mono); font-size: 2.1rem; font-weight: 700; margin-bottom: 8px; word-break: break-word; }
+  .fc-hint { font-size: .8rem; color: var(--ink-soft); }
+  .fc-trans { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--seal); margin-bottom: 8px; }
+  .fc-en-sub { font-family: var(--font-mono); font-size: .95rem; color: var(--ink-soft); }
+  .fc-badge { display: inline-block; font-size: .62rem; font-weight: 800; background: var(--indigo-soft); color: var(--indigo); border: 1px solid var(--indigo); padding: 1px 8px; border-radius: 20px; margin-bottom: 10px; }
+  .learn-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ── QUIZ ── */
+  .quiz-q, .typing-q, .sentence-q {
+    background: var(--surface2);
+    border: 2px solid var(--border-strong); border-radius: 16px;
+    padding: 28px 20px; text-align: center; margin-bottom: 16px; box-shadow: var(--shadow);
+  }
+  .quiz-q { font-family: var(--font-mono); font-size: 1.7rem; font-weight: 700; }
+  .quiz-dir { display: block; font-family: var(--font-body); font-size: .68rem; font-weight: 700; color: var(--indigo); margin-bottom: 8px; letter-spacing: .05em; }
+  .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quiz-opt {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 10px;
+    padding: 14px 10px; text-align: center; cursor: pointer;
+    font-family: var(--font-body); font-size: .92rem; font-weight: 700; color: var(--ink);
+    transition: border-color .15s, background .15s;
+  }
+  .quiz-opt:hover:not(:disabled) { background: var(--surface2); border-color: var(--indigo); }
+  .quiz-opt:focus-visible { outline: 3px solid var(--indigo); outline-offset: 1px; }
+  .quiz-opt.correct { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+  .quiz-opt.wrong   { background: var(--bad-soft);  border-color: var(--bad);  color: var(--bad); }
+  .quiz-fb { text-align: center; min-height: 26px; font-weight: 800; margin-top: 12px; }
+
+  /* ── TYPING / SENTENCE INPUT ── */
+  .typing-q { font-family: var(--font-body); font-size: 1.35rem; font-weight: 800; color: var(--ink); }
+  .typing-q .tq-mono { font-family: var(--font-mono); color: var(--seal); }
+  .typing-sub { text-align: center; font-size: .8rem; color: var(--ink-soft); margin-bottom: 10px; font-weight: 700; }
+  .typing-input {
+    width: 100%; padding: 13px 16px; font-size: 1.05rem; font-family: var(--font-mono);
+    background: var(--surface); border: 2px solid var(--border-strong); border-radius: 10px;
+    color: var(--ink); outline: none; margin-bottom: 12px; transition: border-color .2s, box-shadow .2s;
+  }
+  .typing-input:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-soft); }
+  .typing-input.ok  { border-color: var(--good); background: var(--good-soft); }
+  .typing-input.ng  { border-color: var(--bad);  background: var(--bad-soft); }
+  .typing-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .typing-fb { text-align: center; min-height: 26px; font-weight: 800; }
+  .blank-mark { display: inline-block; min-width: 46px; border-bottom: 3px solid var(--seal); color: var(--seal); font-family: var(--font-mono); }
+
+  /* ── WORD LIST ── */
+  .wl-row { padding: 11px 2px; border-bottom: 1px solid var(--border); }
+  .wl-row:last-child { border-bottom: none; }
+  .wl-head { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .wl-en { font-family: var(--font-mono); font-weight: 700; font-size: .92rem; }
+  .wl-ja { color: var(--ink-soft); font-size: .8rem; margin-top: 2px; }
+  .wl-badge { display: inline-block; font-size: .58rem; font-weight: 800; padding: 1px 6px; border-radius: 8px; white-space: nowrap; }
+  .wl-badge.phrase { background: var(--indigo-soft); color: var(--indigo); }
+  .wl-badge.prod   { background: var(--seal-soft); color: var(--seal); }
+  .wl-meters { display: flex; gap: 14px; margin-top: 7px; font-size: .68rem; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  .wl-meter { display: flex; align-items: center; gap: 4px; }
+  .wl-meter .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── RESULT ── */
+  .result-wrap { text-align: center; padding: 26px 14px; }
+  .result-emoji { font-size: 3.2rem; margin-bottom: 10px; }
+  .result-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+  .result-pts { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: var(--seal); margin: 12px 0; }
+  .result-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 16px 0; }
+  .result-msg { color: var(--ink-soft); font-size: .9rem; margin-bottom: 18px; font-weight: 700; }
+
+  /* ── NOTIFICATION ── */
+  .notif {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-70px);
+    background: var(--surface); border: 2px solid var(--border-strong); border-radius: 10px;
+    padding: 10px 20px; font-weight: 800; font-size: .88rem; z-index: 999;
+    transition: transform .3s; pointer-events: none; white-space: nowrap; box-shadow: var(--shadow);
+  }
+  .notif.show { transform: translateX(-50%) translateY(0); }
+  .notif.ok  { border-color: var(--good); color: var(--good); }
+  .notif.err { border-color: var(--bad);   color: var(--bad); }
+
+  .score-pop {
+    position: fixed; pointer-events: none; font-family: var(--font-display); font-size: 1.25rem; font-weight: 800;
+    z-index: 1000; transition: all .7s ease; top: 44%; left: 50%; transform: translate(-50%,-50%);
+  }
+  .score-pop.fade { opacity: 0; transform: translate(-50%,-110%); }
+
+  .speak-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--indigo-soft); border: 1px solid var(--indigo);
+    color: var(--indigo); border-radius: 20px; padding: 6px 13px;
+    font-size: .8rem; font-weight: 700; cursor: pointer; transition: background .2s; margin-top: 10px;
+    font-family: var(--font-body);
+  }
+  .speak-btn:hover { background: var(--indigo-soft); filter: brightness(0.92); }
+  .speak-btn.playing { animation: pulse .6s infinite alternate; }
+  @keyframes pulse { from { opacity:.65; } to { opacity:1; } }
+
+  .sec-title { font-size: .74rem; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+
+  /* ── FINAL BOSS ── */
+  .boss-panel {
+    cursor: pointer; border: 3px solid var(--border-strong); box-shadow: var(--shadow);
+    background: var(--surface); transition: transform .15s, border-color .2s, background .2s;
+  }
+  .boss-panel:hover { transform: translateY(-2px); }
+  .boss-panel:active { transform: translate(2px,2px); box-shadow: none; }
+  .boss-panel:not(.boss-locked) { border-color: var(--seal); background: var(--seal-soft); }
+  .boss-reqs-list { margin-top: 12px; font-size: .74rem; color: var(--ink-soft); display: grid; gap: 4px; text-align: left; }
+  .boss-hp-fill { background: var(--seal); }
+  .boss-rank-badge {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 6px auto 10px; padding: 10px 26px; min-width: 96px; border-radius: 999px;
+    font-family: var(--font-display); font-size: 1.7rem; font-weight: 800; white-space: nowrap;
+    border: 4px solid var(--rank-color, var(--seal)); color: var(--rank-color, var(--seal));
+    background: var(--rank-color-soft, var(--seal-soft)); box-shadow: var(--shadow-sm);
+  }
+  .boss-rank-badge .rb-medal { font-size: 1.5rem; }
+  .boss-time-row { display: flex; justify-content: center; gap: 18px; margin: 4px 0 10px; font-size: .82rem; color: var(--ink-soft); }
+  .boss-time-row b { color: var(--ink); font-family: var(--font-mono); }
+  .boss-best-line { font-size: .74rem; color: var(--ink-soft); margin-top: 6px; }
+
+  .boss-best-badge {
+    display: inline-flex; align-items: center; gap: 10px; margin: 6px auto 2px;
+    padding: 5px 18px 5px 12px; border-radius: 999px;
+    border: 2.5px solid var(--rank-color, var(--seal)); background: var(--rank-color-soft, var(--seal-soft));
+  }
+  .boss-best-badge .bb-rank {
+    font-family: var(--font-display); font-size: 1.7rem; font-weight: 800; line-height: 1;
+    color: var(--rank-color, var(--seal));
+  }
+  .boss-best-badge .bb-time {
+    font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--ink);
+  }
+
+  .boss-rank-table {
+    margin-top: 12px; border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; background: var(--surface); text-align: left;
+  }
+  .brt-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 14px; font-size: .8rem; border-top: 1px solid var(--border); }
+  .brt-row:first-child { border-top: none; }
+  .brt-row.brt-head {
+    background: var(--surface2); font-weight: 800; color: var(--ink-soft);
+    font-size: .68rem; text-transform: uppercase; letter-spacing: .05em;
+  }
+  .brt-rank { font-family: var(--font-display); font-weight: 800; }
+  .brt-time { font-family: var(--font-mono); color: var(--ink-soft); }
+
+  .foot-link { text-align: center; margin-top: 6px; }
+  .foot-link button { background: none; border: none; color: var(--ink-soft); font-size: .74rem; text-decoration: underline; cursor: pointer; font-family: var(--font-body); }
+
+  .trophy-overlay {
+    position: fixed; inset: 0; background: rgba(20,16,10,.86); z-index: 2000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    animation: fadeInOv .3s ease; padding: 20px;
+  }
+  @keyframes fadeInOv { from { opacity:0; } to { opacity:1; } }
+  .trophy-popup { text-align: center; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); max-width: 340px; }
+  @keyframes popIn { from { transform:scale(.4); opacity:0; } to { transform:scale(1); opacity:1; } }
+
+  @media (max-width:380px) {
+    .fc-word { font-size: 1.7rem; }
+    .quiz-q  { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+<div id="notif" class="notif"></div>
+<div class="container">
+
+<!-- ═══════════ HOME ═══════════ -->
+<div id="screen-home" class="screen active">
+  <div class="header">
+    <div class="brand">
+      <div class="brand-text">
+        <div class="logo">Vocabulary Trainer <span style="font-size:.6em;">1年</span></div>
+      </div>
+    </div>
+    <div class="header-btns">
+      <a class="home-link-btn" href="単語学習.html">🏠 戻る</a>
+      <button class="ov-open-btn" onclick="go('overview')">📊 学習状況</button>
+    </div>
+  </div>
+
+  <div id="unit-selector" class="unit-selector"></div>
+
+  <div id="core-modes-section">
+  <div class="panel" style="margin-bottom:18px;">
+    <div class="sec-title" style="margin-bottom:10px;">🏆 トロフィー</div>
+    <div class="trophy-progress">
+      <div>
+        <div class="tp-label">🎯 Quiz</div>
+        <div class="tp-bar"><div class="tp-fill" id="trophy-qz-fill" style="width:0%;background:var(--seal);"></div></div>
+        <div class="tp-txt" id="trophy-qz-txt">0/0</div>
+      </div>
+      <div>
+        <div class="tp-label">⌨️ Typing</div>
+        <div class="tp-bar"><div class="tp-fill" id="trophy-ty-fill" style="width:0%;background:var(--indigo);"></div></div>
+        <div class="tp-txt" id="trophy-ty-txt">0/0</div>
+      </div>
+      <div>
+        <div class="tp-label">📝 Sentence</div>
+        <div class="tp-bar"><div class="tp-fill" id="trophy-st-fill" style="width:0%;background:var(--good);"></div></div>
+        <div class="tp-txt" id="trophy-st-txt">0/0</div>
+      </div>
+    </div>
+    <div class="trophy-slots">
+      <div id="slot-silver" class="trophy-slot">
+        <div class="t-icon" id="icon-silver">🥈</div>
+        <div class="t-name" id="name-silver">銀トロフィー</div>
+        <div class="t-cond" id="cond-silver">全モード80%でGET</div>
+      </div>
+      <div id="slot-gold" class="trophy-slot">
+        <div class="t-icon" id="icon-gold">🥇</div>
+        <div class="t-name" id="name-gold">金トロフィー</div>
+        <div class="t-cond" id="cond-gold">全モード100%でGET</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">学習モードを選ぼう</div>
+  <label class="only-unmastered" id="only-unmastered-row">
+    <input type="checkbox" id="only-unmastered" onchange="toggleOnlyUnmastered()">
+    <span class="ou-text">
+      <span class="ou-title">まだ習得していない単語だけ出題する</span>
+      <span class="ou-sub" id="only-unmastered-sub"></span>
+    </span>
+  </label>
+  <div class="mode-grid">
+    <div class="mode-card" onclick="go('learn')">
+      <div class="mode-icon">📖</div>
+      <div class="mode-name">Learn</div>
+      <div class="mode-desc">Card / Listで単語を確認</div>
+    </div>
+    <div class="mode-card" onclick="startMode('quiz')">
+      <div class="mode-icon">🎯</div>
+      <div class="mode-name">Quiz</div>
+      <div class="mode-desc">英→日・日→英の4択</div>
+    </div>
+    <div class="mode-card" onclick="go('typingSelect')">
+      <div class="mode-icon">⌨️</div>
+      <div class="mode-name">Typing</div>
+      <div class="mode-desc">Recall / Copyでつづりを練習</div>
+    </div>
+    <div class="mode-card" onclick="startMode('sentence')">
+      <div class="mode-icon">📝</div>
+      <div class="mode-name">Sentence</div>
+      <div class="mode-desc">英文の中で単語を使う</div>
+    </div>
+  </div>
+  </div>
+
+  <div class="sec-title">🎮 Play で腕試し</div>
+  <div class="mode-grid">
+    <div class="mode-card" id="pm-openmatch" onclick="startOpenMatch()">
+      <div class="mode-icon">🔗</div>
+      <div class="mode-name">Open Match</div>
+      <div class="mode-desc" id="pm-openmatch-desc">英語と日本語を組み合わせる</div>
+    </div>
+    <div class="mode-card" id="pm-wordhunt" onclick="startWordHunt()">
+      <div class="mode-icon">🔍</div>
+      <div class="mode-name">Word Hunt</div>
+      <div class="mode-desc" id="pm-wordhunt-desc">正解の英単語をすばやく探す</div>
+    </div>
+    <div class="mode-card" id="pm-timerace" onclick="startTimeRace()">
+      <div class="mode-icon">⏱️</div>
+      <div class="mode-name">Time Race</div>
+      <div class="mode-desc" id="pm-timerace-desc">時間内にどんどん答える</div>
+    </div>
+    <div class="mode-card" id="pm-fallingwords" onclick="startFallingWords()">
+      <div class="mode-icon">⬇️</div>
+      <div class="mode-name">Falling Words</div>
+      <div class="mode-desc" id="pm-fallingwords-desc">落ちてくる正解をタップ</div>
+    </div>
+  </div>
+
+  <div class="sec-title">🏆 ファイナルチャレンジ</div>
+  <div class="panel boss-panel" id="boss-card" onclick="tryEnterBoss()">
+    <div style="text-align:center;">
+      <div style="font-size:2.4rem; margin-bottom:4px;">👹</div>
+      <div class="mode-name" style="font-size:1.1rem;">Final Boss</div>
+      <div class="boss-best-badge" id="boss-best-badge" style="display:none;">
+        <span class="bb-rank" id="bb-rank">S</span>
+        <span class="bb-time" id="bb-time">0.0秒</span>
+      </div>
+      <div class="mode-desc" id="boss-desc" style="margin-top:4px;">🔒 下の条件をすべて満たすと挑戦できます</div>
+    </div>
+    <div class="boss-reqs-list" id="boss-reqs"></div>
+    <div class="boss-rank-table" id="boss-rank-table" style="display:none;"></div>
+  </div>
+
+  <div class="foot-link"><button onclick="resetProgress()">🔄 このUnitの学習記録をリセットする</button></div>
+  <div class="foot-link"><button onclick="showDebugPasscodeModal()">🔓 (動作確認用) このUnitのPlay/Bossをすべて解放する</button></div>
+  <div class="foot-link"><button onclick="debugRelockAll()">🔒 (動作確認用) このUnitのPlay/Bossを再びロックする</button></div>
+</div>
+
+
+<!-- ═══════════ OVERVIEW (all-Units learning status) ═══════════ -->
+<div id="screen-overview" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="sec-title">📊 全Unitの学習状況</div>
+
+  <div class="panel">
+    <div class="ov-summary-grid">
+      <div class="ov-summary-tile">
+        <div class="ov-summary-num" id="ov-silver-count">0/10</div>
+        <div class="ov-summary-label">🥈 銀トロフィー</div>
+      </div>
+      <div class="ov-summary-tile">
+        <div class="ov-summary-num" id="ov-gold-count">0/10</div>
+        <div class="ov-summary-label">🥇 金トロフィー</div>
+      </div>
+      <div class="ov-summary-tile">
+        <div class="ov-summary-num" id="ov-boss-count">0/10</div>
+        <div class="ov-summary-label">👹 Boss撃破</div>
+      </div>
+    </div>
+    <div class="trophy-progress" style="margin-top:12px; margin-bottom:0;">
+      <div>
+        <div class="tp-label">🎯 Quiz（全Unit合計）</div>
+        <div class="tp-bar"><div class="tp-fill" id="ov-qz-fill" style="width:0%;background:var(--seal);"></div></div>
+        <div class="tp-txt" id="ov-qz-txt">0/0</div>
+      </div>
+      <div>
+        <div class="tp-label">⌨️ Typing（全Unit合計）</div>
+        <div class="tp-bar"><div class="tp-fill" id="ov-ty-fill" style="width:0%;background:var(--indigo);"></div></div>
+        <div class="tp-txt" id="ov-ty-txt">0/0</div>
+      </div>
+      <div>
+        <div class="tp-label">📝 Sentence（全Unit合計）</div>
+        <div class="tp-bar"><div class="tp-fill" id="ov-st-fill" style="width:0%;background:var(--good);"></div></div>
+        <div class="tp-txt" id="ov-st-txt">0/0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel ov-summary-final">
+    <div class="ov-summary-final-label">🏁 まとめ Final Boss</div>
+    <div class="ov-summary-final-status" id="ov-summary-final-status">未挑戦</div>
+  </div>
+
+  <div class="panel" id="ov-weak-panel">
+    <div class="sec-title" style="margin-bottom:10px;">🩹 苦手な単語</div>
+    <div id="ov-weak-empty" style="display:none; text-align:center; color:var(--ink-soft); font-size:.85rem; padding:8px 0 4px;">まだ間違えた単語はありません。素晴らしい！🎉</div>
+    <div id="ov-weak-list"></div>
+    <button class="btn btn-primary btn-block" id="ov-weak-practice-btn" style="margin-top:12px; margin-bottom:0;" onclick="startWeakWordsPractice()">🩹 苦手な単語を練習する</button>
+  </div>
+
+  <div class="sec-title" style="margin-top:4px;">Unitごとの記録</div>
+  <div id="ov-unit-list"></div>
+</div>
+
+
+<!-- ═══════════ WEAK WORDS PRACTICE (cross-Unit mistake review) ═══════════ -->
+<div id="screen-weak" class="screen">
+  <button class="back-btn" onclick="go('overview')">← 学習状況に戻る</button>
+
+  <div id="ww-quiz-area">
+    <div class="prog-row">
+      <span id="ww-cnt">1 / 10</span>
+      <div class="prog-bar"><div class="prog-fill" id="ww-prog" style="width:0%"></div></div>
+    </div>
+    <div style="text-align:center; margin-bottom:6px;">
+      <span class="wl-badge" id="ww-unit-tag" style="background:var(--indigo-soft); color:var(--indigo);">Unit 1</span>
+    </div>
+    <div class="quiz-q">
+      <span class="quiz-dir" id="ww-dir">ENGLISH → 日本語</span>
+      <span id="ww-q">---</span>
+    </div>
+    <div style="text-align:center; margin-bottom:14px;">
+      <button class="speak-btn" onclick="speak(event)">🔊 発音を聞く</button>
+    </div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" id="wwo0" onclick="wwAns(0)">---</button>
+      <button class="quiz-opt" id="wwo1" onclick="wwAns(1)">---</button>
+      <button class="quiz-opt" id="wwo2" onclick="wwAns(2)">---</button>
+      <button class="quiz-opt" id="wwo3" onclick="wwAns(3)">---</button>
+    </div>
+    <div class="quiz-fb" id="ww-fb"></div>
+  </div>
+
+  <div id="ww-complete" class="panel" style="display:none; text-align:center;">
+    <div style="font-size:2.2rem; margin-bottom:6px;">🩹</div>
+    <div class="mode-name" style="font-size:1.05rem; margin-bottom:10px;">練習おつかれさま！</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-num" id="ww-ok" style="color:var(--good);">0</div><div class="stat-label">正解</div></div>
+      <div class="stat-card"><div class="stat-num" id="ww-ng" style="color:var(--bad);">0</div><div class="stat-label">不正解</div></div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="startWeakWordsPractice()">🔄 もう一度練習する</button>
+    <button class="btn btn-ghost btn-block" style="margin-bottom:0;" onclick="go('overview')">📊 学習状況に戻る</button>
+  </div>
+</div>
+
+
+<!-- ═══════════ LEARN (Card / List) ═══════════ -->
+<div id="screen-learn" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="tab-row">
+    <button class="tab-btn" id="learn-tab-card" onclick="learnTab('card')">🃏 Card</button>
+    <button class="tab-btn" id="learn-tab-list" onclick="learnTab('list')">📋 List</button>
+  </div>
+
+  <div id="learn-card">
+    <div class="prog-row">
+      <span id="lc-cnt">1 / 34</span>
+      <div class="prog-bar"><div class="prog-fill" id="lc-prog" style="width:0%"></div></div>
+    </div>
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="fc-front">
+        <span class="fc-badge" id="fc-badge"></span>
+        <div class="fc-word" id="fc-word">---</div>
+        <button class="speak-btn" id="fc-speak-btn" onclick="speak(event)">🔊 発音を聞く</button>
+        <div class="fc-hint" style="margin-top:10px;">タップして日本語を確認 👆</div>
+      </div>
+      <div class="fc-back">
+        <div class="fc-trans" id="fc-trans">---</div>
+        <div class="fc-en-sub" id="fc-en-sub">---</div>
+        <button class="speak-btn" onclick="speak(event)" style="margin-top:12px;">🔊 もう一度聞く</button>
+      </div>
+    </div>
+    <div class="learn-nav">
+      <button class="btn btn-ghost" onclick="lcStep(-1)">◀ 前へ</button>
+      <button class="btn btn-ghost" onclick="lcStep(1)">次へ ▶</button>
+    </div>
+  </div>
+
+  <div id="learn-list" style="display:none;">
+    <div class="panel" style="padding:6px 12px;">
+      <div id="wl-body"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ QUIZ ═══════════ -->
+<div id="screen-quiz" class="screen">
+  <button class="back-btn" onclick="endMode()">← ホームに戻る</button>
+  <div class="prog-row">
+    <span id="qz-cnt">1 / 34</span>
+    <div class="prog-bar"><div class="prog-fill" id="qz-prog" style="width:0%"></div></div>
+    <span id="qz-pts">🏆 0</span>
+  </div>
+  <div class="streak-row" id="qz-streak"></div>
+
+  <div class="quiz-q">
+    <span class="quiz-dir" id="qz-dir">ENGLISH → 日本語</span>
+    <span id="qz-q">---</span>
+  </div>
+  <div style="text-align:center; margin-bottom:14px;">
+    <button class="speak-btn" onclick="speak(event)">🔊 発音を聞く</button>
+  </div>
+  <div class="quiz-opts">
+    <button class="quiz-opt" id="qo0" onclick="qzAns(0)">---</button>
+    <button class="quiz-opt" id="qo1" onclick="qzAns(1)">---</button>
+    <button class="quiz-opt" id="qo2" onclick="qzAns(2)">---</button>
+    <button class="quiz-opt" id="qo3" onclick="qzAns(3)">---</button>
+  </div>
+  <div class="quiz-fb" id="qz-fb"></div>
+</div>
+
+
+<!-- ═══════════ TYPING SELECT ═══════════ -->
+<div id="screen-typingSelect" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="sec-title">⌨️ Typingモードを選ぼう（発信語彙 6語）</div>
+  <div class="mode-grid" style="grid-template-columns:1fr;">
+    <div class="mode-card" onclick="startTY('recall')">
+      <div class="mode-icon">🧠</div>
+      <div class="mode-name">Recall</div>
+      <div class="mode-desc">日本語の意味を見て、記憶から英語のつづりを書く</div>
+    </div>
+    <div class="mode-card" onclick="startTY('copy')">
+      <div class="mode-icon">📝</div>
+      <div class="mode-name">Copy</div>
+      <div class="mode-desc">英単語を見ながら、そのまま書き写して練習する</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ TYPING ═══════════ -->
+<div id="screen-typing" class="screen">
+  <button class="back-btn" onclick="endMode()">← ホームに戻る</button>
+  <div class="prog-row">
+    <span id="ty-cnt">1 / 6</span>
+    <div class="prog-bar"><div class="prog-fill" id="ty-prog" style="width:0%"></div></div>
+    <span id="ty-pts">🏆 0</span>
+  </div>
+  <div class="streak-row" id="ty-streak"></div>
+
+  <div class="typing-q"><span class="tq-mono" id="ty-q">---</span></div>
+  <div class="typing-sub" id="ty-sub">英語のスペルを入力してください</div>
+  <input id="ty-input" class="typing-input" type="text" placeholder="英単語を入力..."
+    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+  <div class="typing-btns">
+    <button class="btn btn-ghost" id="ty-hint-btn" onclick="tyHint()">💡 ヒント</button>
+    <button class="btn btn-warn"  onclick="tySkip()">⏭️ スキップ</button>
+    <button class="btn btn-primary" onclick="tySubmit()">✅ 答える</button>
+  </div>
+  <div class="typing-fb" id="ty-fb"></div>
+</div>
+
+
+<!-- ═══════════ SENTENCE ═══════════ -->
+<div id="screen-sentence" class="screen">
+  <button class="back-btn" onclick="endMode()">← ホームに戻る</button>
+  <div class="prog-row">
+    <span id="st-cnt">1 / 34</span>
+    <div class="prog-bar"><div class="prog-fill" id="st-prog" style="width:0%"></div></div>
+    <span id="st-pts">🏆 0</span>
+  </div>
+  <div class="streak-row" id="st-streak"></div>
+
+  <div class="typing-q" id="st-sentence-box"><span id="st-sentence">---</span></div>
+
+  <div style="text-align:center;margin-bottom:14px;">
+    <button class="speak-btn" id="st-hint-toggle" onclick="toggleSentenceHint()">💡 日本語訳のヒント</button>
+    <div id="st-hint-box" style="display:none;margin-top:10px;font-size:.88rem;color:var(--ink-soft);font-weight:700;line-height:1.6;"></div>
+  </div>
+
+  <div id="st-choice-wrap">
+    <div class="typing-sub">空所に入る正しい語句を選ぼう</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" id="so0" onclick="stAnsChoice(0)">---</button>
+      <button class="quiz-opt" id="so1" onclick="stAnsChoice(1)">---</button>
+      <button class="quiz-opt" id="so2" onclick="stAnsChoice(2)">---</button>
+      <button class="quiz-opt" id="so3" onclick="stAnsChoice(3)">---</button>
+    </div>
+  </div>
+
+  <div id="st-type-wrap" style="display:none;">
+    <div class="typing-sub">空所に入る単語のつづりを入力しよう（意味：<span id="st-hintword"></span>）</div>
+    <input id="st-input" class="typing-input" type="text" placeholder="英単語を入力..."
+      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <div class="typing-btns">
+      <button class="btn btn-ghost" onclick="stHint()">💡 スペルのヒント</button>
+      <button class="btn btn-warn"  onclick="stSkip()">⏭️ スキップ</button>
+      <button class="btn btn-primary" onclick="stSubmit()">✅ 答える</button>
+    </div>
+  </div>
+  <div class="quiz-fb" id="st-fb"></div>
+</div>
+
+
+<!-- ═══════════ RESULT ═══════════ -->
+<div id="screen-result" class="screen">
+  <div class="result-wrap">
+    <div class="result-emoji" id="r-emoji">🎉</div>
+    <div class="result-title" id="r-title">ラウンド完了！</div>
+    <div class="result-pts" id="r-pts">+0 pts</div>
+    <div class="result-stats">
+      <div class="stat-card"><div class="stat-num" id="r-ok"  style="color:var(--good)">0</div><div class="stat-label">正解</div></div>
+      <div class="stat-card"><div class="stat-num" id="r-ng"  style="color:var(--bad)">0</div><div class="stat-label">不正解</div></div>
+      <div class="stat-card"><div class="stat-num" id="r-str">0</div><div class="stat-label">最大連続</div></div>
+    </div>
+    <div class="result-msg" id="r-msg"></div>
+    <button class="btn btn-primary btn-block" onclick="retryMode()">🔄 もう一度やる</button>
+    <button class="btn btn-ghost btn-block" onclick="go('home')">🏠 ホームに戻る</button>
+  </div>
+</div>
+
+
+<!-- ═══════════ PLAY: OPEN MATCH ═══════════ -->
+<div id="screen-openmatch" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="prog-row">
+    <span id="om-cnt">ペア 0 / 6</span>
+    <div class="prog-bar"><div class="prog-fill" id="om-prog" style="width:0%"></div></div>
+    <span id="om-time">⏱ 0秒</span>
+  </div>
+  <div class="streak-row" id="om-mistakes">ミス：0</div>
+
+  <div class="match-grid" id="om-grid">
+    <div class="match-col" id="om-en-col"></div>
+    <div class="match-col" id="om-ja-col"></div>
+  </div>
+
+  <div id="om-complete" style="display:none;">
+    <div class="panel" style="text-align:center;">
+      <div class="result-emoji">🎉</div>
+      <div class="result-title">クリア！</div>
+      <div class="result-stats">
+        <div class="stat-card"><div class="stat-num" id="om-r-time">0秒</div><div class="stat-label">タイム</div></div>
+        <div class="stat-card"><div class="stat-num" id="om-r-mistakes">0</div><div class="stat-label">ミス</div></div>
+        <div class="stat-card"><div class="stat-num stat-num-sm" id="om-r-best">-</div><div class="stat-label">自己ベスト</div></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="startOpenMatch()">🔄 もう一度プレイ</button>
+      <button class="btn btn-ghost btn-block" onclick="go('home')">🏠 ホームに戻る</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ PLAY: WORD HUNT ═══════════ -->
+<div id="screen-wordhunt" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="prog-row">
+    <span id="wh-cnt">ラウンド 1 / 8</span>
+    <div class="prog-bar"><div class="prog-fill" id="wh-prog" style="width:0%"></div></div>
+    <span id="wh-time">⏱ 0秒</span>
+  </div>
+  <div class="streak-row" id="wh-mistakes">ミス：0</div>
+
+  <div id="wh-body">
+    <div class="typing-q">
+      <span class="quiz-dir">この意味の英単語をさがそう</span>
+      <span id="wh-target">---</span>
+    </div>
+    <div class="hunt-grid" id="wh-grid"></div>
+  </div>
+
+  <div id="wh-complete" style="display:none;">
+    <div class="panel" style="text-align:center;">
+      <div class="result-emoji">🎉</div>
+      <div class="result-title">クリア！</div>
+      <div class="result-stats">
+        <div class="stat-card"><div class="stat-num" id="wh-r-time">0秒</div><div class="stat-label">タイム</div></div>
+        <div class="stat-card"><div class="stat-num" id="wh-r-mistakes">0</div><div class="stat-label">ミス</div></div>
+        <div class="stat-card"><div class="stat-num stat-num-sm" id="wh-r-best">-</div><div class="stat-label">自己ベスト</div></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="startWordHunt()">🔄 もう一度プレイ</button>
+      <button class="btn btn-ghost btn-block" onclick="go('home')">🏠 ホームに戻る</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ PLAY: TIME RACE ═══════════ -->
+<div id="screen-timerace" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="prog-row">
+    <span id="tr-correct">✅ 0</span>
+    <div class="prog-bar"><div class="prog-fill" id="tr-timebar" style="width:100%"></div></div>
+    <span id="tr-time">⏱ 45秒</span>
+  </div>
+  <div class="streak-row" id="tr-wrong">❌ ミス 0</div>
+
+  <div id="tr-body">
+    <div class="quiz-q">
+      <span class="quiz-dir" id="tr-dir">ENGLISH → 日本語</span>
+      <span id="tr-q">---</span>
+    </div>
+    <div id="tr-choice-wrap">
+      <div class="quiz-opts">
+        <button class="quiz-opt" id="tro0" onclick="trAns(0)">---</button>
+        <button class="quiz-opt" id="tro1" onclick="trAns(1)">---</button>
+        <button class="quiz-opt" id="tro2" onclick="trAns(2)">---</button>
+        <button class="quiz-opt" id="tro3" onclick="trAns(3)">---</button>
+      </div>
+    </div>
+    <div id="tr-type-wrap" style="display:none;">
+      <input id="tr-input" class="typing-input" type="text" placeholder="英単語を入力..."
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      <div class="typing-btns">
+        <button class="btn btn-primary btn-block" onclick="trSubmit()">✅ 答える</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tr-complete" style="display:none;">
+    <div class="panel" style="text-align:center;">
+      <div class="result-emoji">⏰</div>
+      <div class="result-title">タイムアップ！</div>
+      <div class="result-stats">
+        <div class="stat-card"><div class="stat-num" id="tr-r-correct" style="color:var(--good)">0問</div><div class="stat-label">正解</div></div>
+        <div class="stat-card"><div class="stat-num" id="tr-r-wrong" style="color:var(--bad)">0問</div><div class="stat-label">不正解</div></div>
+        <div class="stat-card"><div class="stat-num" id="tr-r-best">-</div><div class="stat-label">自己ベスト</div></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="startTimeRace()">🔄 もう一度プレイ</button>
+      <button class="btn btn-ghost btn-block" onclick="go('home')">🏠 ホームに戻る</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ PLAY: FALLING WORDS ═══════════ -->
+<div id="screen-fallingwords" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="prog-row">
+    <span id="fw-score">✅ 0</span>
+    <span id="fw-lives" style="margin-left:auto;">❤️❤️❤️</span>
+  </div>
+
+  <div id="fw-body">
+    <div class="typing-q" style="margin-bottom:10px;">
+      <span class="quiz-dir">落ちてくる正解をタップ</span>
+      <span id="fw-target">---</span>
+    </div>
+    <div class="fall-area" id="fw-area"></div>
+  </div>
+
+  <div id="fw-complete" style="display:none;">
+    <div class="panel" style="text-align:center;">
+      <div class="result-emoji">💥</div>
+      <div class="result-title">ゲームオーバー！</div>
+      <div class="result-stats" style="grid-template-columns:1fr 1fr;">
+        <div class="stat-card"><div class="stat-num" id="fw-r-score" style="color:var(--good)">0問</div><div class="stat-label">キャッチ数</div></div>
+        <div class="stat-card"><div class="stat-num" id="fw-r-best">-</div><div class="stat-label">自己ベスト</div></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="startFallingWords()">🔄 もう一度プレイ</button>
+      <button class="btn btn-ghost btn-block" onclick="go('home')">🏠 ホームに戻る</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ FINAL BOSS ═══════════ -->
+<div id="screen-boss" class="screen">
+  <button class="back-btn" onclick="go('home')">← ホームに戻る</button>
+  <div class="prog-row">
+    <span id="bs-hearts">❤️❤️❤️</span>
+    <div class="prog-bar"><div class="prog-fill boss-hp-fill" id="bs-hpbar" style="width:100%;"></div></div>
+    <span id="bs-phase">フェーズ 1 / 4</span>
+  </div>
+  <div class="streak-row" style="font-weight:800;"><span id="bs-phase-name">Open Match</span> <span id="bs-round" style="font-weight:600; color:var(--ink-soft);"></span></div>
+
+  <div id="boss-body">
+    <div id="boss-phase-om">
+      <div class="match-grid">
+        <div class="match-col" id="bsom-en-col"></div>
+        <div class="match-col" id="bsom-ja-col"></div>
+      </div>
+    </div>
+    <div id="boss-phase-wh" style="display:none;">
+      <div class="typing-q">
+        <span class="quiz-dir">この意味の英単語をさがそう</span>
+        <span id="bswh-target">---</span>
+      </div>
+      <div class="hunt-grid" id="bswh-grid"></div>
+    </div>
+    <div id="boss-phase-fw" style="display:none;">
+      <div class="typing-q" style="margin-bottom:10px;">
+        <span class="quiz-dir">落ちてくる正解をタップ</span>
+        <span id="bsfw-target">---</span>
+      </div>
+      <div class="fall-area" id="bsfw-area"></div>
+    </div>
+    <div id="boss-phase-tr" style="display:none;">
+      <div style="text-align:right; font-size:.8rem; color:var(--ink-soft); font-weight:700; margin-bottom:6px;" id="bstr-time">⏱ 20秒</div>
+      <div class="quiz-q">
+        <span class="quiz-dir" id="bstr-dir">ENGLISH → 日本語</span>
+        <span id="bstr-q">---</span>
+      </div>
+      <div id="bstr-choice-wrap">
+        <div class="quiz-opts">
+          <button class="quiz-opt" id="bstro0" onclick="bossTRAns(0)">---</button>
+          <button class="quiz-opt" id="bstro1" onclick="bossTRAns(1)">---</button>
+          <button class="quiz-opt" id="bstro2" onclick="bossTRAns(2)">---</button>
+          <button class="quiz-opt" id="bstro3" onclick="bossTRAns(3)">---</button>
+        </div>
+      </div>
+      <div id="bstr-type-wrap" style="display:none;">
+        <input id="bstr-input" class="typing-input" type="text" placeholder="英単語を入力..."
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <div class="typing-btns">
+          <button class="btn btn-primary btn-block" onclick="bossTRSubmit()">✅ 答える</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="boss-result" style="display:none;">
+    <div class="panel" style="text-align:center;">
+      <div class="result-emoji" id="boss-result-emoji">🏆</div>
+      <div class="result-title" id="boss-result-title">ボス撃破！</div>
+      <div class="result-msg" id="boss-result-msg"></div>
+      <div id="boss-rank-wrap" style="display:none;">
+        <div class="boss-rank-badge" id="boss-rank-badge"><span class="rb-medal" id="boss-rank-medal">💎</span><span id="boss-rank-label">Platinum</span></div>
+        <div class="boss-time-row">
+          <span>タイム：<b id="boss-time">0.0秒</b></span>
+        </div>
+        <div class="boss-best-line" id="boss-best-line"></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="startBoss()">🔄 もう一度挑戦</button>
+      <button class="btn btn-ghost btn-block" onclick="go('home')">🏠 ホームに戻る</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ══════════════════════════════════════════
+//  WORD DATA — one array per unit.
+//  To add a new unit, add another {id, title, words} entry to UNITS below.
+//  The unit selector on the Home screen is built from this list automatically.
+// ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  中1の単語データ（教科書の区切りのまま）
+//  productive: 太字の重要語（タイピング対象・例文つき）
+//  phrase: 熟語・連語
+// ══════════════════════════════════════════
+// ===== 中1 Unit 1 =====
+const G1_U1_WORDS = [
+  {en:"call", ja:"…を〜と呼ぶ", productive:true, accept:["call","calls"], sentence:"My friends ___ me Yuki.", sentenceJa:"友達は私をユキと呼びます。"},
+  {en:"South Africa", ja:"南アフリカ"},
+  {en:"love", ja:"…が大好きである", productive:true, accept:["love","loves"], sentence:"I ___ music very much.", sentenceJa:"私は音楽が大好きです。"},
+  {en:"everyone", ja:"みなさん", productive:true, accept:["everyone"], sentence:"Hello, ___! I'm Aya.", sentenceJa:"こんにちは、みなさん！私はアヤです。"},
+  {en:"me", ja:"私を", productive:true, accept:["me"], sentence:"Please call ___ tonight.", sentenceJa:"今夜私に電話してください。"},
+  {en:"from", ja:"…から", productive:true, accept:["from"], sentence:"I'm ___ Osaka.", sentenceJa:"私は大阪出身です。"},
+  {en:"Japanese", ja:"日本の", productive:true, accept:["Japanese"], sentence:"I like ___ food.", sentenceJa:"私は日本の食べ物が好きです。"},
+  {en:"sweet(s)", ja:"菓子", productive:true, accept:["sweets","sweet"], sentence:"I like Japanese ___.", sentenceJa:"私は日本のお菓子が好きです。"},
+  {en:"and", ja:"…と〜", productive:true, accept:["and"], sentence:"I like math ___ science.", sentenceJa:"私は数学と理科が好きです。"},
+  {en:"too", ja:"…もまた", productive:true, accept:["too"], sentence:"I like tennis. I like soccer, ___.", sentenceJa:"私はテニスが好きです。サッカーも好きです。"},
+  {en:"join", ja:"…に参加する", productive:true, accept:["join","joins"], sentence:"I want to ___ the music club.", sentenceJa:"私は音楽部に入りたいです。"},
+  {en:"the", ja:"その", productive:true, accept:["the"], sentence:"Look at ___ moon. It's beautiful.", sentenceJa:"月を見て。美しいです。"},
+  {en:"club", ja:"クラブ、部", productive:true, accept:["club","clubs"], sentence:"I'm in the art ___.", sentenceJa:"私は美術部にいます。"},
+  {en:"Call me ....", ja:"私を…と呼んでください。", phrase:true},
+  {en:"want to", ja:"…したい", phrase:true},
+  {en:"number(s)", ja:"数", productive:true, accept:["number","numbers"], sentence:"My favorite ___ is seven.", sentenceJa:"私のいちばん好きな数は7です。"},
+  {en:"fan", ja:"ファン"},
+  {en:"often", ja:"よく", productive:true, accept:["often"], sentence:"I ___ watch soccer games.", sentenceJa:"私はよくサッカーの試合を見ます。"},
+  {en:"with", ja:"…といっしょに", productive:true, accept:["with"], sentence:"I play tennis ___ my friends.", sentenceJa:"私は友達といっしょにテニスをします。"},
+  {en:"but", ja:"しかし", productive:true, accept:["but"], sentence:"I like soccer, ___ I can't play it well.", sentenceJa:"私はサッカーが好きですが、上手にできません。"},
+  {en:"rugby", ja:"ラグビー"},
+  {en:"watch", ja:"…を見る", productive:true, accept:["watch","watches"], sentence:"I ___ TV every night.", sentenceJa:"私は毎晩テレビを見ます。"},
+  {en:"friend(s)", ja:"友達", productive:true, accept:["friend","friends"], sentence:"She is my best ___.", sentenceJa:"彼女は私の親友です。"},
+  {en:"great", ja:"すばらしい", productive:true, accept:["great"], sentence:"That's a ___ idea!", sentenceJa:"それはすばらしい考えです！"},
+  {en:"no", ja:"いいえ、いや", productive:true, accept:["no"], sentence:"___, I'm not a student.", sentenceJa:"いいえ、私は学生ではありません。"},
+  {en:"not", ja:"…でない、…しない", productive:true, accept:["not"], sentence:"I am ___ hungry now.", sentenceJa:"私は今おなかがすいていません。"},
+  {en:"oh", ja:"まあ、あら、ああ", productive:true, accept:["oh"], sentence:"___, that's nice!", sentenceJa:"まあ、それはすてきですね！"},
+  {en:"don't", ja:"⇐ do not"},
+  {en:"draw", ja:"（線画）をかく", productive:true, accept:["draw","draws"], sentence:"I like to ___ pictures.", sentenceJa:"私は絵をかくのが好きです。"},
+  {en:"an", ja:"1つの", productive:true, accept:["an"], sentence:"I have ___ old bike.", sentenceJa:"私は古い自転車を持っています。"},
+  {en:"anime", ja:"アニメ"},
+  {en:"so", ja:"だから、それで", productive:true, accept:["so"], sentence:"I was tired, ___ I went to bed early.", sentenceJa:"私は疲れていたので、早く寝ました。"},
+  {en:"about", ja:"…について", productive:true, accept:["about"], sentence:"Let's talk ___ our school.", sentenceJa:"私たちの学校について話しましょう。"},
+  {en:"lesson(s)", ja:"授業、レッスン"},
+  {en:"comic(s)", ja:"マンガ"},
+  {en:"wow", ja:"うわあ、わあ"},
+  {en:"are", ja:"…です、…だ", productive:true, accept:["are"], sentence:"You ___ a good singer.", sentenceJa:"あなたは歌が上手です。"},
+  {en:"in", ja:"…に所属して", productive:true, accept:["in"], sentence:"I'm ___ the tennis club.", sentenceJa:"私はテニス部に所属しています。"},
+  {en:"art", ja:"美術", productive:true, accept:["art"], sentence:"My favorite subject is ___.", sentenceJa:"私のいちばん好きな教科は美術です。"},
+  {en:"how", ja:"どんなようすで", productive:true, accept:["how"], sentence:"___ are you today?", sentenceJa:"今日はごきげんいかがですか。"},
+  {en:"school", ja:"学校", productive:true, accept:["school"], sentence:"I go to ___ by bus.", sentenceJa:"私はバスで学校に行きます。"},
+  {en:"now", ja:"今", productive:true, accept:["now"], sentence:"I'm busy ___.", sentenceJa:"私は今忙しいです。"},
+  {en:"take", ja:"…を受ける", productive:true, accept:["take","takes"], sentence:"I ___ swimming lessons on Sundays.", sentenceJa:"私は日曜日に水泳のレッスンを受けます。"},
+  {en:"swimming", ja:"水泳", productive:true, accept:["swimming"], sentence:"I'm on the ___ team.", sentenceJa:"私は水泳チームに入っています。"},
+  {en:"How about you?", ja:"あなたはどうですか。", phrase:true},
+];
+
+// ===== 中1 Unit 2 =====
+const G1_U2_WORDS = [
+  {en:"class", ja:"学級、クラス", productive:true, accept:["class","classes"], sentence:"We are in the same ___.", sentenceJa:"私たちは同じクラスです。"},
+  {en:"our", ja:"私たちの", productive:true, accept:["our"], sentence:"This is ___ classroom.", sentenceJa:"これは私たちの教室です。"},
+  {en:"Canada", ja:"カナダ"},
+  {en:"America", ja:"アメリカ"},
+  {en:"Ms.", ja:"（女性をさして）…さん、…先生", productive:true, accept:["Ms.","Ms"], sentence:"___ Green is our English teacher.", sentenceJa:"グリーン先生は私たちの英語の先生です。"},
+  {en:"Mr.", ja:"（男性をさして）…さん、…先生", productive:true, accept:["Mr.","Mr"], sentence:"___ Sato teaches math.", sentenceJa:"佐藤先生は数学を教えます。"},
+  {en:"he", ja:"彼は", productive:true, accept:["he"], sentence:"This is Ken. ___ is my friend.", sentenceJa:"こちらはケンです。彼は私の友達です。"},
+  {en:"she", ja:"彼女は", productive:true, accept:["she"], sentence:"This is Aya. ___ is a good singer.", sentenceJa:"こちらはアヤです。彼女は歌が上手です。"},
+  {en:"new", ja:"新しい", productive:true, accept:["new"], sentence:"I have a ___ bike.", sentenceJa:"私は新しい自転車を持っています。"},
+  {en:"teacher", ja:"先生", productive:true, accept:["teacher","teachers"], sentence:"Ms. Brown is a music ___.", sentenceJa:"ブラウン先生は音楽の先生です。"},
+  {en:"on", ja:"…の一員で、…の上に", productive:true, accept:["on"], sentence:"He is ___ the soccer team.", sentenceJa:"彼はサッカーチームの一員です。"},
+  {en:"team", ja:"チーム", productive:true, accept:["team","teams"], sentence:"Our ___ won the game.", sentenceJa:"私たちのチームは試合に勝ちました。"},
+  {en:"at", ja:"…は、…に関しては", productive:true, accept:["at"], sentence:"She is good ___ cooking.", sentenceJa:"彼女は料理が得意です。"},
+  {en:"cool", ja:"かっこいい", productive:true, accept:["cool"], sentence:"Your bag is so ___!", sentenceJa:"あなたのかばんはとてもかっこいいね！"},
+  {en:"be good at (...ing)", ja:"…が得意だ", phrase:true},
+  {en:"he's", ja:"⇐ he is"},
+  {en:"she's", ja:"⇐ she is"},
+  {en:"Chinese", ja:"中国の"},
+  {en:"cannot", ja:"…できない", productive:true, accept:["cannot"], sentence:"I ___ swim well.", sentenceJa:"私は上手に泳ぐことができません。"},
+  {en:"some", ja:"いくつかの、いくらかの", productive:true, accept:["some"], sentence:"I have ___ questions.", sentenceJa:"私はいくつか質問があります。"},
+  {en:"parent(s)", ja:"親、[parentsで]両親", productive:true, accept:["parents","parent"], sentence:"My ___ are from Canada.", sentenceJa:"私の両親はカナダ出身です。"},
+  {en:"China", ja:"中国"},
+  {en:"food", ja:"食べ物", productive:true, accept:["food","foods"], sentence:"Chinese ___ is delicious.", sentenceJa:"中国の食べ物はおいしいです。"},
+  {en:"father", ja:"父", productive:true, accept:["father"], sentence:"My ___ can cook very well.", sentenceJa:"私の父はとても上手に料理ができます。"},
+  {en:"can", ja:"…できる", productive:true, accept:["can"], sentence:"I ___ play the piano.", sentenceJa:"私はピアノを弾くことができます。"},
+  {en:"make", ja:"…を作る", productive:true, accept:["make","makes"], sentence:"My mother can ___ a cake.", sentenceJa:"母はケーキを作ることができます。"},
+  {en:"very", ja:"とても", productive:true, accept:["very"], sentence:"This book is ___ interesting.", sentenceJa:"この本はとてもおもしろいです。"},
+  {en:"well", ja:"上手に", productive:true, accept:["well"], sentence:"He plays soccer ___.", sentenceJa:"彼は上手にサッカーをします。"},
+  {en:"that", ja:"それは、あれは", productive:true, accept:["that"], sentence:"___ is my bag.", sentenceJa:"あれは私のかばんです。"},
+  {en:"read", ja:"…を読む", productive:true, accept:["read","reads"], sentence:"I ___ a book every day.", sentenceJa:"私は毎日本を読みます。"},
+  {en:"really", ja:"本当に", productive:true, accept:["really"], sentence:"This cake is ___ good!", sentenceJa:"このケーキは本当においしい！"},
+  {en:"see", ja:"…がわかる、…が見える", productive:true, accept:["see","sees"], sentence:"I ___ a bird in the tree.", sentenceJa:"木に鳥が見えます。"},
+  {en:"I see.", ja:"なるほど。", phrase:true},
+  {en:"that's", ja:"⇐ that is"},
+  {en:"can't", ja:"⇐ cannot"},
+  {en:"excuse", ja:"…を許す", productive:true, accept:["excuse"], sentence:"___ me, where is the station?", sentenceJa:"すみません、駅はどこですか。"},
+  {en:"oops", ja:"おっと、うわ"},
+  {en:"here", ja:"ここに", productive:true, accept:["here"], sentence:"Come ___, please.", sentenceJa:"こちらに来てください。"},
+  {en:"welcome", ja:"歓迎される", productive:true, accept:["welcome"], sentence:"You're ___.", sentenceJa:"どういたしまして。"},
+  {en:"totem pole", ja:"トーテムポール"},
+  {en:"your", ja:"あなたの", productive:true, accept:["your"], sentence:"Is this ___ pen?", sentenceJa:"これはあなたのペンですか。"},
+  {en:"thank", ja:"感謝する", productive:true, accept:["thank","thanks"], sentence:"___ you for your help.", sentenceJa:"手伝ってくれてありがとう。"},
+  {en:"it", ja:"それは", productive:true, accept:["it"], sentence:"I like this song. ___ is beautiful.", sentenceJa:"私はこの歌が好きです。それは美しいです。"},
+  {en:"bird", ja:"鳥", productive:true, accept:["bird","birds"], sentence:"A small ___ is singing.", sentenceJa:"小さな鳥が鳴いています。"},
+  {en:"Excuse me.", ja:"すみません。", phrase:true},
+  {en:"Here you are.", ja:"はいどうぞ。", phrase:true},
+  {en:"Thank you.", ja:"ありがとう。", phrase:true},
+  {en:"You're welcome.", ja:"どういたしまして。", phrase:true},
+  {en:"you're", ja:"⇐ you are"},
+  {en:"it's", ja:"⇐ it is"},
+];
+
+// ===== 中1 Unit 3 =====
+const G1_U3_WORDS = [
+  {en:"symbol", ja:"シンボル、象徴"},
+  {en:"for", ja:"…のかわりに、…に相当する", productive:true, accept:["for"], sentence:"This is a symbol ___ peace.", sentenceJa:"これは平和を表すシンボルです。"},
+  {en:"interesting", ja:"おもしろい", productive:true, accept:["interesting"], sentence:"I read an ___ story yesterday.", sentenceJa:"私は昨日おもしろい話を読みました。"},
+  {en:"favorite", ja:"いちばん好きな、お気に入りの", productive:true, accept:["favorite"], sentence:"My ___ sport is basketball.", sentenceJa:"私のいちばん好きなスポーツはバスケットボールです。"},
+  {en:"character", ja:"登場人物", productive:true, accept:["character","characters"], sentence:"Who is your favorite ___?", sentenceJa:"あなたのいちばん好きな登場人物はだれですか。"},
+  {en:"also", ja:"…もまた、そのうえ", productive:true, accept:["also"], sentence:"I like music. I ___ like art.", sentenceJa:"私は音楽が好きです。美術も好きです。"},
+  {en:"what", ja:"何、どんなもの[こと]", productive:true, accept:["what"], sentence:"___ is this?", sentenceJa:"これは何ですか。"},
+  {en:"family", ja:"家族", productive:true, accept:["family","families"], sentence:"I have a big ___.", sentenceJa:"私は大家族です。"},
+  {en:"who", ja:"だれ", productive:true, accept:["who"], sentence:"___ is that girl?", sentenceJa:"あの女の子はだれですか。"},
+  {en:"why", ja:"なぜ", productive:true, accept:["why"], sentence:"___ do you like it?", sentenceJa:"なぜあなたはそれが好きなのですか。"},
+  {en:"brave", ja:"勇かんな"},
+  {en:"kind", ja:"親切な、やさしい", productive:true, accept:["kind"], sentence:"He is very ___ to everyone.", sentenceJa:"彼はみんなにとても親切です。"},
+  {en:"what's", ja:"⇐ what is"},
+  {en:"who's", ja:"⇐ who is"},
+  {en:"around", ja:"…の近くに、…のまわりに", productive:true, accept:["around"], sentence:"There are many shops ___ the station.", sentenceJa:"駅のまわりにはたくさんの店があります。"},
+  {en:"after", ja:"…のあとに[で]", productive:true, accept:["after"], sentence:"I play soccer ___ school.", sentenceJa:"私は放課後にサッカーをします。"},
+  {en:"online", ja:"オンラインで"},
+  {en:"live", ja:"住む、住んでいる", productive:true, accept:["live","lives"], sentence:"I ___ in Nagoya.", sentenceJa:"私は名古屋に住んでいます。"},
+  {en:"come", ja:"来る", productive:true, accept:["come","comes"], sentence:"Please ___ to my house.", sentenceJa:"私の家に来てください。"},
+  {en:"by", ja:"…によって", productive:true, accept:["by"], sentence:"I go to school ___ bike.", sentenceJa:"私は自転車で学校に行きます。"},
+  {en:"walk", ja:"歩く", productive:true, accept:["walk","walks"], sentence:"I ___ to school every day.", sentenceJa:"私は毎日歩いて学校に行きます。"},
+  {en:"when", ja:"いつ、どんなときに", productive:true, accept:["when"], sentence:"___ is your birthday?", sentenceJa:"あなたの誕生日はいつですか。"},
+  {en:"study", ja:"（…を）勉強する、研究する", productive:true, accept:["study","studies"], sentence:"I ___ English every day.", sentenceJa:"私は毎日英語を勉強します。"},
+  {en:"after school", ja:"放課後（に）", phrase:true},
+  {en:"week", ja:"週、1週間", productive:true, accept:["week","weeks"], sentence:"I practice the piano three times a ___.", sentenceJa:"私は週に3回ピアノを練習します。"},
+  {en:"hallway", ja:"廊下"},
+  {en:"win", ja:"（…に）勝つ", productive:true, accept:["win","wins"], sentence:"I hope we ___ the game.", sentenceJa:"私たちが試合に勝つといいなと思います。"},
+  {en:"next", ja:"次の、今度の", productive:true, accept:["next"], sentence:"Let's meet ___ Sunday.", sentenceJa:"次の日曜日に会いましょう。"},
+  {en:"luck", ja:"運、幸運"},
+  {en:"near", ja:"…の近くに[で]", productive:true, accept:["near"], sentence:"My house is ___ the park.", sentenceJa:"私の家は公園の近くです。"},
+  {en:"where", ja:"どこに[で、へ]", productive:true, accept:["where"], sentence:"___ do you live?", sentenceJa:"あなたはどこに住んでいますか。"},
+  {en:"practice", ja:"（…を）練習する", productive:true, accept:["practice","practices"], sentence:"We ___ soccer after school.", sentenceJa:"私たちは放課後サッカーを練習します。"},
+  {en:"hard", ja:"熱心に、一生懸命に", productive:true, accept:["hard"], sentence:"She studies very ___.", sentenceJa:"彼女はとても熱心に勉強します。"},
+  {en:"go", ja:"行く", productive:true, accept:["go","goes"], sentence:"Let's ___ to the park.", sentenceJa:"公園に行きましょう。"},
+  {en:"park", ja:"公園、遊園地", productive:true, accept:["park","parks"], sentence:"I play tennis in the ___.", sentenceJa:"私は公園でテニスをします。"},
+  {en:"station", ja:"駅", productive:true, accept:["station","stations"], sentence:"The ___ is near my school.", sentenceJa:"駅は私の学校の近くです。"},
+  {en:"under", ja:"…の下に", productive:true, accept:["under"], sentence:"The cat is ___ the table.", sentenceJa:"ネコはテーブルの下にいます。"},
+  {en:"Good luck.", ja:"幸運を祈ります。", phrase:true},
+  {en:"when's", ja:"⇐ when is"},
+  {en:"where's", ja:"⇐ where is"},
+  {en:"month", ja:"月、1か月", productive:true, accept:["month","months"], sentence:"February is the second ___ of the year.", sentenceJa:"2月は1年の2番目の月です。"},
+  {en:"date", ja:"日、日付", productive:true, accept:["date"], sentence:"What's the ___ today?", sentenceJa:"今日は何日ですか。"},
+];
+
+// ===== 中1 Unit 4 =====
+const G1_U4_WORDS = [
+  {en:"puppy, puppies", ja:"子イヌ"},
+  {en:"of", ja:"…の", productive:true, accept:["of"], sentence:"He is one ___ my best friends.", sentenceJa:"彼は私の親友の1人です。"},
+  {en:"someday", ja:"いつか"},
+  {en:"lot", ja:"[a lotまたはlotsで]たくさん", productive:true, accept:["lot"], sentence:"I have a ___ of books.", sentenceJa:"私はたくさんの本を持っています。"},
+  {en:"they", ja:"彼らは、彼女らは", productive:true, accept:["they"], sentence:"I have two dogs. ___ are very cute.", sentenceJa:"私はイヌを2匹飼っています。それらはとてもかわいいです。"},
+  {en:"animal(s)", ja:"動物", productive:true, accept:["animals","animal"], sentence:"I like ___ very much.", sentenceJa:"私は動物が大好きです。"},
+  {en:"visit", ja:"…を訪ねる", productive:true, accept:["visit","visits"], sentence:"I want to ___ Kyoto someday.", sentenceJa:"私はいつか京都を訪れたいです。"},
+  {en:"Japan", ja:"日本", productive:true, accept:["Japan"], sentence:"Many people visit ___ every year.", sentenceJa:"毎年たくさんの人が日本を訪れます。"},
+  {en:"many", ja:"たくさんの、多くの", productive:true, accept:["many"], sentence:"How ___ books do you have?", sentenceJa:"あなたは何冊の本を持っていますか。"},
+  {en:"one of", ja:"…の1つ[1人]", phrase:true},
+  {en:"a lot of", ja:"たくさんの、多数の", phrase:true},
+  {en:"How many ...?", ja:"どれくらい多くの、いくつの", phrase:true},
+  {en:"they're", ja:"⇐ they are"},
+  {en:"noon", ja:"正午、真昼", productive:true, accept:["noon"], sentence:"We eat lunch at ___.", sentenceJa:"私たちは正午に昼食を食べます。"},
+  {en:"last", ja:"最後の、最終の", productive:true, accept:["last"], sentence:"This is the ___ question.", sentenceJa:"これが最後の質問です。"},
+  {en:"like", ja:"…のような", productive:true, accept:["like"], sentence:"He swims ___ a fish.", sentenceJa:"彼は魚のように泳ぎます。"},
+  {en:"o'clock", ja:"…時", productive:true, accept:["o'clock","oclock"], sentence:"I get up at six ___.", sentenceJa:"私は6時に起きます。"},
+  {en:"netball", ja:"ネットボール"},
+  {en:"time", ja:"時刻", productive:true, accept:["time"], sentence:"What ___ is it now?", sentenceJa:"今何時ですか。"},
+  {en:"afternoon", ja:"午後", productive:true, accept:["afternoon"], sentence:"I have P.E. in the ___.", sentenceJa:"私は午後に体育があります。"},
+  {en:"sport(s)", ja:"スポーツ", productive:true, accept:["sport","sports"], sentence:"What ___ do you like?", sentenceJa:"あなたは何のスポーツが好きですか。"},
+  {en:"a.m.", ja:"午前", productive:true, accept:["a.m.","am"], sentence:"The class starts at 8:30 ___.", sentenceJa:"授業は午前8時30分に始まります。"},
+  {en:"p.m.", ja:"午後（時刻のあとにつけて）", productive:true, accept:["p.m.","pm"], sentence:"I go home at 5:00 ___.", sentenceJa:"私は午後5時に帰宅します。"},
+  {en:"basketball", ja:"バスケットボール", productive:true, accept:["basketball"], sentence:"I play ___ with my friends.", sentenceJa:"私は友達とバスケットボールをします。"},
+  {en:"Sounds ....", ja:"…そうですね。", phrase:true},
+  {en:"front", ja:"前、正面", productive:true, accept:["front"], sentence:"He is standing in ___ of the door.", sentenceJa:"彼はドアの前に立っています。"},
+  {en:"be", ja:"…である、…になる", productive:true, accept:["be"], sentence:"Don't ___ nervous.", sentenceJa:"緊張しないで。"},
+  {en:"nervous", ja:"緊張して"},
+  {en:"worry", ja:"心配する、悩む", productive:true, accept:["worry"], sentence:"Don't ___. You can do it.", sentenceJa:"心配しないで。あなたならできます。"},
+  {en:"yourself", ja:"あなた自身を[に]", productive:true, accept:["yourself"], sentence:"Enjoy ___ at the party.", sentenceJa:"パーティーで楽しんでね。"},
+  {en:"sheep", ja:"ヒツジ"},
+  {en:"kiwi(s)", ja:"キーウィ"},
+  {en:"right", ja:"正しい、正確な", productive:true, accept:["right"], sentence:"Your answer is ___.", sentenceJa:"あなたの答えは正しいです。"},
+  {en:"turn", ja:"順番、番", productive:true, accept:["turn"], sentence:"It's your ___ now.", sentenceJa:"今はあなたの番です。"},
+  {en:"please", ja:"どうぞ、お願いします", productive:true, accept:["please"], sentence:"___ open your textbook.", sentenceJa:"教科書を開いてください。"},
+  {en:"look", ja:"見る、目を向ける", productive:true, accept:["look","looks"], sentence:"___ at this picture.", sentenceJa:"この写真を見て。"},
+  {en:"enjoy oneself", ja:"楽しむ、楽しく過ごす", phrase:true},
+  {en:"look at", ja:"…を見る", phrase:true},
+  {en:"poster", ja:"ポスター"},
+  {en:"age", ja:"年齢", productive:true, accept:["age"], sentence:"What is your ___?", sentenceJa:"あなたは何歳ですか。"},
+  {en:"movie", ja:"映画", productive:true, accept:["movie","movies"], sentence:"I watched a good ___ last night.", sentenceJa:"私は昨夜よい映画を見ました。"},
+  {en:"student", ja:"学生、生徒", productive:true, accept:["student","students"], sentence:"I am a junior high school ___.", sentenceJa:"私は中学生です。"},
+  {en:"much", ja:"おおいに、たいへん", productive:true, accept:["much"], sentence:"Thank you very ___.", sentenceJa:"どうもありがとうございます。"},
+  {en:"starter", ja:"先発メンバー"},
+  {en:"famous", ja:"有名な", productive:true, accept:["famous"], sentence:"She is a ___ singer.", sentenceJa:"彼女は有名な歌手です。"},
+  {en:"tell", ja:"…に（〜を）話す、教える", productive:true, accept:["tell","tells"], sentence:"Please ___ me about your school.", sentenceJa:"あなたの学校について私に教えてください。"},
+];
+
+// ===== 中1 Unit 5 =====
+const G1_U5_WORDS = [
+  {en:"as", ja:"…として", productive:true, accept:["as"], sentence:"He works ___ a tour guide.", sentenceJa:"彼はツアーガイドとして働いています。"},
+  {en:"tour", ja:"旅行、ツアー、見学"},
+  {en:"guide", ja:"ガイド、案内人"},
+  {en:"write(s)", ja:"（…を）書く", productive:true, accept:["writes","write"], sentence:"She ___ a blog every week.", sentenceJa:"彼女は毎週ブログを書きます。"},
+  {en:"blog", ja:"ブログ"},
+  {en:"local", ja:"地方の、地元の", productive:true, accept:["local"], sentence:"I like this ___ food.", sentenceJa:"私はこの地元の食べ物が好きです。"},
+  {en:"beautiful", ja:"美しい", productive:true, accept:["beautiful"], sentence:"The beach is very ___.", sentenceJa:"そのビーチはとても美しいです。"},
+  {en:"spot(s)", ja:"地点、場所"},
+  {en:"his", ja:"彼の", productive:true, accept:["his"], sentence:"This is ___ bike.", sentenceJa:"これは彼の自転車です。"},
+  {en:"brother", ja:"兄、弟、兄弟", productive:true, accept:["brother","brothers"], sentence:"My ___ is fifteen years old.", sentenceJa:"私の兄は15歳です。"},
+  {en:"year(s)", ja:"…歳、年齢、年", productive:true, accept:["years","year"], sentence:"He is twelve ___ old.", sentenceJa:"彼は12歳です。"},
+  {en:"old", ja:"…歳の、古い", productive:true, accept:["old"], sentence:"How ___ is your sister?", sentenceJa:"あなたのお姉さんは何歳ですか。"},
+  {en:"work(s)", ja:"働く、作業をする", productive:true, accept:["works","work"], sentence:"My father ___ at a hospital.", sentenceJa:"私の父は病院で働いています。"},
+  {en:"nature", ja:"自然", productive:true, accept:["nature"], sentence:"I love ___ and animals.", sentenceJa:"私は自然と動物が大好きです。"},
+  {en:"... year(s) old", ja:"…歳", phrase:true},
+  {en:"enjoy ...ing", ja:"…して楽しむ", phrase:true},
+  {en:"any", ja:"いくらかの、何らかの", productive:true, accept:["any"], sentence:"Do you have ___ questions?", sentenceJa:"何か質問はありますか。"},
+  {en:"does", ja:"[疑問文や応答や否定文を作る]", productive:true, accept:["does"], sentence:"___ he play tennis?", sentenceJa:"彼はテニスをしますか。"},
+  {en:"has", ja:"[haveの三人称単数現在形]…を持っている", productive:true, accept:["has"], sentence:"She ___ a new bag.", sentenceJa:"彼女は新しいかばんを持っています。"},
+  {en:"there", ja:"そこに[で、へ]", productive:true, accept:["there"], sentence:"Let's go ___ next Sunday.", sentenceJa:"次の日曜日にそこへ行きましょう。"},
+  {en:"surf(s)", ja:"サーフィンをする"},
+  {en:"life", ja:"生活、暮らし", productive:true, accept:["life"], sentence:"He enjoys his ___ in Hawaii.", sentenceJa:"彼はハワイでの生活を楽しんでいます。"},
+  {en:"question(s)", ja:"質問、疑問", productive:true, accept:["question","questions"], sentence:"I have a ___ about this word.", sentenceJa:"この単語について質問があります。"},
+  {en:"weekend(s)", ja:"週末", productive:true, accept:["weekends","weekend"], sentence:"I play soccer on ___.", sentenceJa:"私は週末にサッカーをします。"},
+  {en:"swim(s)", ja:"泳ぐ", productive:true, accept:["swims","swim"], sentence:"She ___ in the sea every morning.", sentenceJa:"彼女は毎朝海で泳ぎます。"},
+  {en:"sometimes", ja:"ときどき", productive:true, accept:["sometimes"], sentence:"I ___ cook dinner for my family.", sentenceJa:"私はときどき家族に夕食を作ります。"},
+  {en:"dolphin(s)", ja:"イルカ"},
+  {en:"doesn't", ja:"⇐ does not"},
+  {en:"cafe", ja:"喫茶店、カフェ"},
+  {en:"website", ja:"ウェブサイト"},
+  {en:"popular", ja:"人気のある", productive:true, accept:["popular"], sentence:"This cafe is very ___.", sentenceJa:"このカフェはとても人気があります。"},
+  {en:"owner", ja:"所有者、持ち主"},
+  {en:"know(s)", ja:"（…を）知っている", productive:true, accept:["know","knows"], sentence:"I ___ his name.", sentenceJa:"私は彼の名前を知っています。"},
+  {en:"patty", ja:"パティ"},
+  {en:"fried", ja:"油であげた、油でいためた"},
+  {en:"top", ja:"表面、上部"},
+  {en:"wonderful", ja:"すばらしい、すてきな", productive:true, accept:["wonderful"], sentence:"We had a ___ time.", sentenceJa:"私たちはすばらしい時間を過ごしました。"},
+  {en:"restaurant", ja:"レストラン", productive:true, accept:["restaurant","restaurants"], sentence:"Let's have lunch at that ___.", sentenceJa:"あのレストランで昼食を食べましょう。"},
+  {en:"friendly", ja:"好意的な、親切な"},
+  {en:"dish", ja:"料理、1品", productive:true, accept:["dish","dishes"], sentence:"This ___ is very popular here.", sentenceJa:"この料理はここではとても人気です。"},
+  {en:"fried egg", ja:"目玉焼き", phrase:true},
+  {en:"on top of", ja:"…の上に", phrase:true},
+];
+
+// ===== 中1 Unit 6 =====
+const G1_U6_WORDS = [
+  {en:"him", ja:"彼を[に]", productive:true, accept:["him"], sentence:"I met ___ at the station.", sentenceJa:"私は駅で彼に会いました。"},
+  {en:"say", ja:"（…を）言う、…だと言う", productive:true, accept:["say","says"], sentence:"Please ___ it again.", sentenceJa:"もう一度それを言ってください。"},
+  {en:"everything", ja:"何でも、全てのもの[こと]", productive:true, accept:["everything"], sentence:"I want to see ___ in this museum.", sentenceJa:"私はこの博物館で全てのものを見たいです。"},
+  {en:"show", ja:"ショー、…を見せる", productive:true, accept:["show","shows"], sentence:"Let's watch the ___ together.", sentenceJa:"いっしょにショーを見ましょう。"},
+  {en:"her", ja:"彼女を[に]、彼女の", productive:true, accept:["her"], sentence:"I know ___ very well.", sentenceJa:"私は彼女をとてもよく知っています。"},
+  {en:"performer", ja:"演技者"},
+  {en:"the U.K.", ja:"英国"},
+  {en:"together", ja:"いっしょに、ともに", productive:true, accept:["together"], sentence:"Let's sing ___.", sentenceJa:"いっしょに歌いましょう。"},
+  {en:"let's", ja:"…しよう", productive:true, accept:["let's","lets"], sentence:"___ go to the park.", sentenceJa:"公園に行きましょう。"},
+  {en:"Why don't we ...?", ja:"…しませんか。", phrase:true},
+  {en:"how's", ja:"⇐ how is"},
+  {en:"minute(s)", ja:"分", productive:true, accept:["minutes","minute"], sentence:"Please wait ten ___.", sentenceJa:"10分待ってください。"},
+  {en:"wait", ja:"待つ", productive:true, accept:["wait","waits"], sentence:"Please ___ here.", sentenceJa:"ここで待ってください。"},
+  {en:"whose", ja:"だれの、だれのもの", productive:true, accept:["whose"], sentence:"___ bag is this?", sentenceJa:"これはだれのかばんですか。"},
+  {en:"yours", ja:"あなた（たち）のもの", productive:true, accept:["yours"], sentence:"Is this pen ___?", sentenceJa:"このペンはあなたのものですか。"},
+  {en:"mine", ja:"私のもの", productive:true, accept:["mine"], sentence:"That bike is ___.", sentenceJa:"あの自転車は私のものです。"},
+  {en:"maybe", ja:"たぶん、もしかすると"},
+  {en:"careful", ja:"注意深い"},
+  {en:"crowded", ja:"こみ合った、満員の"},
+  {en:"history", ja:"歴史", productive:true, accept:["history"], sentence:"I like Japanese ___.", sentenceJa:"私は日本の歴史が好きです。"},
+  {en:"still", ja:"まだ、今でも", productive:true, accept:["still"], sentence:"He is ___ waiting for you.", sentenceJa:"彼はまだあなたを待っています。"},
+  {en:"over", ja:"…より多く、…をこえて", productive:true, accept:["over"], sentence:"___ one hundred people came.", sentenceJa:"100人をこえる人が来ました。"},
+  {en:"start(s)", ja:"始まる、出発する", productive:true, accept:["starts","start"], sentence:"The show ___ at seven.", sentenceJa:"ショーは7時に始まります。"},
+  {en:"ticket", ja:"チケット", productive:true, accept:["ticket","tickets"], sentence:"I bought a ___ for the concert.", sentenceJa:"私はコンサートのチケットを買いました。"},
+  {en:"Thanks.", ja:"ありがとう。", phrase:true},
+  {en:"be careful with", ja:"…のあつかいに気をつける", phrase:true},
+  {en:"How old ...?", ja:"何歳で、作られてからどのくらいで", phrase:true},
+  {en:"cushion", ja:"クッション、ざぶとん"},
+  {en:"different", ja:"いろいろな", productive:true, accept:["different"], sentence:"We have many ___ colors.", sentenceJa:"私たちにはいろいろな色があります。"},
+  {en:"role(s)", ja:"役、役割"},
+  {en:"use(s)", ja:"…を使う、利用する", productive:true, accept:["uses","use"], sentence:"She ___ a fan in her performance.", sentenceJa:"彼女は演技で扇子を使います。"},
+  {en:"only", ja:"ただ…だけ", productive:true, accept:["only"], sentence:"I have ___ one ticket.", sentenceJa:"私はチケットを1枚しか持っていません。"},
+  {en:"prop(s)", ja:"小道具"},
+  {en:"which", ja:"どちら、どれ、どちらの人[もの]", productive:true, accept:["which"], sentence:"___ do you like, tea or coffee?", sentenceJa:"紅茶とコーヒーでは、どちらが好きですか。"},
+  {en:"or", ja:"…かまたは〜", productive:true, accept:["or"], sentence:"Do you like dogs ___ cats?", sentenceJa:"あなたはイヌとネコのどちらが好きですか。"},
+  {en:"casual", ja:"カジュアルな、ふだん着の"},
+  {en:"large", ja:"多い、多数の、大きい", productive:true, accept:["large"], sentence:"This room is very ___.", sentenceJa:"この部屋はとても大きいです。"},
+  {en:"collection", ja:"収集したもの、コレクション"},
+  {en:"comic storytelling", ja:"話芸"},
+  {en:"hand", ja:"手", productive:true, accept:["hands","hand"], sentence:"Wash your ___ before lunch.", sentenceJa:"昼食の前に手を洗いなさい。"},
+  {en:"towel", ja:"タオル", productive:true, accept:["towel","towels"], sentence:"Please bring a ___.", sentenceJa:"タオルを持ってきてください。"},
+  {en:"wear", ja:"…を着ている、身につけている", productive:true, accept:["wear","wears"], sentence:"I ___ a school uniform every day.", sentenceJa:"私は毎日制服を着ています。"},
+  {en:"clothes", ja:"衣服", productive:true, accept:["clothes"], sentence:"I like these ___.", sentenceJa:"私はこれらの衣服が好きです。"},
+];
+
+// ===== 中1 Unit 7 =====
+const G1_U7_WORDS = [
+  {en:"tomorrow", ja:"明日", productive:true, accept:["tomorrow"], sentence:"Let's go shopping ___.", sentenceJa:"明日買い物に行きましょう。"},
+  {en:"plan(s)", ja:"計画、予定", productive:true, accept:["plans","plan"], sentence:"Do you have any ___ for Sunday?", sentenceJa:"日曜日の予定はありますか。"},
+  {en:"free", ja:"ひまな", productive:true, accept:["free"], sentence:"Are you ___ this afternoon?", sentenceJa:"今日の午後はひまですか。"},
+  {en:"mean", ja:"…を意味する、…のことを言う", productive:true, accept:["mean","means"], sentence:"What does this word ___?", sentenceJa:"この単語はどういう意味ですか。"},
+  {en:"forward", ja:"[look forward toで]…を楽しみに待つ", productive:true, accept:["forward"], sentence:"I'm looking ___ to the trip.", sentenceJa:"私は旅行を楽しみに待っています。"},
+  {en:"busy", ja:"忙しい", productive:true, accept:["busy"], sentence:"I'm very ___ today.", sentenceJa:"私は今日とても忙しいです。"},
+  {en:"talk", ja:"話す、しゃべる", productive:true, accept:["talk","talks"], sentence:"Let's ___ about it later.", sentenceJa:"あとでそれについて話しましょう。"},
+  {en:"up", ja:"[What's up?で]どうしたのですか。", productive:true, accept:["up"], sentence:"What's ___?", sentenceJa:"どうしたのですか。"},
+  {en:"What's up?", ja:"どうしたのですか。", phrase:true},
+  {en:"sound like", ja:"…のように聞こえる、思える", phrase:true},
+  {en:"look forward to", ja:"…を楽しみに待つ", phrase:true},
+  {en:"market", ja:"市場"},
+  {en:"souvenir(s)", ja:"記念品、みやげ"},
+  {en:"place", ja:"場所、ところ", productive:true, accept:["place","places"], sentence:"This is a nice ___.", sentenceJa:"ここはすてきな場所です。"},
+  {en:"appear(s)", ja:"現れる、姿を現す", productive:true, accept:["appears","appear"], sentence:"A rainbow ___ after the rain.", sentenceJa:"雨のあとに虹が現れます。"},
+  {en:"those", ja:"あれらの、それらの", productive:true, accept:["those"], sentence:"___ flowers are beautiful.", sentenceJa:"あれらの花は美しいです。"},
+  {en:"buy", ja:"…を買う", productive:true, accept:["buy","buys"], sentence:"I want to ___ a souvenir.", sentenceJa:"私はおみやげを買いたいです。"},
+  {en:"people", ja:"人々", productive:true, accept:["people"], sentence:"Many ___ visit this market.", sentenceJa:"たくさんの人々がこの市場を訪れます。"},
+  {en:"Welcome to ....", ja:"…へようこそ。", phrase:true},
+  {en:"mom", ja:"お母さん"},
+  {en:"dad", ja:"お父さん"},
+  {en:"travel(ing)", ja:"旅行する", productive:true, accept:["traveling","travelling","travel"], sentence:"I like ___ with my family.", sentenceJa:"私は家族と旅行するのが好きです。"},
+  {en:"angry", ja:"怒った、腹を立てた", productive:true, accept:["angry"], sentence:"My mother was ___ at me.", sentenceJa:"母は私に腹を立てました。"},
+  {en:"palace", ja:"宮殿、王宮"},
+  {en:"exciting", ja:"興奮させるような、わくわくさせるような", productive:true, accept:["exciting"], sentence:"The game was very ___.", sentenceJa:"その試合はとてもわくわくするものでした。"},
+  {en:"late", ja:"遅い、おくれた", productive:true, accept:["late"], sentence:"Sorry, I'm ___.", sentenceJa:"ごめんなさい、遅れました。"},
+  {en:"sorry", ja:"すまなく思って", productive:true, accept:["sorry"], sentence:"I'm ___ about that.", sentenceJa:"そのことをすまなく思っています。"},
+  {en:"funny", ja:"おかしな", productive:true, accept:["funny"], sentence:"That story was so ___.", sentenceJa:"その話はとてもおかしかったです。"},
+  {en:"OK", ja:"よろしい、はい", productive:true, accept:["OK","okay"], sentence:"Is it ___ to sit here?", sentenceJa:"ここに座ってもよろしいですか。"},
+  {en:"I'm sorry.", ja:"ごめんなさい。すみません。", phrase:true},
+  {en:"we're", ja:"⇐ we are"},
+];
+
+// ===== 中1 Unit 8 =====
+const G1_U8_WORDS = [
+  {en:"ethnic", ja:"民族（特有）の"},
+  {en:"Africa", ja:"アフリカ"},
+  {en:"Kenya", ja:"ケニア"},
+  {en:"volunteer", ja:"ボランティア", productive:true, accept:["volunteer","volunteers"], sentence:"He works as a ___ in Kenya.", sentenceJa:"彼はケニアでボランティアとして働いています。"},
+  {en:"need", ja:"困っている状態、貧困", productive:true, accept:["need"], sentence:"They help children in ___.", sentenceJa:"彼らは困っている子供たちを助けます。"},
+  {en:"teach(es)", ja:"…に（〜を）教える", productive:true, accept:["teaches","teach"], sentence:"She ___ English to the children.", sentenceJa:"彼女は子供たちに英語を教えます。"},
+  {en:"try, tries", ja:"…を試す、やってみる", productive:true, accept:["tries","try"], sentence:"He ___ many new things.", sentenceJa:"彼は新しいことをたくさんやってみます。"},
+  {en:"best", ja:"最もよいもの、最良の状態", productive:true, accept:["best"], sentence:"I always do my ___.", sentenceJa:"私はいつも最善を尽くします。"},
+  {en:"respect", ja:"…を尊敬する"},
+  {en:"become", ja:"…になる", productive:true, accept:["become","becomes"], sentence:"I want to ___ a teacher.", sentenceJa:"私は先生になりたいです。"},
+  {en:"cousin", ja:"いとこ"},
+  {en:"child", ja:"子供", productive:true, accept:["child"], sentence:"The ___ is playing in the park.", sentenceJa:"その子供は公園で遊んでいます。"},
+  {en:"children", ja:"childの複数形", productive:true, accept:["children"], sentence:"Many ___ go to this school.", sentenceJa:"たくさんの子供たちがこの学校に通っています。"},
+  {en:"country, countries", ja:"国", productive:true, accept:["country","countries"], sentence:"Japan is a beautiful ___.", sentenceJa:"日本は美しい国です。"},
+  {en:"always", ja:"いつも、常に", productive:true, accept:["always"], sentence:"She is ___ kind to us.", sentenceJa:"彼女はいつも私たちに親切です。"},
+  {en:"in need", ja:"困っている", phrase:true},
+  {en:"do one's best", ja:"最善を尽くす", phrase:true},
+  {en:"African", ja:"アフリカの"},
+  {en:"reduce", ja:"…を減らす"},
+  {en:"waste", ja:"ごみ、廃棄物"},
+  {en:"plastic", ja:"プラスチック製の"},
+  {en:"paper", ja:"紙の", productive:true, accept:["paper"], sentence:"Let's use ___ straws.", sentenceJa:"紙のストローを使いましょう。"},
+  {en:"straw(s)", ja:"ストロー"},
+  {en:"original", ja:"独創的な、独自の"},
+  {en:"reusable", ja:"再利用できる"},
+  {en:"course", ja:"[of courseで]もちろん"},
+  {en:"meat", ja:"肉"},
+  {en:"pie", ja:"パイ"},
+  {en:"bean", ja:"豆"},
+  {en:"soup", ja:"スープ", productive:true, accept:["soup"], sentence:"I had bread and ___ for lunch.", sentenceJa:"私は昼食にパンとスープを食べました。"},
+  {en:"chicken", ja:"とり肉、チキン"},
+  {en:"curry", ja:"カレー"},
+  {en:"of course", ja:"もちろん", phrase:true},
+  {en:"well", ja:"井戸"},
+  {en:"other", ja:"もう1つの", productive:true, accept:["other"], sentence:"I like this one, but the ___ one is nice, too.", sentenceJa:"私はこれが好きですが、もう1つのほうもすてきです。"},
+  {en:"village(s)", ja:"村", productive:true, accept:["village","villages"], sentence:"They live in a small ___.", sentenceJa:"彼らは小さな村に住んでいます。"},
+  {en:"collect", ja:"…を集める", productive:true, accept:["collect","collects"], sentence:"We ___ money for the children.", sentenceJa:"私たちは子供たちのためにお金を集めます。"},
+  {en:"far", ja:"遠くに［へ］", productive:true, accept:["far"], sentence:"The village is ___ from the city.", sentenceJa:"その村は町から遠くにあります。"},
+  {en:"group", ja:"グループ、団体", productive:true, accept:["group","groups"], sentence:"Our ___ built a school.", sentenceJa:"私たちのグループは学校を建てました。"},
+  {en:"build(s)", ja:"…を建てる、つくる", productive:true, accept:["build","builds"], sentence:"They ___ wells in Africa.", sentenceJa:"彼らはアフリカに井戸をつくります。"},
+  {en:"these", ja:"これら、この人たち", productive:true, accept:["these"], sentence:"___ are my friends.", sentenceJa:"こちらは私の友達です。"},
+  {en:"money", ja:"金、通貨", productive:true, accept:["money"], sentence:"We need more ___.", sentenceJa:"私たちはもっとお金が必要です。"},
+  {en:"get(ting)", ja:"…を得る、受け取る", productive:true, accept:["get","gets","getting"], sentence:"The children can ___ clean water now.", sentenceJa:"子供たちは今きれいな水を得ることができます。"},
+  {en:"clean", ja:"きれいな、清潔な", productive:true, accept:["clean"], sentence:"Everyone needs ___ water.", sentenceJa:"みんなきれいな水が必要です。"},
+  {en:"happy", ja:"幸せな、うれしい", productive:true, accept:["happy"], sentence:"The children look ___.", sentenceJa:"子供たちは幸せそうに見えます。"},
+  {en:"river", ja:"川", productive:true, accept:["river","rivers"], sentence:"They get water from the ___.", sentenceJa:"彼らは川から水をくみます。"},
+  {en:"on the other hand", ja:"他方では", phrase:true},
+  {en:"for a long time", ja:"長い間", phrase:true},
+  {en:"voice", ja:"声"},
+  {en:"word(s)", ja:"歌詞", productive:true, accept:["words","word"], sentence:"I like the ___ of this song.", sentenceJa:"私はこの歌の歌詞が好きです。"},
+  {en:"cheer", ja:"…を元気づける"},
+  {en:"concert", ja:"演奏会、コンサート", productive:true, accept:["concert","concerts"], sentence:"We had a ___ at school.", sentenceJa:"私たちは学校でコンサートを開きました。"},
+  {en:"dome", ja:"ドーム"},
+  {en:"stage", ja:"舞台、ステージ", productive:true, accept:["stage"], sentence:"She sang on the ___.", sentenceJa:"彼女は舞台で歌いました。"},
+  {en:"performance", ja:"演技、演奏、公演", productive:true, accept:["performance"], sentence:"Their ___ was wonderful.", sentenceJa:"彼らの演奏はすばらしかったです。"},
+  {en:"again", ja:"もう一度、また", productive:true, accept:["again"], sentence:"Please sing it ___.", sentenceJa:"もう一度それを歌ってください。"},
+];
+
+// 「まとめ」は全単元の単語を重複なしで集めたもの
+function dedupeWords(lists) {
+  const seen = new Set(), result = [];
+  lists.forEach(list => {
+    list.forEach(w => {
+      if (!seen.has(w.en)) { seen.add(w.en); result.push(w); }
+    });
+  });
+  return result;
+}
+const G1_SUMMARY_WORDS = dedupeWords([
+  G1_U1_WORDS, G1_U2_WORDS, G1_U3_WORDS, G1_U4_WORDS,
+  G1_U5_WORDS, G1_U6_WORDS, G1_U7_WORDS, G1_U8_WORDS,
+]);
+
+// id に g1_ を付けて、2年生・3年生のアプリと学習記録が混ざらないようにしている
+const UNITS = [
+  { id: "g1_unit1", title: "Unit 1", words: G1_U1_WORDS },
+  { id: "g1_unit2", title: "Unit 2", words: G1_U2_WORDS },
+  { id: "g1_unit3", title: "Unit 3", words: G1_U3_WORDS },
+  { id: "g1_unit4", title: "Unit 4", words: G1_U4_WORDS },
+  { id: "g1_unit5", title: "Unit 5", words: G1_U5_WORDS },
+  { id: "g1_unit6", title: "Unit 6", words: G1_U6_WORDS },
+  { id: "g1_unit7", title: "Unit 7", words: G1_U7_WORDS },
+  { id: "g1_unit8", title: "Unit 8", words: G1_U8_WORDS },
+  { id: "g1_summary", title: "まとめ", words: G1_SUMMARY_WORDS, isSummary: true },
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let currentUnitIndex = 0;
+let words = UNITS[currentUnitIndex].words;
+let quizProgress = {}, typingProgress = {}, sentenceProgress = {};
+let quizScore = 0, typingScore = 0, sentenceScore = 0;
+let allTimeMaxStreak = 0;
+let silverTrophyEarned = false, goldTrophyEarned = false;
+
+let currentMode = null;
+let queue = [], idx = 0;
+let mOk = 0, mNg = 0, mScore = 0, mStreak = 0, mMaxStreak = 0;
+
+let fcFlipped = false, lcIdx = 0;
+let qzAnswered = false, qzDir = 'e2j', qzCorrectIdx = 0;
+let tyMode = 'recall', tyHintLv = 0;
+let stAnswered = false, stCorrectIdx = 0, stHintLv = 0;
+
+// Play: Open Match game — a bonus mode, not linked to XP/levels/trophies.
+let omEnItems = [], omJaItems = [], omSelected = null, omMatchedCount = 0, omMistakes = 0;
+let omPairCount = 6, omLocked = false, omStartTs = 0, omTimerId = null, omElapsed = 0;
+
+// Play: Word Hunt game — a bonus mode, not linked to XP/levels/trophies.
+let whQueue = [], whIdx = 0, whRounds = 8, whMistakes = 0, whLocked = false;
+let whStartTs = 0, whTimerId = null, whElapsed = 0, whCurrentOpts = [], whCurrentCorrectEn = '';
+
+// Play: Time Race game — a bonus mode, not linked to XP/levels/trophies.
+let trCorrect = 0, trWrong = 0, trAnswered = false, trCorrectIdx = 0, trDir = 'e2j', trTypeWord = null;
+let trTimeLimit = 45, trRemaining = 45, trTimerId = null, trActive = false;
+
+// Play: Falling Words game — a bonus mode, not linked to XP/levels/trophies.
+let fwLives = 3, fwScore = 0, fwActive = false, fwTickId = null, fwItems = [], fwFallMs = 3800;
+let fwUsedTargets = []; // words already presented this run, so waves don't repeat a question
+
+// Final Boss — a mixed gauntlet through all 4 Play games, gated by
+// each game's best-record meeting a performance bar (see BOSS_REQS).
+let bsHearts = 3, bsPhase = 0, bsActive = false, bsStartTime = 0;
+let bsOMEnItems = [], bsOMJaItems = [], bsOMSelected = null, bsOMLocked = false;
+let bsWHOpts = [], bsWHCorrectEn = '', bsWHCleared = 0, bsWHUsedTargets = [];
+let bsFWItems = [], bsFWTickId = null, bsFWCleared = 0, bsFWFallMs = 3000, bsFWUsedTargets = [];
+let bsTRCorrectIdx = 0, bsTRAnswered = false, bsTRCleared = 0, bsTRTimerId = null, bsTRRemaining = 20, bsTRTypeWord = null;
+
+// Storage keys are namespaced per unit id, so each unit keeps its own
+// progress/scores/trophies independently.
+function ls(key) { return 'wscroll_' + UNITS[currentUnitIndex].id + '_' + key; }
+
+// Picks a random word not yet presented in this play session (tracked in
+// usedArr by .en), so Word Hunt / Falling Words / Final Boss rounds never
+// show the same question twice in a row. Time Race is intentionally left
+// out of this — its rapid-fire format is meant to stay purely random. If
+// every word has already been used (e.g. a long Falling Words run), the
+// used-list is cleared and refilled — skipping the just-used word when
+// possible — so play continues without an immediate repeat.
+function pickUnusedWord(usedArr) {
+  let available = words.filter(w => !usedArr.includes(w.en));
+  if (available.length === 0) {
+    const last = usedArr[usedArr.length - 1];
+    usedArr.length = 0;
+    available = words.filter(w => w.en !== last);
+    if (available.length === 0) available = words.slice();
+  }
+  const picked = available[Math.floor(Math.random() * available.length)];
+  usedArr.push(picked.en);
+  return picked;
+}
+
+function loadUnitState() {
+  words = UNITS[currentUnitIndex].words;
+  try { quizProgress     = JSON.parse(localStorage.getItem(ls('qzp'))) || {}; } catch(e) { quizProgress = {}; }
+  try { typingProgress   = JSON.parse(localStorage.getItem(ls('typ'))) || {}; } catch(e) { typingProgress = {}; }
+  try { sentenceProgress = JSON.parse(localStorage.getItem(ls('stp'))) || {}; } catch(e) { sentenceProgress = {}; }
+  quizScore     = parseInt(localStorage.getItem(ls('qzs'))) || 0;
+  typingScore   = parseInt(localStorage.getItem(ls('tys'))) || 0;
+  sentenceScore = parseInt(localStorage.getItem(ls('sts'))) || 0;
+  allTimeMaxStreak   = parseInt(localStorage.getItem(ls('streak'))) || 0;
+  silverTrophyEarned = localStorage.getItem(ls('trophy_silver')) === '1';
+  goldTrophyEarned   = localStorage.getItem(ls('trophy_gold'))   === '1';
+  // 以前の不具合で金だけ獲得して銀が付いていない記録を、開いたときに直す
+  if (goldTrophyEarned && !silverTrophyEarned) {
+    silverTrophyEarned = true;
+    try { localStorage.setItem(ls('trophy_silver'), '1'); } catch(e) {}
+  }
+  lcIdx = 0;
+}
+
+function init() {
+  migrateToStreak();   // 以前の記録を新しい判定に合わせて変換（初回のみ）
+  let saved = 0;
+  try { saved = parseInt(localStorage.getItem('wscroll_last_unit_g1')); } catch(e) { saved = 0; }
+  if (!Number.isInteger(saved) || saved < 0 || saved >= UNITS.length) saved = 0;
+  currentUnitIndex = saved;
+  loadUnitState();
+  renderUnitSelector();
+  go('home');
+  saveVocabSummary();
+}
+
+function selectUnit(i) {
+  if (i === currentUnitIndex) return;
+  if (i < 0 || i >= UNITS.length) return;
+  currentUnitIndex = i;
+  try { localStorage.setItem('wscroll_last_unit_g1', i); } catch(e) {}
+  loadUnitState();
+  renderUnitSelector();
+  go('home');
+}
+
+function renderUnitSelector() {
+  const wrap = document.getElementById('unit-selector');
+  wrap.innerHTML = '';
+  let activeBtn = null;
+  UNITS.forEach((u, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'unit-chip-btn' + (i === currentUnitIndex ? ' active' : '');
+    btn.textContent = u.title;
+    btn.onclick = () => selectUnit(i);
+    wrap.appendChild(btn);
+    if (i === currentUnitIndex) activeBtn = btn;
+  });
+  // As more units are added the pill row can overflow and scroll — make sure
+  // whichever unit is actually selected (including on page load, restored
+  // from localStorage) is scrolled into view instead of hiding off-screen.
+  if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+function go(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (name !== 'openmatch' && omTimerId) { clearInterval(omTimerId); omTimerId = null; }
+  if (name !== 'wordhunt' && whTimerId) { clearInterval(whTimerId); whTimerId = null; }
+  if (name !== 'timerace' && trTimerId) { clearInterval(trTimerId); trTimerId = null; trActive = false; }
+  if (name !== 'fallingwords' && fwTickId) { clearInterval(fwTickId); fwTickId = null; fwActive = false; }
+  if (name !== 'boss') {
+    if (bsTRTimerId) { clearInterval(bsTRTimerId); bsTRTimerId = null; }
+    if (bsFWTickId) { clearInterval(bsFWTickId); bsFWTickId = null; }
+    bsActive = false;
+  }
+  if (name === 'home')     updateHome();
+  if (name === 'learn')    { learnTab('card'); }
+  if (name === 'overview') renderOverview();
+}
+
+// ══════════════════════════════════════════
+//  HOME
+// ══════════════════════════════════════════
+// "まとめ" is a virtual unit that pools every real Unit's words but has no
+// Learn/Quiz/Typing/Sentence of its own (so it has no trophy progress to
+// show or earn) — only PLAY (always unlocked) and Final Boss (same
+// requirement as any other Unit, based on PLAY best-records).
+function isSummaryUnit() {
+  return !!UNITS[currentUnitIndex].isSummary;
+}
+function updateHome() {
+  document.getElementById('core-modes-section').style.display = isSummaryUnit() ? 'none' : '';
+  const typingWords = words.filter(w => w.productive);
+  const qzMastered = words.filter(masteredQuiz).length;
+  const tyMastered = typingWords.filter(masteredTyping).length;
+  const sentenceWords = words.filter(hasSentence);
+  const stMastered = sentenceWords.filter(masteredSentence).length;
+
+  const qzTotal = words.length, tyTotal = typingWords.length, stTotal = sentenceWords.length;
+  const qzPct = qzTotal ? Math.round(qzMastered/qzTotal*100) : 0;
+  const tyPct = tyTotal ? Math.round(tyMastered/tyTotal*100) : 0;
+  const stPct = stTotal ? Math.round(stMastered/stTotal*100) : 0;
+  document.getElementById('trophy-qz-fill').style.width = qzPct + '%';
+  document.getElementById('trophy-ty-fill').style.width = tyPct + '%';
+  document.getElementById('trophy-st-fill').style.width = stPct + '%';
+  document.getElementById('trophy-qz-txt').textContent = qzMastered+'/'+qzTotal;
+  document.getElementById('trophy-ty-txt').textContent = tyMastered+'/'+tyTotal;
+  document.getElementById('trophy-st-txt').textContent = stMastered+'/'+stTotal;
+
+  // 「まだ習得していない単語だけ出題する」スイッチの状態と残り語数
+  const ouBox = document.getElementById('only-unmastered');
+  if (ouBox) {
+    ouBox.checked = onlyUnmastered();
+    const left = { 'Quiz': qzTotal - qzMastered, 'Typing': tyTotal - tyMastered, 'Sentence': stTotal - stMastered };
+    const parts = Object.keys(left).filter(k => left[k] > 0).map(k => k + ' ' + left[k] + '語');
+    document.getElementById('only-unmastered-sub').textContent = parts.length
+      ? '未習得：' + parts.join('／')
+      : 'この単元はすべて習得済みです 🎉';
+  }
+
+  if (silverTrophyEarned) {
+    const s = document.getElementById('slot-silver');
+    s.style.background = 'var(--seal-soft)'; s.style.borderColor = 'var(--ink-soft)';
+    document.getElementById('icon-silver').style.filter = 'none'; document.getElementById('icon-silver').style.opacity = '1';
+    document.getElementById('cond-silver').textContent = '獲得済み！🎉';
+  } else {
+    const s = document.getElementById('slot-silver');
+    s.style.background = ''; s.style.borderColor = '';
+    document.getElementById('icon-silver').style.filter = 'grayscale(1)'; document.getElementById('icon-silver').style.opacity = '.35';
+    document.getElementById('cond-silver').textContent = '全モード80%でGET';
+  }
+  if (goldTrophyEarned) {
+    const g = document.getElementById('slot-gold');
+    g.style.background = 'var(--warn-soft)'; g.style.borderColor = 'var(--warn)';
+    document.getElementById('icon-gold').style.filter = 'none'; document.getElementById('icon-gold').style.opacity = '1';
+    document.getElementById('cond-gold').textContent = '獲得済み！✨';
+  } else {
+    const g = document.getElementById('slot-gold');
+    g.style.background = ''; g.style.borderColor = '';
+    document.getElementById('icon-gold').style.filter = 'grayscale(1)'; document.getElementById('icon-gold').style.opacity = '.35';
+    document.getElementById('cond-gold').textContent = '全モード100%でGET';
+  }
+
+  updatePlayLocks();
+  renderBossCard();
+}
+
+// Play games unlock as the student earns this Unit's trophies:
+// silver unlocks Open Match & Word Hunt, gold unlocks Time Race & Falling Words.
+const PLAY_LOCK_INFO = {
+  openmatch:    { unlockedDesc: '英語と日本語を組み合わせる',   lockedDesc: '🔒 銀トロフィーで解放', requires: 'silver' },
+  wordhunt:     { unlockedDesc: '正解の英単語をすばやく探す',   lockedDesc: '🔒 銀トロフィーで解放', requires: 'silver' },
+  timerace:     { unlockedDesc: '時間内にどんどん答える',       lockedDesc: '🔒 金トロフィーで解放', requires: 'gold' },
+  fallingwords: { unlockedDesc: '落ちてくる正解をタップ',       lockedDesc: '🔒 金トロフィーで解放', requires: 'gold' },
+};
+function updatePlayLocks() {
+  Object.keys(PLAY_LOCK_INFO).forEach(key => {
+    const info = PLAY_LOCK_INFO[key];
+    const card = document.getElementById('pm-' + key);
+    const desc = document.getElementById('pm-' + key + '-desc');
+    const unlocked = isSummaryUnit() ? true : (info.requires === 'silver' ? silverTrophyEarned : goldTrophyEarned);
+    card.classList.toggle('game-soon', !unlocked);
+    desc.textContent = unlocked ? info.unlockedDesc : info.lockedDesc;
+  });
+}
+
+// ══════════════════════════════════════════
+//  PROGRESS / MEMORY RATE
+// ══════════════════════════════════════════
+function memOf(dict, w) {
+  const p = dict[w.en];
+  if (!p || p.correct + p.wrong === 0) return 0;
+  return Math.round(p.correct/(p.correct+p.wrong)*100);
+}
+function memQuiz(w)     { return memOf(quizProgress, w); }
+function memTyping(w)   { return memOf(typingProgress, w); }
+function memSentence(w) { return memOf(sentenceProgress, w); }
+
+// ══════════════════════════════════════════
+//  習得の判定
+//  「直近◯回連続で正解できたら習得」という考え方。
+//  以前は「これまでの通算正答率80%以上」で判定していたが、それだと
+//  一度間違えた記録がいつまでも残り、全問正解を何度繰り返しても
+//  達成率が動かないことがあったため、連続正解で判定するようにした。
+//  間違えると連続回数は0に戻る。
+// ══════════════════════════════════════════
+const MASTERY_STREAK = 2;
+// 中2は重要語（太字）だけに例文を用意しているので、Sentenceモードは
+// 例文のある単語だけを出題し、達成率もその語数で数える。
+function hasSentence(w) { return !!w.sentence; }
+function streakOf(dict, w) {
+  const p = dict[w.en];
+  return p && p.streak ? p.streak : 0;
+}
+function isMastered(dict, w)   { return streakOf(dict, w) >= MASTERY_STREAK; }
+function masteredQuiz(w)       { return isMastered(quizProgress, w); }
+function masteredTyping(w)     { return isMastered(typingProgress, w); }
+function masteredSentence(w)   { return isMastered(sentenceProgress, w); }
+
+// 以前の記録（連続正解の回数を持っていないもの）を、新しい判定に合わせて一度だけ変換する。
+// これまでに習得扱いだった単語はそのまま習得のままにし、
+// 正解したことがある単語は「あと1回で習得」の状態から再開できるようにする。
+const STREAK_MIGRATION_KEY = 'wscroll_streak_migrated_g1';
+function migrateToStreak() {
+  try {
+    if (localStorage.getItem(STREAK_MIGRATION_KEY) === '1') return;
+    UNITS.forEach(u => ['qzp', 'typ', 'stp'].forEach(kind => {
+      const key = lsFor(u.id, kind);
+      let dict = null;
+      try { dict = JSON.parse(localStorage.getItem(key)); } catch(e) {}
+      if (!dict || typeof dict !== 'object') return;
+      let changed = false;
+      Object.keys(dict).forEach(en => {
+        const p = dict[en];
+        if (!p || typeof p.streak === 'number') return;
+        const total = (p.correct || 0) + (p.wrong || 0);
+        const acc = total ? (p.correct || 0) / total * 100 : 0;
+        p.streak = acc >= 80 ? MASTERY_STREAK : ((p.correct || 0) > 0 ? 1 : 0);
+        changed = true;
+      });
+      if (changed) localStorage.setItem(key, JSON.stringify(dict));
+    }));
+    localStorage.setItem(STREAK_MIGRATION_KEY, '1');
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
+//  OVERVIEW (all-Units learning status)
+// ══════════════════════════════════════════
+// Reads a real Unit's stats straight from localStorage (not the live
+// quizProgress/typingProgress/sentenceProgress/silverTrophyEarned globals,
+// which only reflect whichever Unit is currently selected) so this can
+// summarize every Unit at once regardless of which one the student is on.
+function computeUnitStats(u) {
+  let qzp = {}, typ = {}, stp = {};
+  try { qzp = JSON.parse(localStorage.getItem(lsFor(u.id, 'qzp'))) || {}; } catch(e) {}
+  try { typ = JSON.parse(localStorage.getItem(lsFor(u.id, 'typ'))) || {}; } catch(e) {}
+  try { stp = JSON.parse(localStorage.getItem(lsFor(u.id, 'stp'))) || {}; } catch(e) {}
+  const typingWords = u.words.filter(w => w.productive);
+  const qzMastered = u.words.filter(w => isMastered(qzp, w)).length;
+  const tyMastered = typingWords.filter(w => isMastered(typ, w)).length;
+  const sentenceWords = u.words.filter(hasSentence);
+  const stMastered = sentenceWords.filter(w => isMastered(stp, w)).length;
+  return {
+    qzMastered, qzTotal: u.words.length,
+    tyMastered, tyTotal: typingWords.length,
+    stMastered, stTotal: sentenceWords.length,
+    silver: localStorage.getItem(lsFor(u.id, 'trophy_silver')) === '1',
+    gold: localStorage.getItem(lsFor(u.id, 'trophy_gold')) === '1',
+    bossCleared: localStorage.getItem(lsFor(u.id, 'boss_cleared')) === '1',
+    bossBestRank: localStorage.getItem(lsFor(u.id, 'boss_best_rank')),
+  };
+}
+// 全Unitの到達状況を要約して localStorage に保存する。
+// トップページや先生用ダッシュボードは、この要約だけを読めば
+// 単語学習の進み具合が分かる（単語データ本体を読む必要がない）。
+function saveVocabSummary() {
+  try {
+    const agg = realUnits().reduce((a, u) => {
+      const s = computeUnitStats(u);
+      a.qzMastered += s.qzMastered; a.qzTotal += s.qzTotal;
+      a.tyMastered += s.tyMastered; a.tyTotal += s.tyTotal;
+      a.stMastered += s.stMastered; a.stTotal += s.stTotal;
+      if (s.silver) a.silver++;
+      if (s.gold) a.gold++;
+      if (s.bossCleared) a.boss++;
+      return a;
+    }, { qzMastered:0, qzTotal:0, tyMastered:0, tyTotal:0, stMastered:0, stTotal:0, silver:0, gold:0, boss:0 });
+    agg.unitCount = realUnits().length;
+    localStorage.setItem('vocab_summary_g1', JSON.stringify(agg));
+  } catch(e) {}
+  // 要約が更新されたらサーバーにも送る（未登録なら何もしない）
+  if (window.ProgressSync) window.ProgressSync.sync(false);
+}
+
+function renderOverview() {
+  const unitsReal = realUnits();
+  const summaryUnit = UNITS.find(u => u.isSummary);
+  const stats = unitsReal.map(u => ({ unit: u, s: computeUnitStats(u) }));
+
+  const silverCount = stats.filter(x => x.s.silver).length;
+  const goldCount = stats.filter(x => x.s.gold).length;
+  const bossCount = stats.filter(x => x.s.bossCleared).length;
+  document.getElementById('ov-silver-count').textContent = silverCount + '/' + unitsReal.length;
+  document.getElementById('ov-gold-count').textContent = goldCount + '/' + unitsReal.length;
+  document.getElementById('ov-boss-count').textContent = bossCount + '/' + unitsReal.length;
+
+  const totals = stats.reduce((acc, x) => {
+    acc.qzMastered += x.s.qzMastered; acc.qzTotal += x.s.qzTotal;
+    acc.tyMastered += x.s.tyMastered; acc.tyTotal += x.s.tyTotal;
+    acc.stMastered += x.s.stMastered; acc.stTotal += x.s.stTotal;
+    return acc;
+  }, { qzMastered:0, qzTotal:0, tyMastered:0, tyTotal:0, stMastered:0, stTotal:0 });
+  const pct = (m, t) => t ? Math.round(m/t*100) : 0;
+  document.getElementById('ov-qz-fill').style.width = pct(totals.qzMastered, totals.qzTotal) + '%';
+  document.getElementById('ov-ty-fill').style.width = pct(totals.tyMastered, totals.tyTotal) + '%';
+  document.getElementById('ov-st-fill').style.width = pct(totals.stMastered, totals.stTotal) + '%';
+  document.getElementById('ov-qz-txt').textContent = totals.qzMastered + '/' + totals.qzTotal;
+  document.getElementById('ov-ty-txt').textContent = totals.tyMastered + '/' + totals.tyTotal;
+  document.getElementById('ov-st-txt').textContent = totals.stMastered + '/' + totals.stTotal;
+
+  if (summaryUnit) {
+    const cleared = localStorage.getItem(lsFor(summaryUnit.id, 'boss_cleared')) === '1';
+    const el = document.getElementById('ov-summary-final-status');
+    el.textContent = cleared ? '🏆 撃破済み！' : '未挑戦';
+    el.classList.toggle('cleared', cleared);
+  }
+
+  renderWeakWordsPanel();
+
+  document.getElementById('ov-unit-list').innerHTML = stats.map(({ unit, s }) => {
+    const bossMedal = s.bossCleared ? (BOSS_RANKS.find(r => r.rank === s.bossBestRank) || BOSS_RANKS[BOSS_RANKS.length-1]).medal : '👹';
+    return '<div class="panel ov-unit-panel">' +
+      '<div class="ov-unit-header">' +
+        '<div class="ov-unit-title">' + unit.title + '</div>' +
+        '<div class="ov-unit-badges">' +
+          '<span class="ov-badge' + (s.silver ? ' earned' : '') + '" title="銀トロフィー">🥈</span>' +
+          '<span class="ov-badge' + (s.gold ? ' earned' : '') + '" title="金トロフィー">🥇</span>' +
+          '<span class="ov-badge' + (s.bossCleared ? ' earned' : '') + '" title="Final Boss">' + bossMedal + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="trophy-progress" style="margin-bottom:0;">' +
+        '<div><div class="tp-label">🎯 Quiz</div><div class="tp-bar"><div class="tp-fill" style="width:' + pct(s.qzMastered, s.qzTotal) + '%;background:var(--seal);"></div></div><div class="tp-txt">' + s.qzMastered + '/' + s.qzTotal + '</div></div>' +
+        '<div><div class="tp-label">⌨️ Typing</div><div class="tp-bar"><div class="tp-fill" style="width:' + pct(s.tyMastered, s.tyTotal) + '%;background:var(--indigo);"></div></div><div class="tp-txt">' + s.tyMastered + '/' + s.tyTotal + '</div></div>' +
+        '<div><div class="tp-label">📝 Sentence</div><div class="tp-bar"><div class="tp-fill" style="width:' + pct(s.stMastered, s.stTotal) + '%;background:var(--good);"></div></div><div class="tp-txt">' + s.stMastered + '/' + s.stTotal + '</div></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+//  WEAK WORDS PRACTICE (cross-Unit mistake review)
+// ══════════════════════════════════════════
+// Finds words the student has actually gotten wrong (in Quiz, Typing, or
+// Sentence — combined, since a mistake in any mode is a sign the word
+// needs review) across every real Unit, worst first, and lets the student
+// drill just those in a short multiple-choice review. Progress from this
+// review is written back into each word's OWN Unit (not whichever Unit
+// happens to be selected right now), so it genuinely improves that word's
+// real Quiz mastery.
+let currentWeakWords = [];
+let wwQueue = [], wwIdx = 0, wwOk = 0, wwNg = 0, wwAnswered = false, wwDir = 'e2j', wwCorrectIdx = 0;
+
+function collectWeakWords(limit) {
+  limit = limit || 10;
+  const out = [];
+  realUnits().forEach(u => {
+    let qzp = {}, typ = {}, stp = {};
+    try { qzp = JSON.parse(localStorage.getItem(lsFor(u.id, 'qzp'))) || {}; } catch(e) {}
+    try { typ = JSON.parse(localStorage.getItem(lsFor(u.id, 'typ'))) || {}; } catch(e) {}
+    try { stp = JSON.parse(localStorage.getItem(lsFor(u.id, 'stp'))) || {}; } catch(e) {}
+    u.words.forEach(w => {
+      const q = qzp[w.en] || { correct:0, wrong:0 };
+      const t = typ[w.en] || { correct:0, wrong:0 };
+      const s = stp[w.en] || { correct:0, wrong:0 };
+      const wrong = q.wrong + t.wrong + s.wrong;
+      const correct = q.correct + t.correct + s.correct;
+      const accuracy = (correct + wrong) ? Math.round(correct/(correct+wrong)*100) : 0;
+      // 間違えたことがあり、まだどこかのモードで習得できていない単語だけを出す。
+      // 連続正解で習得になればこの一覧から自然に外れるので、
+      // 昔1回間違えただけの単語がいつまでも残り続けることはない。
+      const notMasteredYet = !isMastered(qzp, w) || !isMastered(stp, w) ||
+                             (w.productive && !isMastered(typ, w));
+      if (wrong > 0 && notMasteredYet) {
+        out.push({ word: w, unitId: u.id, unitTitle: u.title, wrong, correct, accuracy });
+      }
+    });
+  });
+  // Most mistakes first; among ties, the lower accuracy is the shakier word.
+  out.sort((a,b) => b.wrong - a.wrong || a.accuracy - b.accuracy);
+  return out.slice(0, limit);
+}
+
+function renderWeakWordsPanel() {
+  currentWeakWords = collectWeakWords(10);
+  const listEl = document.getElementById('ov-weak-list');
+  const emptyEl = document.getElementById('ov-weak-empty');
+  const btnEl = document.getElementById('ov-weak-practice-btn');
+  if (currentWeakWords.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    btnEl.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  btnEl.style.display = 'flex';
+  listEl.innerHTML = currentWeakWords.map(x =>
+    '<div class="ov-weak-row">' +
+      '<div class="ov-weak-main">' +
+        '<div class="ov-weak-en">' + x.word.en + '</div>' +
+        '<div class="ov-weak-ja">' + x.word.ja + '</div>' +
+      '</div>' +
+      '<div class="ov-weak-meta">' +
+        '<div class="ov-weak-unit">' + x.unitTitle + '</div>' +
+        '<div class="ov-weak-stat">❌' + x.wrong + '回　正答率' + x.accuracy + '%</div>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function recordWWProgress(unitId, en, ok) {
+  const key = lsFor(unitId, 'qzp');
+  let dict = {};
+  try { dict = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) {}
+  if (!dict[en]) dict[en] = { correct: 0, wrong: 0, streak: 0 };
+  const p = dict[en];
+  if (typeof p.streak !== 'number') p.streak = 0;
+  if (ok) { p.correct++; p.streak++; } else { p.wrong++; p.streak = 0; }
+  localStorage.setItem(key, JSON.stringify(dict));
+  // Keep the in-memory quizProgress in sync too when the word's own Unit
+  // happens to also be the one currently selected, so that Unit's own home
+  // screen reflects this practice immediately without needing a reload.
+  if (UNITS[currentUnitIndex] && UNITS[currentUnitIndex].id === unitId) quizProgress = dict;
+}
+
+function startWeakWordsPractice() {
+  if (!currentWeakWords || currentWeakWords.length === 0) { notif('練習できる苦手な単語がまだありません', 'err'); return; }
+  wwQueue = currentWeakWords.slice().sort(() => Math.random()-.5);
+  wwIdx = 0; wwOk = 0; wwNg = 0;
+  document.getElementById('ww-quiz-area').style.display = '';
+  document.getElementById('ww-complete').style.display = 'none';
+  go('weak');
+  loadWW();
+}
+
+function loadWW() {
+  // Guard against a stray setTimeout firing after the student has already
+  // navigated away from this screen.
+  if (document.querySelector('.screen.active').id !== 'screen-weak') return;
+  if (wwIdx >= wwQueue.length) { finishWW(); return; }
+  wwAnswered = false;
+  const item = wwQueue[wwIdx];
+  const w = item.word;
+  wwDir = Math.random() < 0.5 ? 'e2j' : 'j2e';
+  document.getElementById('ww-dir').textContent = wwDir === 'e2j' ? 'ENGLISH → 日本語' : '日本語 → ENGLISH';
+  document.getElementById('ww-q').textContent = wwDir === 'e2j' ? w.en : w.ja;
+  document.getElementById('ww-q').style.fontFamily = wwDir === 'e2j' ? 'var(--font-mono)' : 'var(--font-body)';
+  document.getElementById('ww-fb').textContent = '';
+  document.getElementById('ww-unit-tag').textContent = item.unitTitle;
+
+  const unit = UNITS.find(u => u.id === item.unitId);
+  const key = wwDir === 'e2j' ? 'ja' : 'en';
+  const pool = (unit ? unit.words : []).filter(o => o.en !== w.en).sort(() => Math.random()-.5);
+  const choices = [w[key]];
+  for (let i=0; i<Math.min(3, pool.length); i++) choices.push(pool[i][key]);
+  const opts = choices.sort(() => Math.random()-.5);
+  wwCorrectIdx = opts.indexOf(w[key]);
+
+  [0,1,2,3].forEach(i => {
+    const btn = document.getElementById('wwo'+i);
+    btn.textContent = opts[i] !== undefined ? opts[i] : '---';
+    btn.className = 'quiz-opt';
+    btn.disabled = opts[i] === undefined;
+  });
+  document.getElementById('ww-prog').style.width = Math.round(wwIdx/wwQueue.length*100) + '%';
+  document.getElementById('ww-cnt').textContent = (wwIdx+1) + ' / ' + wwQueue.length;
+}
+
+function wwAns(i) {
+  if (wwAnswered) return;
+  wwAnswered = true;
+  const item = wwQueue[wwIdx];
+  const w = item.word;
+  const ok = (i === wwCorrectIdx);
+  [0,1,2,3].forEach(j => {
+    const btn = document.getElementById('wwo'+j);
+    btn.disabled = true;
+    if (j === wwCorrectIdx) btn.classList.add('correct');
+  });
+  recordWWProgress(item.unitId, w.en, ok);
+  const fb = document.getElementById('ww-fb');
+  if (ok) {
+    wwOk++;
+    fb.textContent = '✓ 正解！'; fb.style.color = 'var(--good)';
+    wwIdx++; setTimeout(loadWW, 700);
+  } else {
+    wwNg++;
+    document.getElementById('wwo'+i).classList.add('wrong');
+    const correctText = wwDir === 'e2j' ? w.ja : w.en;
+    fb.textContent = '✗ 正解は「' + correctText + '」でした'; fb.style.color = 'var(--bad)';
+    wwIdx++; setTimeout(loadWW, 1700);
+  }
+}
+
+function finishWW() {
+  document.getElementById('ww-quiz-area').style.display = 'none';
+  document.getElementById('ww-complete').style.display = 'block';
+  document.getElementById('ww-ok').textContent = wwOk;
+  document.getElementById('ww-ng').textContent = wwNg;
+}
+
+function record(w, ok) {
+  let dict = currentMode === 'quiz' ? quizProgress : currentMode === 'typing' ? typingProgress : sentenceProgress;
+  if (!dict[w.en]) dict[w.en] = {correct:0, wrong:0, streak:0};
+  const p = dict[w.en];
+  if (typeof p.streak !== 'number') p.streak = 0;
+  if (ok) {
+    p.correct++; p.streak++;                       // 連続正解を1つ進める
+    mStreak++; if (mStreak > mMaxStreak) mMaxStreak = mStreak;
+  } else {
+    p.wrong++; p.streak = 0;                       // 間違えたら連続正解はやり直し
+    mStreak = 0;
+  }
+}
+
+function addPts(pts) {
+  mScore += pts;
+  if (currentMode === 'quiz')     quizScore     += pts;
+  if (currentMode === 'typing')   typingScore   += pts;
+  if (currentMode === 'sentence') sentenceScore += pts;
+  if (allTimeMaxStreak < mMaxStreak) allTimeMaxStreak = mMaxStreak;
+  save();
+}
+
+function save() {
+  localStorage.setItem(ls('qzp'), JSON.stringify(quizProgress));
+  localStorage.setItem(ls('typ'), JSON.stringify(typingProgress));
+  localStorage.setItem(ls('stp'), JSON.stringify(sentenceProgress));
+  localStorage.setItem(ls('qzs'), quizScore);
+  localStorage.setItem(ls('tys'), typingScore);
+  localStorage.setItem(ls('sts'), sentenceScore);
+  localStorage.setItem(ls('streak'), allTimeMaxStreak);
+  saveVocabSummary();
+}
+
+// Custom in-page confirm dialog — the browser's native confirm()/alert() is
+// blocked (silently returns false) inside the sandboxed iframe an Artifact
+// renders in, so a real UI is needed instead of window.confirm().
+function showConfirmModal(title, msg, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.className = 'trophy-overlay';
+  overlay.innerHTML = `
+    <div class="trophy-popup" style="max-width:320px; width:100%;">
+      <div class="panel" style="text-align:center; box-shadow:none;">
+        <div style="font-size:2.2rem;margin-bottom:10px;">⚠️</div>
+        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;margin-bottom:8px;line-height:1.4;">${title}</div>
+        <div style="font-size:.85rem;color:var(--ink-soft);margin-bottom:20px;line-height:1.6;">${msg}</div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-ghost" style="flex:1;">キャンセル</button>
+          <button class="btn btn-danger" style="flex:1;">リセットする</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const btns = overlay.querySelectorAll('button');
+  btns[0].onclick = () => overlay.remove();
+  btns[1].onclick = () => { overlay.remove(); onConfirm(); };
+}
+
+const DEBUG_UNLOCK_PASSCODE = 'kasugaieigo';
+function showDebugPasscodeModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'trophy-overlay';
+  overlay.innerHTML = `
+    <div class="trophy-popup" style="max-width:320px; width:100%;">
+      <div class="panel" style="text-align:center; box-shadow:none;">
+        <div style="font-size:2.2rem;margin-bottom:10px;">🔒</div>
+        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;margin-bottom:8px;line-height:1.4;">動作確認用パスコード</div>
+        <div style="font-size:.85rem;color:var(--ink-soft);margin-bottom:16px;line-height:1.6;">このUnitのPlay/Bossをすべて解放するには、パスコードを入力してください。</div>
+        <input type="password" class="typing-input" id="debug-passcode-input" style="margin-bottom:6px;" placeholder="パスコード" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <div class="debug-pass-err" style="font-size:.8rem;color:var(--bad);min-height:1.3em;margin-bottom:10px;"></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-ghost" style="flex:1;">キャンセル</button>
+          <button class="btn btn-primary" style="flex:1;">解放する</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const input = overlay.querySelector('#debug-passcode-input');
+  const errEl = overlay.querySelector('.debug-pass-err');
+  const btns = overlay.querySelectorAll('button');
+  const tryUnlock = () => {
+    if (input.value === DEBUG_UNLOCK_PASSCODE) {
+      overlay.remove();
+      debugUnlockAll();
+    } else {
+      errEl.textContent = '❌ パスコードが違います';
+      input.classList.add('ng');
+      input.value = '';
+      input.focus();
+    }
+  };
+  input.addEventListener('input', () => { input.classList.remove('ng'); errEl.textContent = ''; });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+  btns[0].onclick = () => overlay.remove();
+  btns[1].onclick = tryUnlock;
+  setTimeout(() => input.focus(), 50);
+}
+function debugUnlockAll() {
+  // Testing helper: instantly unlocks Open Match / Word Hunt / Time Race /
+  // Falling Words (silver+gold trophies) and Final Boss (all 4 best-record
+  // thresholds) for the CURRENT unit, without needing to actually earn them
+  // through normal play. Does not touch Quiz/Typing/Sentence XP or level.
+  // Gated behind showDebugPasscodeModal() in the UI; callable directly here
+  // (e.g. from our own test scripts) without the passcode prompt.
+  localStorage.setItem(ls('trophy_silver'), '1');
+  localStorage.setItem(ls('trophy_gold'), '1');
+  silverTrophyEarned = true; goldTrophyEarned = true;
+  localStorage.setItem(ls('om_best_mistakes'), '0');
+  localStorage.setItem(ls('wh_best_mistakes'), '0');
+  localStorage.setItem(ls('tr_best_correct'), '10');
+  localStorage.setItem(ls('fw_best_score'), '10');
+  if (isSummaryUnit()) {
+    // まとめ's Final Boss unlocks once every real Unit's own Final Boss is
+    // cleared (any rank) rather than from PLAY records — mark them all
+    // cleared here too, so this button still fully unlocks まとめ for
+    // quick testing instead of only unlocking its (already-unlocked) PLAY.
+    realUnits().forEach(u => localStorage.setItem(lsFor(u.id, 'boss_cleared'), '1'));
+  }
+  updateHome();
+  notif('🔓 このUnitのPlay/Bossをすべて解放しました（動作確認用）', 'ok');
+}
+function debugRelockAll() {
+  // Testing helper: the reverse of debugUnlockAll() — relocks Open Match /
+  // Word Hunt / Time Race / Falling Words and Final Boss for the CURRENT
+  // unit, without touching Quiz/Typing/Sentence progress, so the locked
+  // state can be re-tested without a full progress reset. Not passcode-
+  // gated since it only removes access rather than granting it.
+  localStorage.removeItem(ls('trophy_silver'));
+  localStorage.removeItem(ls('trophy_gold'));
+  silverTrophyEarned = false; goldTrophyEarned = false;
+  localStorage.removeItem(ls('om_best_mistakes')); localStorage.removeItem(ls('om_best_time'));
+  localStorage.removeItem(ls('wh_best_mistakes')); localStorage.removeItem(ls('wh_best_time'));
+  localStorage.removeItem(ls('tr_best_correct'));
+  localStorage.removeItem(ls('fw_best_score'));
+  localStorage.removeItem(ls('boss_cleared'));
+  localStorage.removeItem(ls('boss_best_ms')); localStorage.removeItem(ls('boss_best_rank'));
+  updateHome();
+  notif('🔒 このUnitのPlay/Bossを再びロックしました（動作確認用）', 'ok');
+}
+function resetProgress() {
+  showConfirmModal(
+    'この Unit の学習記録をリセットしますか？',
+    'この操作は取り消せません。',
+    () => {
+      quizProgress = {}; typingProgress = {}; sentenceProgress = {};
+      quizScore = 0; typingScore = 0; sentenceScore = 0; allTimeMaxStreak = 0;
+      silverTrophyEarned = false; goldTrophyEarned = false;
+      localStorage.removeItem(ls('trophy_silver')); localStorage.removeItem(ls('trophy_gold'));
+      localStorage.removeItem(ls('om_best_mistakes')); localStorage.removeItem(ls('om_best_time'));
+      localStorage.removeItem(ls('wh_best_mistakes')); localStorage.removeItem(ls('wh_best_time'));
+      localStorage.removeItem(ls('tr_best_correct'));
+      localStorage.removeItem(ls('fw_best_score'));
+      localStorage.removeItem(ls('boss_cleared'));
+      localStorage.removeItem(ls('boss_best_ms')); localStorage.removeItem(ls('boss_best_rank'));
+      save();
+      updateHome();
+      notif('✅ このUnitの学習記録をリセットしました');
+    }
+  );
+}
+
+// ══════════════════════════════════════════
+//  TROPHY
+// ══════════════════════════════════════════
+function checkTrophy() {
+  const typingWords = words.filter(w => w.productive);
+  const qzMastered = words.filter(masteredQuiz).length;
+  const tyMastered = typingWords.filter(masteredTyping).length;
+  const sentenceWords = words.filter(hasSentence);
+  const stMastered = sentenceWords.filter(masteredSentence).length;
+  const qzTotal = words.length, tyTotal = typingWords.length, stTotal = sentenceWords.length;
+
+  if (!goldTrophyEarned && qzMastered===qzTotal && tyMastered===tyTotal && stMastered===stTotal) {
+    goldTrophyEarned = true;
+    localStorage.setItem(ls('trophy_gold'), '1');
+    // 金の条件（全モード100%）を満たしていれば銀の条件（80%）も満たしているので、
+    // 1回目で満点を取った場合でも銀を取りそこねないように、ここで一緒に獲得にする
+    if (!silverTrophyEarned) {
+      silverTrophyEarned = true;
+      localStorage.setItem(ls('trophy_silver'), '1');
+    }
+    saveVocabSummary();
+    setTimeout(() => showTrophyAnimation('gold'), 600);
+    return;
+  }
+  if (!silverTrophyEarned) {
+    const qzOk = qzMastered >= Math.ceil(qzTotal*0.8);
+    const tyOk = tyMastered >= Math.ceil(tyTotal*0.8);
+    const stOk = stMastered >= Math.ceil(stTotal*0.8);
+    if (qzOk && tyOk && stOk) {
+      silverTrophyEarned = true;
+      localStorage.setItem(ls('trophy_silver'), '1');
+      saveVocabSummary();
+      setTimeout(() => showTrophyAnimation('silver'), 600);
+    }
+  }
+}
+
+function showTrophyAnimation(type) {
+  const isGold = type === 'gold';
+  const icon = isGold ? '🥇' : '🥈';
+  const color = isGold ? 'var(--warn)' : 'var(--ink-soft)';
+  const bg = isGold ? 'var(--warn)' : 'var(--ink-soft)';
+  const title = isGold ? '金トロフィー獲得！' : '銀トロフィー獲得！';
+  const sub = isGold ? '全モードで完全マスター！<br>本当にすごい！👑' : '全モードで80%以上マスター！<br>この調子で金を目指そう！🎉';
+  const btn = isGold ? '✨ 最高！！' : '🎉 やったー！';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'trophy-overlay';
+  overlay.innerHTML = `
+    <div class="trophy-popup">
+      <div style="font-size:5.5rem;margin-bottom:16px;">${icon}</div>
+      <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:${color};margin-bottom:10px;">${title}</div>
+      <div style="font-size:.95rem;color:var(--ink-soft);margin-bottom:24px;line-height:1.7;">${sub}</div>
+      <button onclick="this.closest('.trophy-overlay').remove(); updateHome();"
+        class="btn btn-primary" style="background:${bg};padding:14px 36px;">${btn}</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+// ══════════════════════════════════════════
+//  LEARN (Card / List)
+// ══════════════════════════════════════════
+function learnTab(tab) {
+  document.getElementById('learn-tab-card').classList.toggle('active', tab==='card');
+  document.getElementById('learn-tab-list').classList.toggle('active', tab==='list');
+  document.getElementById('learn-card').style.display = tab==='card' ? 'block' : 'none';
+  document.getElementById('learn-list').style.display = tab==='list' ? 'block' : 'none';
+  if (tab === 'list') renderList();
+  if (tab === 'card') loadLC();
+}
+
+function loadLC() {
+  const w = words[lcIdx];
+  document.getElementById('fc-word').textContent = w.en;
+  document.getElementById('fc-trans').textContent = w.ja;
+  document.getElementById('fc-en-sub').textContent = w.en;
+  document.getElementById('fc-badge').textContent = w.phrase ? '表現' : (w.productive ? '発信語彙' : '');
+  document.getElementById('fc-badge').style.display = (w.phrase || w.productive) ? 'inline-block' : 'none';
+  document.getElementById('flashcard').classList.remove('flipped');
+  fcFlipped = false;
+  document.getElementById('lc-cnt').textContent = (lcIdx+1) + ' / ' + words.length;
+  document.getElementById('lc-prog').style.width = Math.round((lcIdx+1)/words.length*100) + '%';
+}
+function lcStep(dir) {
+  lcIdx = (lcIdx + dir + words.length) % words.length;
+  loadLC();
+}
+function flipCard() {
+  if (fcFlipped) return;
+  fcFlipped = true;
+  document.getElementById('flashcard').classList.add('flipped');
+}
+
+function renderList() {
+  const wrap = document.getElementById('wl-body');
+  wrap.innerHTML = '';
+  // 連続正解の回数で「習得」が決まるので、残り何回で習得かが分かるように表示する
+  const color = s => s >= MASTERY_STREAK ? 'var(--good)' : s > 0 ? 'var(--warn)' : 'var(--border-strong)';
+  const mark  = s => s >= MASTERY_STREAK ? '習得' : s > 0 ? 'あと1回' : '未';
+  words.forEach(w => {
+    const qs = streakOf(quizProgress, w);
+    const ts = w.productive ? streakOf(typingProgress, w) : null;
+    const ss = hasSentence(w) ? streakOf(sentenceProgress, w) : null;
+    const tip = (label, m) => `${label} 正答率${m}%`;
+    const badge = w.phrase ? '<span class="wl-badge phrase">表現</span>' : (w.productive ? '<span class="wl-badge prod">発信</span>' : '');
+    const row = document.createElement('div');
+    row.className = 'wl-row';
+    row.innerHTML = `
+      <div class="wl-head"><span class="wl-en">${w.en}</span>${badge}</div>
+      <div class="wl-ja">${w.ja}</div>
+      <div class="wl-meters">
+        <div class="wl-meter" title="${tip('Quiz', memQuiz(w))}"><span class="dot" style="background:${color(qs)}"></span>🎯${mark(qs)}</div>
+        <div class="wl-meter" title="${ts===null?'発信語彙ではありません':tip('Typing', memTyping(w))}"><span class="dot" style="background:${ts===null?'var(--border)':color(ts)}"></span>⌨️${ts===null?'—':mark(ts)}</div>
+        <div class="wl-meter" title="${ss===null?'この単語には例文がありません':tip('Sentence', memSentence(w))}"><span class="dot" style="background:${ss===null?'var(--border)':color(ss)}"></span>📝${ss===null?'—':mark(ss)}</div>
+      </div>`;
+    wrap.appendChild(row);
+  });
+}
+
+// ══════════════════════════════════════════
+//  MODE START / END (Quiz, Typing, Sentence)
+// ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  「まだ習得していない単語だけ出題する」設定
+//  すでに覚えた単語を解き直さずに済むようにするためのもの。
+//  設定は端末に保存され、Quiz / Typing / Sentence のすべてに効く。
+// ══════════════════════════════════════════
+const ONLY_UNMASTERED_KEY = 'wscroll_only_unmastered_g1';
+function onlyUnmastered() {
+  try { return localStorage.getItem(ONLY_UNMASTERED_KEY) === '1'; } catch(e) { return false; }
+}
+function toggleOnlyUnmastered() {
+  const on = document.getElementById('only-unmastered').checked;
+  try { localStorage.setItem(ONLY_UNMASTERED_KEY, on ? '1' : '0'); } catch(e) {}
+  updateHome();
+}
+/** 出題する単語を絞り込む。全部習得済みのときは、いつもどおり全単語から出す。 */
+function pickPool(pool, dict) {
+  if (!onlyUnmastered()) return pool;
+  const rest = pool.filter(w => !isMastered(dict, w));
+  if (rest.length === 0) {
+    notif('✅ すべて習得済みです。全単語から出題します', 'ok');
+    return pool;
+  }
+  return rest;
+}
+
+function startMode(mode) {
+  if (mode === 'quiz' && words.length < 4) { notif('クイズには4語以上必要です', 'err'); return; }
+  currentMode = mode;
+  idx = 0; mOk = 0; mNg = 0; mScore = 0; mStreak = 0; mMaxStreak = 0;
+
+  if (mode === 'quiz') {
+    queue = pickPool(words, quizProgress).slice().sort(() => Math.random()-.5);
+    go('quiz'); startQZ();
+  }
+  if (mode === 'sentence') {
+    queue = pickPool(words.filter(hasSentence), sentenceProgress).slice().sort(() => Math.random()-.5);
+    go('sentence'); startST();
+  }
+}
+
+function startTY(m) {
+  tyMode = m;
+  currentMode = 'typing';
+  idx = 0; mOk = 0; mNg = 0; mScore = 0; mStreak = 0; mMaxStreak = 0;
+  const pool = words.filter(w => w.productive);
+  if (pool.length === 0) { notif('発信語彙がありません', 'err'); return; }
+  queue = pickPool(pool, typingProgress).slice().sort(() => Math.random()-.5);
+  go('typing'); loadTY();
+}
+
+function endMode() { go('home'); }
+function retryMode() {
+  if (currentMode === 'typing') { go('typingSelect'); return; }
+  startMode(currentMode);
+}
+
+function showResult() {
+  go('result');
+  document.getElementById('r-pts').textContent = '+' + mScore + ' pts';
+  document.getElementById('r-ok').textContent = mOk;
+  document.getElementById('r-ng').textContent = mNg;
+  document.getElementById('r-str').textContent = mMaxStreak;
+  const total = mOk + mNg, rate = total ? Math.round(mOk/total*100) : 0;
+  let emoji='🎉', title='ラウンド完了！';
+  if (rate===100){ emoji='🏆'; title='完璧です！すごい！'; }
+  else if(rate>=80){ emoji='🌟'; title='すばらしい！'; }
+  else if(rate>=60){ emoji='😊'; title='よくできました！'; }
+  else if(rate>=40){ emoji='😐'; title='もう少し頑張ろう！'; }
+  else             { emoji='😅'; title='もっと練習しよう！'; }
+  document.getElementById('r-emoji').textContent = emoji;
+  document.getElementById('r-title').textContent = title;
+  document.getElementById('r-msg').textContent = `正解率: ${rate}% (${mOk}/${total})`;
+  checkTrophy();
+}
+
+function updStreak(elId) {
+  const el = document.getElementById(elId);
+  if (mStreak >= 3) {
+    const bonus = mStreak>=10 ? '🔥🔥🔥' : mStreak>=5 ? '🔥🔥' : '🔥';
+    el.innerHTML = `${bonus} <strong>${mStreak}連続正解！</strong>`;
+    el.style.color = 'var(--warn)';
+  } else { el.textContent = ''; el.style.color = 'var(--ink-soft)'; }
+}
+function updProg(cntId, progId, ptsId, score) {
+  const pct = Math.round(idx/queue.length*100);
+  document.getElementById(progId).style.width = pct + '%';
+  document.getElementById(cntId).textContent = Math.min(idx+1, queue.length) + ' / ' + queue.length;
+  document.getElementById(ptsId).textContent = '🏆 ' + score;
+}
+
+// ══════════════════════════════════════════
+//  QUIZ (英→日 / 日→英)
+// ══════════════════════════════════════════
+function startQZ() { qzAnswered = false; loadQZ(); }
+
+function loadQZ() {
+  if (idx >= queue.length) { showResult(); return; }
+  qzAnswered = false;
+  const w = queue[idx];
+  qzDir = Math.random() < 0.5 ? 'e2j' : 'j2e';
+  document.getElementById('qz-dir').textContent = qzDir === 'e2j' ? 'ENGLISH → 日本語' : '日本語 → ENGLISH';
+  document.getElementById('qz-q').textContent = qzDir === 'e2j' ? w.en : w.ja;
+  document.getElementById('qz-q').style.fontFamily = qzDir === 'e2j' ? 'var(--font-mono)' : 'var(--font-body)';
+  document.getElementById('qz-fb').textContent = '';
+
+  const opts = genQZOpts(w, qzDir);
+  const correctText = qzDir === 'e2j' ? w.ja : w.en;
+  qzCorrectIdx = opts.indexOf(correctText);
+
+  [0,1,2,3].forEach(i => {
+    const btn = document.getElementById('qo'+i);
+    btn.textContent = opts[i] || '---';
+    btn.className = 'quiz-opt';
+    btn.disabled = false;
+  });
+  updProg('qz-cnt','qz-prog','qz-pts', quizScore);
+  updStreak('qz-streak');
+}
+function genQZOpts(correct, dir) {
+  const key = dir === 'e2j' ? 'ja' : 'en';
+  const choices = [correct[key]];
+  const pool = words.filter(w => w.en !== correct.en).sort(() => Math.random()-.5);
+  for (let i=0; i<Math.min(3, pool.length); i++) choices.push(pool[i][key]);
+  return choices.sort(() => Math.random()-.5);
+}
+function qzAns(i) {
+  if (qzAnswered) return;
+  qzAnswered = true;
+  const w = queue[idx];
+  const ok = (i === qzCorrectIdx);
+  [0,1,2,3].forEach(j => {
+    const btn = document.getElementById('qo'+j);
+    btn.disabled = true;
+    if (j === qzCorrectIdx) btn.classList.add('correct');
+  });
+  const fb = document.getElementById('qz-fb');
+  record(w, ok);
+  if (ok) {
+    mOk++;
+    const pts = 10 + (mStreak>=10?10:mStreak>=5?5:0);
+    addPts(pts); scorePop('+'+pts, 'var(--good)');
+    fb.textContent = '✓ 正解！'; fb.style.color = 'var(--good)';
+    idx++; setTimeout(loadQZ, 700);
+  } else {
+    mNg++; mStreak = 0; save();
+    document.getElementById('qo'+i).classList.add('wrong');
+    const correctText = qzDir === 'e2j' ? w.ja : w.en;
+    fb.textContent = '✗ 正解は「' + correctText + '」でした'; fb.style.color = 'var(--bad)';
+    idx++; setTimeout(loadQZ, 1700);
+  }
+}
+
+// ══════════════════════════════════════════
+//  TYPING (Recall / Copy) — productive words only
+// ══════════════════════════════════════════
+function checkAnswer(w, ans) {
+  const a = ans.trim().toLowerCase();
+  const accepted = w.accept || [w.en];
+  // 正解候補にMrs.のような大文字が含まれていても正しく判定できるよう、両方を小文字にして比べる
+  return accepted.some(function (x) { return String(x).trim().toLowerCase() === a; });
+}
+// The canonical spelling a student should actually type — accept[0] strips
+// dictionary notation like "(s)"/"(ed)" that w.en carries for display only.
+function typingTarget(w) { return w.accept ? w.accept[0] : w.en; }
+
+function loadTY() {
+  if (idx >= queue.length) { showResult(); return; }
+  tyHintLv = 0;
+  const w = queue[idx];
+  const isCopy = tyMode === 'copy';
+  document.getElementById('ty-q').textContent = isCopy ? typingTarget(w) : w.ja;
+  document.getElementById('ty-sub').textContent = isCopy
+    ? '見たまま入力して、スペルを書き写そう（コピー練習）'
+    : '日本語の意味を見て、英語のスペルを入力しよう（記憶から）';
+  document.getElementById('ty-hint-btn').style.display = isCopy ? 'none' : 'inline-flex';
+  const inp = document.getElementById('ty-input');
+  inp.value = ''; inp.className = 'typing-input';
+  document.getElementById('ty-fb').textContent = '';
+  updProg('ty-cnt','ty-prog','ty-pts', typingScore);
+  updStreak('ty-streak');
+  setTimeout(() => inp.focus(), 100);
+}
+function tyHint() {
+  const w = queue[idx];
+  const t = typingTarget(w);
+  tyHintLv = Math.min(tyHintLv+1, t.length);
+  const revealed = t.slice(0, tyHintLv), hidden = '_'.repeat(t.length - tyHintLv);
+  const fb = document.getElementById('ty-fb');
+  fb.textContent = '💡 ' + revealed + hidden; fb.style.color = 'var(--warn)';
+}
+function tySkip() {
+  const w = queue[idx];
+  record(w, false); mNg++; mStreak = 0; save();
+  const fb = document.getElementById('ty-fb');
+  fb.textContent = '正解：' + typingTarget(w); fb.style.color = 'var(--ink-soft)';
+  idx++; setTimeout(loadTY, 1400);
+}
+function tySubmit() {
+  const w = queue[idx];
+  const inp = document.getElementById('ty-input');
+  const ok = checkAnswer(w, inp.value);
+  const fb = document.getElementById('ty-fb');
+  if (ok) {
+    inp.className = 'typing-input ok';
+    fb.textContent = '✓ 正解！ ' + w.en; fb.style.color = 'var(--good)';
+    record(w, true); mOk++;
+    const base = tyMode === 'copy' ? 8 : 15;
+    const pts = Math.max(5, base + (mStreak>=10?10:mStreak>=5?5:0) - tyHintLv*3);
+    addPts(pts); scorePop('+'+pts, 'var(--good)');
+    idx++; setTimeout(loadTY, 900);
+  } else {
+    inp.className = 'typing-input ng';
+    fb.textContent = '✗ もう一度試してみよう'; fb.style.color = 'var(--bad)';
+    setTimeout(() => {
+      inp.className = 'typing-input'; inp.value = '';
+      if (document.getElementById('ty-fb').textContent.includes('もう一度')) document.getElementById('ty-fb').textContent = '';
+    }, 800);
+  }
+}
+document.getElementById('ty-input').addEventListener('keydown', e => { if (e.key === 'Enter') tySubmit(); });
+
+// ══════════════════════════════════════════
+//  SENTENCE — productive = type the blank, others = choose the blank
+// ══════════════════════════════════════════
+function startST() { stAnswered = false; loadST(); }
+
+function loadST() {
+  if (idx >= queue.length) { showResult(); return; }
+  stAnswered = false; stHintLv = 0;
+  const w = queue[idx];
+  document.getElementById('st-sentence').innerHTML = w.sentence.replace('___', '<span class="blank-mark">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
+  document.getElementById('st-fb').textContent = '';
+  document.getElementById('st-hint-box').style.display = 'none';
+  document.getElementById('st-hint-box').textContent = '';
+  document.getElementById('st-hint-toggle').textContent = '💡 日本語訳のヒント';
+
+  const isType = !!w.productive;
+  document.getElementById('st-choice-wrap').style.display = isType ? 'none' : 'block';
+  document.getElementById('st-type-wrap').style.display = isType ? 'block' : 'none';
+
+  if (isType) {
+    document.getElementById('st-hintword').textContent = w.ja;
+    const inp = document.getElementById('st-input');
+    inp.value = ''; inp.className = 'typing-input';
+    setTimeout(() => inp.focus(), 100);
+  } else {
+    const opts = genSentenceOpts(w);
+    stCorrectIdx = opts.indexOf(w.en);
+    [0,1,2,3].forEach(i => {
+      const btn = document.getElementById('so'+i);
+      btn.textContent = opts[i] || '---';
+      btn.className = 'quiz-opt';
+      btn.disabled = false;
+    });
+  }
+  updProg('st-cnt','st-prog','st-pts', sentenceScore);
+  updStreak('st-streak');
+}
+function toggleSentenceHint() {
+  const w = queue[idx];
+  const box = document.getElementById('st-hint-box');
+  const btn = document.getElementById('st-hint-toggle');
+  const showing = box.style.display !== 'none';
+  if (showing) {
+    box.style.display = 'none';
+    btn.textContent = '💡 日本語訳のヒント';
+  } else {
+    box.textContent = '訳：' + w.sentenceJa;
+    box.style.display = 'block';
+    btn.textContent = '🙈 ヒントを隠す';
+  }
+}
+function genSentenceOpts(correct) {
+  const pool = words.filter(w => w.en !== correct.en && !!w.phrase === !!correct.phrase).sort(() => Math.random()-.5);
+  const choices = [correct.en];
+  for (let i=0; i<Math.min(3, pool.length); i++) choices.push(pool[i].en);
+  return choices.sort(() => Math.random()-.5);
+}
+function stAnsChoice(i) {
+  if (stAnswered) return;
+  stAnswered = true;
+  const w = queue[idx];
+  const ok = (i === stCorrectIdx);
+  [0,1,2,3].forEach(j => {
+    const btn = document.getElementById('so'+j);
+    btn.disabled = true;
+    if (j === stCorrectIdx) btn.classList.add('correct');
+  });
+  finishST(w, ok, ok ? '' : w.en);
+}
+function stHint() {
+  const w = queue[idx];
+  const t = typingTarget(w);
+  stHintLv = Math.min(stHintLv+1, t.length);
+  const revealed = t.slice(0, stHintLv), hidden = '_'.repeat(t.length - stHintLv);
+  const fb = document.getElementById('st-fb');
+  fb.textContent = '💡 ' + revealed + hidden; fb.style.color = 'var(--warn)';
+}
+function stSkip() {
+  const w = queue[idx];
+  record(w, false); mNg++; mStreak = 0; save();
+  const fb = document.getElementById('st-fb');
+  fb.textContent = '正解：' + typingTarget(w); fb.style.color = 'var(--ink-soft)';
+  idx++; setTimeout(loadST, 1400);
+}
+function stSubmit() {
+  const w = queue[idx];
+  const inp = document.getElementById('st-input');
+  const ok = checkAnswer(w, inp.value);
+  if (ok) { inp.className = 'typing-input ok'; } else { inp.className = 'typing-input ng'; }
+  if (!ok) {
+    document.getElementById('st-fb').textContent = '✗ もう一度試してみよう'; document.getElementById('st-fb').style.color = 'var(--bad)';
+    setTimeout(() => { inp.className = 'typing-input'; inp.value=''; document.getElementById('st-fb').textContent=''; }, 800);
+    return;
+  }
+  finishST(w, true, '');
+}
+function finishST(w, ok, correctTextIfWrong) {
+  const fb = document.getElementById('st-fb');
+  record(w, ok);
+  if (ok) {
+    mOk++;
+    const pts = 12 + (mStreak>=10?10:mStreak>=5?5:0) - stHintLv*3;
+    addPts(Math.max(5,pts)); scorePop('+'+Math.max(5,pts), 'var(--good)');
+    fb.textContent = '✓ 正解！ ' + w.en; fb.style.color = 'var(--good)';
+    idx++; setTimeout(loadST, 900);
+  } else {
+    mNg++; mStreak = 0; save();
+    fb.textContent = '✗ 正解は「' + w.en + '」でした'; fb.style.color = 'var(--bad)';
+    idx++; setTimeout(loadST, 1700);
+  }
+}
+document.getElementById('st-input').addEventListener('keydown', e => { if (e.key === 'Enter') stSubmit(); });
+
+// ══════════════════════════════════════════
+//  PRONUNCIATION
+// ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  PLAY: OPEN MATCH GAME
+//  A bonus mini-game — tap an English word then its Japanese meaning
+//  (or vice versa) to pair them up. Best mistakes/time are saved
+//  per-unit but kept separate from the Quiz/Typing/Sentence level &
+//  trophy system.
+// ══════════════════════════════════════════
+function startOpenMatch() {
+  if (!isSummaryUnit() && !silverTrophyEarned) { notif('🔒 銀トロフィーを獲得すると解放されます', 'err'); return; }
+  const pool = words.slice().sort(() => Math.random() - .5);
+  omPairCount = Math.min(6, pool.length);
+  const picked = pool.slice(0, omPairCount);
+
+  omEnItems = picked.map((w, i) => ({ wordIdx: i, text: w.en, matched: false, wrongFlash: false }))
+    .sort(() => Math.random() - .5);
+  omJaItems = picked.map((w, i) => ({ wordIdx: i, text: w.ja, matched: false, wrongFlash: false }))
+    .sort(() => Math.random() - .5);
+
+  omSelected = null; omMatchedCount = 0; omMistakes = 0; omLocked = false; omElapsed = 0;
+
+  document.getElementById('om-complete').style.display = 'none';
+  document.getElementById('om-grid').style.display = 'grid';
+  go('openmatch');
+  renderOMGrid();
+  updOMHud();
+
+  if (omTimerId) clearInterval(omTimerId);
+  omStartTs = Date.now();
+  omTimerId = setInterval(() => {
+    omElapsed = Math.floor((Date.now() - omStartTs) / 1000);
+    document.getElementById('om-time').textContent = '⏱ ' + omElapsed + '秒';
+  }, 1000);
+}
+
+function omItemClass(side, i, it) {
+  if (it.matched) return 'matched';
+  if (it.wrongFlash) return 'wrong';
+  if (omSelected && omSelected.side === side && omSelected.i === i) return 'selected';
+  return '';
+}
+
+function renderOMGrid() {
+  const enCol = document.getElementById('om-en-col');
+  const jaCol = document.getElementById('om-ja-col');
+  enCol.innerHTML = ''; jaCol.innerHTML = '';
+  omEnItems.forEach((it, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'match-item match-mono ' + omItemClass('en', i, it);
+    btn.textContent = it.text;
+    btn.onclick = () => omClick('en', i);
+    enCol.appendChild(btn);
+  });
+  omJaItems.forEach((it, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'match-item ' + omItemClass('ja', i, it);
+    btn.textContent = it.text;
+    btn.onclick = () => omClick('ja', i);
+    jaCol.appendChild(btn);
+  });
+}
+
+function omClick(side, i) {
+  if (omLocked) return;
+  const item = side === 'en' ? omEnItems[i] : omJaItems[i];
+  if (item.matched) return;
+
+  if (!omSelected) { omSelected = { side, i }; renderOMGrid(); return; }
+
+  if (omSelected.side === side) {
+    // tapping the same column again just changes (or clears) the selection
+    omSelected = (omSelected.i === i) ? null : { side, i };
+    renderOMGrid();
+    return;
+  }
+
+  const enIdx = side === 'en' ? i : omSelected.i;
+  const jaIdx = side === 'ja' ? i : omSelected.i;
+  const enItem = omEnItems[enIdx], jaItem = omJaItems[jaIdx];
+
+  if (enItem.wordIdx === jaItem.wordIdx) {
+    enItem.matched = true; jaItem.matched = true;
+    omSelected = null;
+    omMatchedCount++;
+    scorePop('マッチ！', 'var(--good)');
+    renderOMGrid();
+    updOMHud();
+    if (omMatchedCount === omPairCount) finishOpenMatch();
+  } else {
+    omMistakes++;
+    omLocked = true;
+    enItem.wrongFlash = true; jaItem.wrongFlash = true;
+    renderOMGrid();
+    updOMHud();
+    setTimeout(() => {
+      enItem.wrongFlash = false; jaItem.wrongFlash = false;
+      omSelected = null; omLocked = false;
+      renderOMGrid();
+    }, 700);
+  }
+}
+
+function updOMHud() {
+  document.getElementById('om-cnt').textContent = 'ペア ' + omMatchedCount + ' / ' + omPairCount;
+  document.getElementById('om-prog').style.width = Math.round(omMatchedCount / omPairCount * 100) + '%';
+  document.getElementById('om-mistakes').textContent = 'ミス：' + omMistakes;
+}
+
+function finishOpenMatch() {
+  clearInterval(omTimerId); omTimerId = null;
+  const bestMistakesKey = ls('om_best_mistakes'), bestTimeKey = ls('om_best_time');
+  const prevBestMistakes = parseInt(localStorage.getItem(bestMistakesKey));
+  const prevBestTime     = parseInt(localStorage.getItem(bestTimeKey));
+  const hasPrev = Number.isInteger(prevBestMistakes) && Number.isInteger(prevBestTime);
+  let isNewBest = false, bestText;
+  if (!hasPrev || omMistakes < prevBestMistakes || (omMistakes === prevBestMistakes && omElapsed < prevBestTime)) {
+    localStorage.setItem(bestMistakesKey, omMistakes);
+    localStorage.setItem(bestTimeKey, omElapsed);
+    isNewBest = true;
+    bestText = omMistakes + 'ミス / ' + omElapsed + '秒';
+  } else {
+    bestText = prevBestMistakes + 'ミス / ' + prevBestTime + '秒';
+  }
+  document.getElementById('om-r-time').textContent = omElapsed + '秒';
+  document.getElementById('om-r-mistakes').textContent = omMistakes + 'ミス';
+  document.getElementById('om-r-best').textContent = bestText + (isNewBest ? ' 🏅' : '');
+  document.getElementById('om-grid').style.display = 'none';
+  document.getElementById('om-complete').style.display = 'block';
+}
+
+// ══════════════════════════════════════════
+//  PLAY: WORD HUNT GAME
+//  A bonus mini-game — a Japanese meaning is shown, and the student
+//  taps the matching English word out of a grid of decoys, as fast
+//  as possible. Best mistakes/time are saved per-unit but kept
+//  separate from the Quiz/Typing/Sentence level & trophy system.
+// ══════════════════════════════════════════
+function startWordHunt() {
+  if (!isSummaryUnit() && !silverTrophyEarned) { notif('🔒 銀トロフィーを獲得すると解放されます', 'err'); return; }
+  const pool = words.slice().sort(() => Math.random() - .5);
+  whRounds = Math.min(8, pool.length);
+  whQueue = pool.slice(0, whRounds);
+  whIdx = 0; whMistakes = 0; whLocked = false; whElapsed = 0;
+
+  document.getElementById('wh-complete').style.display = 'none';
+  document.getElementById('wh-body').style.display = 'block';
+  go('wordhunt');
+  loadWH();
+
+  if (whTimerId) clearInterval(whTimerId);
+  whStartTs = Date.now();
+  whTimerId = setInterval(() => {
+    whElapsed = Math.floor((Date.now() - whStartTs) / 1000);
+    document.getElementById('wh-time').textContent = '⏱ ' + whElapsed + '秒';
+  }, 1000);
+}
+
+function loadWH() {
+  if (whIdx >= whQueue.length) { finishWordHunt(); return; }
+  const target = whQueue[whIdx];
+  document.getElementById('wh-target').textContent = target.ja;
+  const distractPool = words.filter(w => w.en !== target.en).sort(() => Math.random() - .5);
+  const n = Math.min(8, distractPool.length);
+  whCurrentOpts = [target, ...distractPool.slice(0, n)].sort(() => Math.random() - .5);
+  whCurrentCorrectEn = target.en;
+  renderWHGrid();
+  updWHHud();
+}
+
+function renderWHGrid() {
+  const grid = document.getElementById('wh-grid');
+  grid.innerHTML = '';
+  whCurrentOpts.forEach((w, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'hunt-item';
+    btn.textContent = w.en;
+    btn.onclick = () => whClick(i, w);
+    grid.appendChild(btn);
+  });
+}
+
+function whClick(i, w) {
+  if (whLocked) return;
+  const btns = document.querySelectorAll('#wh-grid .hunt-item');
+  if (w.en === whCurrentCorrectEn) {
+    whLocked = true;
+    btns[i].classList.add('correct');
+    btns.forEach(b => b.disabled = true);
+    scorePop('+1', 'var(--good)');
+    whIdx++;
+    setTimeout(() => { whLocked = false; loadWH(); }, 550);
+  } else {
+    if (btns[i].disabled) return;
+    whMistakes++;
+    updWHHud();
+    btns[i].classList.add('wrong');
+    btns[i].disabled = true;
+  }
+}
+
+function updWHHud() {
+  document.getElementById('wh-cnt').textContent = 'ラウンド ' + Math.min(whIdx + 1, whRounds) + ' / ' + whRounds;
+  document.getElementById('wh-prog').style.width = Math.round(whIdx / whRounds * 100) + '%';
+  document.getElementById('wh-mistakes').textContent = 'ミス：' + whMistakes;
+}
+
+function finishWordHunt() {
+  clearInterval(whTimerId); whTimerId = null;
+  const bestMistakesKey = ls('wh_best_mistakes'), bestTimeKey = ls('wh_best_time');
+  const prevBestMistakes = parseInt(localStorage.getItem(bestMistakesKey));
+  const prevBestTime     = parseInt(localStorage.getItem(bestTimeKey));
+  const hasPrev = Number.isInteger(prevBestMistakes) && Number.isInteger(prevBestTime);
+  let isNewBest = false, bestText;
+  if (!hasPrev || whMistakes < prevBestMistakes || (whMistakes === prevBestMistakes && whElapsed < prevBestTime)) {
+    localStorage.setItem(bestMistakesKey, whMistakes);
+    localStorage.setItem(bestTimeKey, whElapsed);
+    isNewBest = true;
+    bestText = whMistakes + 'ミス / ' + whElapsed + '秒';
+  } else {
+    bestText = prevBestMistakes + 'ミス / ' + prevBestTime + '秒';
+  }
+  document.getElementById('wh-r-time').textContent = whElapsed + '秒';
+  document.getElementById('wh-r-mistakes').textContent = whMistakes + 'ミス';
+  document.getElementById('wh-r-best').textContent = bestText + (isNewBest ? ' 🏅' : '');
+  document.getElementById('wh-body').style.display = 'none';
+  document.getElementById('wh-complete').style.display = 'block';
+}
+
+// ══════════════════════════════════════════
+//  PLAY: TIME RACE GAME
+//  A bonus mini-game — a countdown timer runs while the student
+//  answers as many bidirectional 4-choice questions as possible.
+//  Best correct-answer count is saved per-unit but kept separate
+//  from the Quiz/Typing/Sentence level & trophy system.
+// ══════════════════════════════════════════
+function startTimeRace() {
+  if (!isSummaryUnit() && !goldTrophyEarned) { notif('🔒 金トロフィーを獲得すると解放されます', 'err'); return; }
+  trCorrect = 0; trWrong = 0; trRemaining = trTimeLimit; trActive = true;
+
+  document.getElementById('tr-complete').style.display = 'none';
+  document.getElementById('tr-body').style.display = 'block';
+  document.getElementById('tr-timebar').style.background = 'var(--seal)';
+  go('timerace');
+  loadTR();
+  updTRHud();
+  updTRTimer();
+
+  if (trTimerId) clearInterval(trTimerId);
+  trTimerId = setInterval(() => {
+    trRemaining--;
+    updTRTimer();
+    if (trRemaining <= 0) finishTimeRace();
+  }, 1000);
+}
+
+function updTRTimer() {
+  document.getElementById('tr-time').textContent = '⏱ ' + trRemaining + '秒';
+  const bar = document.getElementById('tr-timebar');
+  bar.style.width = Math.max(0, Math.round(trRemaining / trTimeLimit * 100)) + '%';
+  if (trRemaining <= 10) bar.style.background = 'var(--bad)';
+}
+
+function loadTR() {
+  trAnswered = false;
+  const w = words[Math.floor(Math.random() * words.length)];
+  // Productive (発信語彙) words must always be typed, never picked from
+  // multiple choice — recall direction is forced to 日本語 → ENGLISH.
+  const isType = !!w.productive;
+  trDir = isType ? 'j2e' : (Math.random() < 0.5 ? 'e2j' : 'j2e');
+  document.getElementById('tr-dir').textContent = trDir === 'e2j' ? 'ENGLISH → 日本語' : '日本語 → ENGLISH';
+  document.getElementById('tr-q').textContent = trDir === 'e2j' ? w.en : w.ja;
+  document.getElementById('tr-q').style.fontFamily = trDir === 'e2j' ? 'var(--font-mono)' : 'var(--font-body)';
+
+  document.getElementById('tr-choice-wrap').style.display = isType ? 'none' : 'block';
+  document.getElementById('tr-type-wrap').style.display = isType ? 'block' : 'none';
+
+  if (isType) {
+    trTypeWord = w;
+    const inp = document.getElementById('tr-input');
+    inp.value = ''; inp.className = 'typing-input'; inp.disabled = false;
+    setTimeout(() => inp.focus(), 50);
+  } else {
+    trTypeWord = null;
+    const opts = genQZOpts(w, trDir);
+    trCorrectIdx = opts.indexOf(trDir === 'e2j' ? w.ja : w.en);
+    [0,1,2,3].forEach(i => {
+      const btn = document.getElementById('tro' + i);
+      btn.textContent = opts[i] || '';
+      btn.disabled = false;
+      btn.classList.remove('correct', 'wrong');
+    });
+  }
+}
+
+function trAns(i) {
+  if (trAnswered || !trActive) return;
+  trAnswered = true;
+  const ok = (i === trCorrectIdx);
+  document.getElementById('tro' + trCorrectIdx).classList.add('correct');
+  if (!ok) document.getElementById('tro' + i).classList.add('wrong');
+  [0,1,2,3].forEach(j => document.getElementById('tro' + j).disabled = true);
+  if (ok) { trCorrect++; scorePop('+1', 'var(--good)'); } else { trWrong++; }
+  updTRHud();
+  setTimeout(() => { if (trActive) loadTR(); }, 350);
+}
+
+function trSubmit() {
+  if (trAnswered || !trActive || !trTypeWord) return;
+  trAnswered = true;
+  const inp = document.getElementById('tr-input');
+  const ok = checkAnswer(trTypeWord, inp.value);
+  inp.className = 'typing-input ' + (ok ? 'ok' : 'ng');
+  inp.disabled = true;
+  if (ok) { trCorrect++; scorePop('+1', 'var(--good)'); } else { trWrong++; }
+  updTRHud();
+  setTimeout(() => { if (trActive) loadTR(); }, ok ? 350 : 650);
+}
+document.getElementById('tr-input').addEventListener('keydown', e => { if (e.key === 'Enter') trSubmit(); });
+
+function updTRHud() {
+  document.getElementById('tr-correct').textContent = '✅ ' + trCorrect;
+  document.getElementById('tr-wrong').textContent = '❌ ミス ' + trWrong;
+}
+
+function finishTimeRace() {
+  trActive = false;
+  clearInterval(trTimerId); trTimerId = null;
+  [0,1,2,3].forEach(j => document.getElementById('tro' + j).disabled = true);
+  document.getElementById('tr-input').disabled = true;
+
+  const bestKey = ls('tr_best_correct');
+  const prevBest = parseInt(localStorage.getItem(bestKey));
+  const hasPrev = Number.isInteger(prevBest);
+  let isNewBest = false;
+  if (!hasPrev || trCorrect > prevBest) {
+    localStorage.setItem(bestKey, trCorrect);
+    isNewBest = true;
+  }
+  const bestVal = isNewBest ? trCorrect : (hasPrev ? prevBest : trCorrect);
+
+  document.getElementById('tr-r-correct').textContent = trCorrect + '問';
+  document.getElementById('tr-r-wrong').textContent = trWrong + '問';
+  document.getElementById('tr-r-best').textContent = bestVal + '問' + (isNewBest ? ' 🏅' : '');
+  document.getElementById('tr-body').style.display = 'none';
+  document.getElementById('tr-complete').style.display = 'block';
+}
+
+// ══════════════════════════════════════════
+//  PLAY: FALLING WORDS GAME
+//  A bonus mini-game — a Japanese meaning is shown while 3 English
+//  words fall down 3 lanes; tap the one that matches before it (or
+//  a wrong tap) costs a life. 3 lives, catches keep score. Best
+//  score is saved per-unit but kept separate from the
+//  Quiz/Typing/Sentence level & trophy system.
+// ══════════════════════════════════════════
+function startFallingWords() {
+  if (!isSummaryUnit() && !goldTrophyEarned) { notif('🔒 金トロフィーを獲得すると解放されます', 'err'); return; }
+  fwLives = 3; fwScore = 0; fwActive = true; fwFallMs = 3800; fwUsedTargets = [];
+
+  document.getElementById('fw-complete').style.display = 'none';
+  document.getElementById('fw-body').style.display = 'block';
+  go('fallingwords');
+  updFWHud();
+  spawnFWWave();
+
+  if (fwTickId) clearInterval(fwTickId);
+  fwTickId = setInterval(tickFW, 50);
+}
+
+function spawnFWWave() {
+  const area = document.getElementById('fw-area');
+  area.innerHTML = '';
+  const target = pickUnusedWord(fwUsedTargets);
+  const distractPool = words.filter(w => w.en !== target.en).sort(() => Math.random() - .5);
+  const chosen = [target, distractPool[0], distractPool[1]].sort(() => Math.random() - .5);
+  document.getElementById('fw-target').textContent = target.ja;
+
+  fwItems = chosen.map((w, lane) => {
+    const item = { en: w.en, correct: w.en === target.en, top: -14, removed: false };
+    const el = document.createElement('button');
+    el.className = 'fall-item';
+    el.textContent = w.en;
+    el.style.left = (lane * 33.34) + '%';
+    el.style.top = item.top + '%';
+    // The word keeps moving while it falls, so we react on pointerdown
+    // (the instant of contact) instead of waiting for a full click —
+    // otherwise a fast tap can land after the button has already
+    // moved out from under it and the tap appears to do nothing.
+    el.addEventListener('pointerdown', (ev) => { ev.preventDefault(); fwClick(item); });
+    el.onclick = () => fwClick(item);
+    area.appendChild(el);
+    item.el = el;
+    return item;
+  });
+}
+
+function tickFW() {
+  if (!fwActive) return;
+  const stepPercent = 100 / (fwFallMs / 50);
+  // A plain loop (not forEach) so we can stop cleanly the moment a new
+  // wave is spawned — spawnFWWave() reassigns the fwItems array, and
+  // continuing to iterate the old array reference after that would
+  // touch items whose DOM elements have already been cleared away.
+  for (let i = 0; i < fwItems.length; i++) {
+    const item = fwItems[i];
+    if (item.removed) continue;
+    item.top += stepPercent;
+    item.el.style.top = item.top + '%';
+    if (item.top >= 100) {
+      item.removed = true;
+      item.el.remove();
+      if (item.correct) {
+        fwLives--;
+        updFWHud();
+        if (fwLives <= 0) { finishFallingWords(); return; }
+        spawnFWWave();
+        return;
+      }
+    }
+  }
+}
+
+function fwClick(item) {
+  if (!fwActive || item.removed) return;
+  item.removed = true;
+  if (item.correct) {
+    item.el.classList.add('caught');
+    fwScore++;
+    scorePop('+1', 'var(--good)');
+    fwItems.forEach(it => { if (!it.removed) { it.removed = true; it.el.remove(); } });
+    updFWHud();
+    setTimeout(() => {
+      if (fwActive) { fwFallMs = Math.max(1800, fwFallMs - 60); spawnFWWave(); }
+    }, 300);
+  } else {
+    item.el.classList.add('wrong-tap');
+    item.el.disabled = true;
+    fwLives--;
+    updFWHud();
+    if (fwLives <= 0) { finishFallingWords(); return; }
+    setTimeout(() => { if (item.el && item.el.parentNode) item.el.remove(); }, 200);
+  }
+}
+
+function updFWHud() {
+  document.getElementById('fw-score').textContent = '✅ ' + fwScore;
+  document.getElementById('fw-lives').textContent = '❤️'.repeat(Math.max(0, fwLives)) + '🖤'.repeat(Math.max(0, 3 - fwLives));
+}
+
+function finishFallingWords() {
+  fwActive = false;
+  clearInterval(fwTickId); fwTickId = null;
+  document.getElementById('fw-area').innerHTML = '';
+
+  const bestKey = ls('fw_best_score');
+  const prevBest = parseInt(localStorage.getItem(bestKey));
+  const hasPrev = Number.isInteger(prevBest);
+  let isNewBest = false;
+  if (!hasPrev || fwScore > prevBest) {
+    localStorage.setItem(bestKey, fwScore);
+    isNewBest = true;
+  }
+  const bestVal = isNewBest ? fwScore : (hasPrev ? prevBest : fwScore);
+
+  document.getElementById('fw-r-score').textContent = fwScore + '問';
+  document.getElementById('fw-r-best').textContent = bestVal + '問' + (isNewBest ? ' 🏅' : '');
+  document.getElementById('fw-body').style.display = 'none';
+  document.getElementById('fw-complete').style.display = 'block';
+}
+
+// ══════════════════════════════════════════
+//  FINAL BOSS
+//  A 4-phase gauntlet mixing every Play game: 6 pairs of Open Match,
+//  6 rounds of Word Hunt, 6 catches of Falling Words, then 6 correct
+//  answers of Time Race within 20 seconds. 3 shared hearts for the
+//  whole battle; any mistake in any phase costs one. Unlocks once
+//  each of the 4 games' best record clears its bar (BOSS_REQS below).
+//  A clear is timed from startBoss() to victory and given a medal rank
+//  (プラチナ best → 金 → 銀 → 銅) per BOSS_RANKS; the fastest clear time
+//  + rank are saved per-unit as the new "best". `rank` (S/A/B/C) is the
+//  internal/storage code; `label`/`medal` are what's shown to the player.
+// ══════════════════════════════════════════
+const BOSS_RANKS = [
+  { rank: 'S', label: 'Platinum', medal: '💎', maxSec: 45,      color: 'var(--indigo)',      soft: 'var(--indigo-soft)' },
+  { rank: 'A', label: 'Gold',     medal: '🥇', maxSec: 60,      color: 'var(--rank-s)',      soft: 'var(--rank-s-soft)' },
+  { rank: 'B', label: 'Silver',   medal: '🥈', maxSec: 70,      color: 'var(--rank-silver)', soft: 'var(--rank-silver-soft)' },
+  { rank: 'C', label: 'Bronze',   medal: '🥉', maxSec: Infinity, color: 'var(--rank-bronze)', soft: 'var(--rank-bronze-soft)' },
+];
+function bossRankLabel(rankCode) {
+  const r = BOSS_RANKS.find(x => x.rank === rankCode);
+  return r ? r.label : rankCode;
+}
+function bossRankFor(sec) {
+  return BOSS_RANKS.find(r => sec <= r.maxSec);
+}
+const BOSS_REQS = [
+  { label: 'Open Match',    reqText: 'ノーミスでクリア',    bestKey: 'om_best_mistakes', cmp: v => v <= 0 },
+  { label: 'Word Hunt',     reqText: 'ノーミスでクリア',    bestKey: 'wh_best_mistakes', cmp: v => v <= 0 },
+  { label: 'Time Race',     reqText: '10問以上正解',       bestKey: 'tr_best_correct',  cmp: v => v >= 10 },
+  { label: 'Falling Words', reqText: '10問以上キャッチ',    bestKey: 'fw_best_score',    cmp: v => v >= 10 },
+];
+// "まとめ"'s Final Boss doesn't use the usual PLAY-record requirements
+// (PLAY is always unlocked there with nothing to gate on) — instead it
+// unlocks once every real Unit's own Final Boss has been cleared, any
+// rank. realUnits() excludes "まとめ" itself so this keeps working as
+// more Units get added later.
+function realUnits() {
+  return UNITS.filter(u => !u.isSummary);
+}
+function lsFor(unitId, key) { return 'wscroll_' + unitId + '_' + key; }
+function allUnitsBossCleared() {
+  return realUnits().every(u => localStorage.getItem(lsFor(u.id, 'boss_cleared')) === '1');
+}
+function bossRequirementsMet() {
+  if (isSummaryUnit()) return allUnitsBossCleared();
+  return BOSS_REQS.every(r => {
+    const v = parseInt(localStorage.getItem(ls(r.bestKey)));
+    return Number.isInteger(v) && r.cmp(v);
+  });
+}
+function renderBossCard() {
+  const unlocked = bossRequirementsMet();
+  const cleared = localStorage.getItem(ls('boss_cleared')) === '1';
+  document.getElementById('boss-card').classList.toggle('boss-locked', !unlocked);
+
+  const badge = document.getElementById('boss-best-badge');
+  let clearedLine = '🏆 撃破済み！もう一度挑戦できます';
+  if (cleared) {
+    const bestMs = parseInt(localStorage.getItem(ls('boss_best_ms')));
+    const bestRank = localStorage.getItem(ls('boss_best_rank'));
+    if (Number.isInteger(bestMs) && bestRank) {
+      const rankInfo = BOSS_RANKS.find(r => r.rank === bestRank) || BOSS_RANKS[0];
+      document.getElementById('bb-rank').textContent = rankInfo.medal + ' ' + rankInfo.label;
+      document.getElementById('bb-time').textContent = (bestMs / 1000).toFixed(1) + '秒';
+      badge.style.setProperty('--rank-color', rankInfo.color);
+      badge.style.setProperty('--rank-color-soft', rankInfo.soft);
+      badge.style.display = 'inline-flex';
+      clearedLine = '🏆 撃破済み！もう一度挑戦できます';
+    }
+  } else {
+    badge.style.display = 'none';
+  }
+  document.getElementById('boss-desc').textContent = !unlocked
+    ? (isSummaryUnit() ? '🔒 すべてのUnitのファイナルチャレンジをクリアすると挑戦できます' : '🔒 下の条件をすべて満たすと挑戦できます')
+    : (cleared ? clearedLine : (isSummaryUnit() ? '⚔️ 挑戦できます！全Unitの実力を試そう' : '⚔️ 挑戦できます！4つのゲームの力を試そう'));
+  document.getElementById('boss-reqs').innerHTML = isSummaryUnit()
+    ? realUnits().map(u => {
+        const met = localStorage.getItem(lsFor(u.id, 'boss_cleared')) === '1';
+        return '<div>' + (met ? '✅' : '⬜') + ' ' + u.title + '：ファイナルチャレンジをクリア</div>';
+      }).join('')
+    : BOSS_REQS.map(r => {
+        const v = parseInt(localStorage.getItem(ls(r.bestKey)));
+        const met = Number.isInteger(v) && r.cmp(v);
+        return '<div>' + (met ? '✅' : '⬜') + ' ' + r.label + '：' + r.reqText + '</div>';
+      }).join('');
+
+  // Once unlocked, the requirement checklist has done its job — swap it for
+  // the rank/clear-time reference table instead.
+  document.getElementById('boss-reqs').style.display = unlocked ? 'none' : 'grid';
+  const rankTable = document.getElementById('boss-rank-table');
+  rankTable.style.display = unlocked ? 'block' : 'none';
+  if (unlocked) {
+    rankTable.innerHTML = '<div class="brt-row brt-head"><span>ランク</span><span>クリアタイム</span></div>' +
+      BOSS_RANKS.map(r => {
+        const timeText = r.maxSec === Infinity ? 'それ以上' : r.maxSec + '秒以内';
+        return '<div class="brt-row"><span class="brt-rank" style="color:' + r.color + ';">' +
+          r.medal + ' ' + r.label + '</span><span class="brt-time">' + timeText + '</span></div>';
+      }).join('');
+  }
+}
+function tryEnterBoss() {
+  if (!bossRequirementsMet()) {
+    notif(isSummaryUnit() ? '🔒 すべてのUnitのファイナルチャレンジをクリアすると挑戦できます' : '🔒 4つの条件をすべて満たすと挑戦できます', 'err');
+    return;
+  }
+  startBoss();
+}
+
+function startBoss() {
+  bsHearts = 3; bsPhase = 0; bsActive = true; bsStartTime = Date.now();
+  document.getElementById('boss-result').style.display = 'none';
+  document.getElementById('boss-rank-wrap').style.display = 'none';
+  updBossHud();
+  go('boss');
+  loadBossPhase();
+}
+
+function updBossHud() {
+  document.getElementById('bs-hearts').textContent = '❤️'.repeat(Math.max(0, bsHearts)) + '🖤'.repeat(Math.max(0, 3 - bsHearts));
+  document.getElementById('bs-phase').textContent = 'フェーズ ' + Math.min(bsPhase + 1, 4) + ' / 4';
+  document.getElementById('bs-hpbar').style.width = Math.round((4 - bsPhase) / 4 * 100) + '%';
+}
+
+function bossHit() {
+  bsHearts--;
+  updBossHud();
+  scorePop('-1', 'var(--bad)');
+  if (bsHearts <= 0) finishBoss(false);
+}
+
+function clearBossPhase() {
+  bsPhase++;
+  updBossHud();
+  if (bsPhase >= 4) { finishBoss(true); return; }
+  setTimeout(() => { if (bsActive) loadBossPhase(); }, 500);
+}
+
+function updBossRound(cur, total) {
+  document.getElementById('bs-round').textContent = '(' + Math.min(cur, total) + '/' + total + ')';
+}
+const BOSS_PHASE_NAMES = ['Open Match', 'Word Hunt', 'Falling Words', 'Time Race'];
+function loadBossPhase() {
+  ['om', 'wh', 'fw', 'tr'].forEach((k, i) => {
+    document.getElementById('boss-phase-' + k).style.display = (i === bsPhase) ? 'block' : 'none';
+  });
+  document.getElementById('bs-phase-name').textContent = BOSS_PHASE_NAMES[bsPhase];
+  if (bsPhase === 0) loadBossOM();
+  else if (bsPhase === 1) { bsWHCleared = 0; bsWHUsedTargets = []; loadBossWH(); }
+  else if (bsPhase === 2) { bsFWCleared = 0; bsFWUsedTargets = []; loadBossFW(); }
+  else if (bsPhase === 3) { bsTRCleared = 0; startBossTR(); }
+}
+
+// ── Phase 1: Open Match (6 pairs) ──
+const BOSS_OM_PAIRS = 6;
+function loadBossOM() {
+  const pool = words.slice().sort(() => Math.random() - .5);
+  const picked = pool.slice(0, Math.min(BOSS_OM_PAIRS, pool.length));
+  bsOMEnItems = picked.map((w, i) => ({ wordIdx: i, text: w.en, matched: false, wrongFlash: false })).sort(() => Math.random() - .5);
+  bsOMJaItems = picked.map((w, i) => ({ wordIdx: i, text: w.ja, matched: false, wrongFlash: false })).sort(() => Math.random() - .5);
+  bsOMSelected = null; bsOMLocked = false;
+  renderBossOM();
+}
+function renderBossOM() {
+  const enCol = document.getElementById('bsom-en-col');
+  const jaCol = document.getElementById('bsom-ja-col');
+  enCol.innerHTML = ''; jaCol.innerHTML = '';
+  bsOMEnItems.forEach((it, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'match-item match-mono ' + (it.matched ? 'matched' : it.wrongFlash ? 'wrong' : (bsOMSelected && bsOMSelected.side === 'en' && bsOMSelected.i === i ? 'selected' : ''));
+    btn.textContent = it.text;
+    btn.onclick = () => bossOMClick('en', i);
+    enCol.appendChild(btn);
+  });
+  bsOMJaItems.forEach((it, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'match-item ' + (it.matched ? 'matched' : it.wrongFlash ? 'wrong' : (bsOMSelected && bsOMSelected.side === 'ja' && bsOMSelected.i === i ? 'selected' : ''));
+    btn.textContent = it.text;
+    btn.onclick = () => bossOMClick('ja', i);
+    jaCol.appendChild(btn);
+  });
+  updBossRound(bsOMEnItems.filter(x => x.matched).length, BOSS_OM_PAIRS);
+}
+function bossOMClick(side, i) {
+  if (!bsActive || bsOMLocked) return;
+  const item = side === 'en' ? bsOMEnItems[i] : bsOMJaItems[i];
+  if (item.matched) return;
+  if (!bsOMSelected) { bsOMSelected = { side, i }; renderBossOM(); return; }
+  if (bsOMSelected.side === side) { bsOMSelected = (bsOMSelected.i === i) ? null : { side, i }; renderBossOM(); return; }
+
+  const enIdx = side === 'en' ? i : bsOMSelected.i, jaIdx = side === 'ja' ? i : bsOMSelected.i;
+  const enItem = bsOMEnItems[enIdx], jaItem = bsOMJaItems[jaIdx];
+  if (enItem.wordIdx === jaItem.wordIdx) {
+    enItem.matched = true; jaItem.matched = true; bsOMSelected = null;
+    scorePop('ヒット！', 'var(--good)');
+    renderBossOM();
+    if (bsOMEnItems.every(x => x.matched)) clearBossPhase();
+  } else {
+    bossHit();
+    if (!bsActive) return;
+    bsOMLocked = true;
+    enItem.wrongFlash = true; jaItem.wrongFlash = true;
+    renderBossOM();
+    setTimeout(() => {
+      enItem.wrongFlash = false; jaItem.wrongFlash = false;
+      bsOMSelected = null; bsOMLocked = false;
+      renderBossOM();
+    }, 600);
+  }
+}
+
+// ── Phase 2: Word Hunt (6 rounds) ──
+const BOSS_WH_ROUNDS = 6;
+function loadBossWH() {
+  const target = pickUnusedWord(bsWHUsedTargets);
+  const distractPool = words.filter(w => w.en !== target.en).sort(() => Math.random() - .5);
+  const n = Math.min(8, distractPool.length);
+  bsWHOpts = [target, ...distractPool.slice(0, n)].sort(() => Math.random() - .5);
+  bsWHCorrectEn = target.en;
+  document.getElementById('bswh-target').textContent = target.ja;
+  renderBossWH();
+  updBossRound(bsWHCleared, BOSS_WH_ROUNDS);
+}
+function renderBossWH() {
+  const grid = document.getElementById('bswh-grid');
+  grid.innerHTML = '';
+  bsWHOpts.forEach((w, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'hunt-item';
+    btn.textContent = w.en;
+    btn.onclick = () => bossWHClick(i, w);
+    grid.appendChild(btn);
+  });
+}
+function bossWHClick(i, w) {
+  if (!bsActive) return;
+  const btns = document.querySelectorAll('#bswh-grid .hunt-item');
+  if (w.en === bsWHCorrectEn) {
+    btns[i].classList.add('correct');
+    btns.forEach(b => b.disabled = true);
+    scorePop('ヒット！', 'var(--good)');
+    bsWHCleared++;
+    setTimeout(() => {
+      if (!bsActive) return;
+      if (bsWHCleared >= BOSS_WH_ROUNDS) clearBossPhase();
+      else loadBossWH();
+    }, 500);
+  } else {
+    if (btns[i].disabled) return;
+    btns[i].classList.add('wrong'); btns[i].disabled = true;
+    bossHit();
+  }
+}
+
+// ── Phase 3: Falling Words (6 catches) ──
+const BOSS_FW_CATCHES = 6;
+function loadBossFW() { spawnBossFWWave(); }
+function spawnBossFWWave() {
+  const area = document.getElementById('bsfw-area');
+  area.innerHTML = '';
+  const target = pickUnusedWord(bsFWUsedTargets);
+  const distractPool = words.filter(w => w.en !== target.en).sort(() => Math.random() - .5);
+  const chosen = [target, distractPool[0], distractPool[1]].sort(() => Math.random() - .5);
+  document.getElementById('bsfw-target').textContent = target.ja;
+  updBossRound(bsFWCleared, BOSS_FW_CATCHES);
+
+  bsFWItems = chosen.map((w, lane) => {
+    const item = { en: w.en, correct: w.en === target.en, top: -14, removed: false };
+    const el = document.createElement('button');
+    el.className = 'fall-item';
+    el.textContent = w.en;
+    el.style.left = (lane * 33.34) + '%';
+    el.style.top = item.top + '%';
+    el.addEventListener('pointerdown', (ev) => { ev.preventDefault(); bossFWClick(item); });
+    el.onclick = () => bossFWClick(item);
+    area.appendChild(el);
+    item.el = el;
+    return item;
+  });
+
+  if (bsFWTickId) clearInterval(bsFWTickId);
+  bsFWFallMs = 3000;
+  bsFWTickId = setInterval(tickBossFW, 50);
+}
+function tickBossFW() {
+  if (!bsActive || bsPhase !== 2) { clearInterval(bsFWTickId); bsFWTickId = null; return; }
+  const stepPercent = 100 / (bsFWFallMs / 50);
+  for (let i = 0; i < bsFWItems.length; i++) {
+    const item = bsFWItems[i];
+    if (item.removed) continue;
+    item.top += stepPercent;
+    item.el.style.top = item.top + '%';
+    if (item.top >= 100) {
+      item.removed = true;
+      item.el.remove();
+      if (item.correct) {
+        clearInterval(bsFWTickId); bsFWTickId = null;
+        bossHit();
+        if (bsActive) spawnBossFWWave();
+      }
+      return;
+    }
+  }
+}
+function bossFWClick(item) {
+  if (!bsActive || item.removed) return;
+  item.removed = true;
+  if (item.correct) {
+    item.el.classList.add('caught');
+    scorePop('ヒット！', 'var(--good)');
+    bsFWItems.forEach(it => { if (!it.removed) { it.removed = true; it.el.remove(); } });
+    clearInterval(bsFWTickId); bsFWTickId = null;
+    bsFWCleared++;
+    setTimeout(() => {
+      if (!bsActive) return;
+      if (bsFWCleared >= BOSS_FW_CATCHES) clearBossPhase();
+      else spawnBossFWWave();
+    }, 400);
+  } else {
+    item.el.classList.add('wrong-tap');
+    item.el.disabled = true;
+    bossHit();
+    if (!bsActive) return;
+    setTimeout(() => { if (item.el && item.el.parentNode) item.el.remove(); }, 200);
+  }
+}
+
+// ── Phase 4: Time Race finale (6 correct within 20s) ──
+const BOSS_TR_TARGET = 6;
+function startBossTR() {
+  bsTRRemaining = 20;
+  updBossTRTimer();
+  loadBossTR();
+  if (bsTRTimerId) clearInterval(bsTRTimerId);
+  bsTRTimerId = setInterval(() => {
+    bsTRRemaining--;
+    updBossTRTimer();
+    if (bsTRRemaining <= 0) { clearInterval(bsTRTimerId); bsTRTimerId = null; finishBoss(false); }
+  }, 1000);
+}
+function updBossTRTimer() {
+  document.getElementById('bstr-time').textContent = '⏱ ' + bsTRRemaining + '秒';
+}
+function loadBossTR() {
+  bsTRAnswered = false;
+  const w = words[Math.floor(Math.random() * words.length)];
+  // Productive (発信語彙) words must always be typed, never picked from
+  // multiple choice — recall direction is forced to 日本語 → ENGLISH.
+  const isType = !!w.productive;
+  const dir = isType ? 'j2e' : (Math.random() < 0.5 ? 'e2j' : 'j2e');
+  document.getElementById('bstr-dir').textContent = dir === 'e2j' ? 'ENGLISH → 日本語' : '日本語 → ENGLISH';
+  document.getElementById('bstr-q').textContent = dir === 'e2j' ? w.en : w.ja;
+  document.getElementById('bstr-q').style.fontFamily = dir === 'e2j' ? 'var(--font-mono)' : 'var(--font-body)';
+
+  document.getElementById('bstr-choice-wrap').style.display = isType ? 'none' : 'block';
+  document.getElementById('bstr-type-wrap').style.display = isType ? 'block' : 'none';
+
+  if (isType) {
+    bsTRTypeWord = w;
+    const inp = document.getElementById('bstr-input');
+    inp.value = ''; inp.className = 'typing-input'; inp.disabled = false;
+    setTimeout(() => inp.focus(), 50);
+  } else {
+    bsTRTypeWord = null;
+    const opts = genQZOpts(w, dir);
+    bsTRCorrectIdx = opts.indexOf(dir === 'e2j' ? w.ja : w.en);
+    [0,1,2,3].forEach(i => {
+      const btn = document.getElementById('bstro' + i);
+      btn.textContent = opts[i] || '';
+      btn.disabled = false;
+      btn.classList.remove('correct', 'wrong');
+    });
+  }
+  updBossRound(bsTRCleared, BOSS_TR_TARGET);
+}
+function bossTRAns(i) {
+  if (!bsActive || bsTRAnswered) return;
+  bsTRAnswered = true;
+  const ok = (i === bsTRCorrectIdx);
+  document.getElementById('bstro' + bsTRCorrectIdx).classList.add('correct');
+  if (!ok) document.getElementById('bstro' + i).classList.add('wrong');
+  [0,1,2,3].forEach(j => document.getElementById('bstro' + j).disabled = true);
+  bossTRResolve(ok);
+}
+function bossTRSubmit() {
+  if (!bsActive || bsTRAnswered || !bsTRTypeWord) return;
+  bsTRAnswered = true;
+  const inp = document.getElementById('bstr-input');
+  const ok = checkAnswer(bsTRTypeWord, inp.value);
+  inp.className = 'typing-input ' + (ok ? 'ok' : 'ng');
+  inp.disabled = true;
+  bossTRResolve(ok);
+}
+document.getElementById('bstr-input').addEventListener('keydown', e => { if (e.key === 'Enter') bossTRSubmit(); });
+function bossTRResolve(ok) {
+  if (ok) {
+    scorePop('ヒット！', 'var(--good)');
+    bsTRCleared++;
+    if (bsTRCleared >= BOSS_TR_TARGET) {
+      clearInterval(bsTRTimerId); bsTRTimerId = null;
+      setTimeout(() => clearBossPhase(), 400);
+      return;
+    }
+  } else {
+    bossHit();
+    if (!bsActive) return;
+  }
+  setTimeout(() => { if (bsActive) loadBossTR(); }, 350);
+}
+
+function finishBoss(won) {
+  bsActive = false;
+  if (bsTRTimerId) { clearInterval(bsTRTimerId); bsTRTimerId = null; }
+  if (bsFWTickId) { clearInterval(bsFWTickId); bsFWTickId = null; }
+  const bstrInput = document.getElementById('bstr-input');
+  if (bstrInput) bstrInput.disabled = true;
+  if (won) { localStorage.setItem(ls('boss_cleared'), '1'); saveVocabSummary(); }
+  document.getElementById('boss-result-emoji').textContent = won ? '🏆' : '💀';
+  document.getElementById('boss-result-title').textContent = won ? 'ボス撃破！' : 'やられた…';
+  document.getElementById('boss-result-msg').textContent = won
+    ? 'すべてのフェーズをクリアした！おめでとう！'
+    : (bsHearts <= 0 ? 'ハートがなくなってしまった。もう一度挑戦してみよう。' : '時間切れになってしまった。もう一度挑戦してみよう。');
+
+  const rankWrap = document.getElementById('boss-rank-wrap');
+  if (won) {
+    const elapsedSec = Math.max(0, (Date.now() - bsStartTime) / 1000);
+    const r = bossRankFor(elapsedSec);
+    document.getElementById('boss-rank-medal').textContent = r.medal;
+    document.getElementById('boss-rank-label').textContent = r.label;
+    document.getElementById('boss-rank-badge').style.setProperty('--rank-color', r.color);
+    document.getElementById('boss-rank-badge').style.setProperty('--rank-color-soft', r.soft);
+    document.getElementById('boss-time').textContent = elapsedSec.toFixed(1) + '秒';
+
+    const bestMsKey = ls('boss_best_ms');
+    const prevBestMs = parseInt(localStorage.getItem(bestMsKey));
+    const hasPrevBest = Number.isInteger(prevBestMs);
+    const elapsedMs = Math.round(elapsedSec * 1000);
+    let isNewBest = false;
+    if (!hasPrevBest || elapsedMs < prevBestMs) {
+      localStorage.setItem(bestMsKey, elapsedMs);
+      localStorage.setItem(ls('boss_best_rank'), r.rank);
+      isNewBest = true;
+    }
+    const bestLine = document.getElementById('boss-best-line');
+    if (isNewBest) {
+      bestLine.textContent = hasPrevBest ? '🏅 自己ベスト更新！' : '🏅 初クリア記録！';
+    } else {
+      const prevRank = localStorage.getItem(ls('boss_best_rank')) || r.rank;
+      bestLine.textContent = 'ベスト：' + (prevBestMs / 1000).toFixed(1) + '秒（' + bossRankLabel(prevRank) + '）';
+    }
+    rankWrap.style.display = 'block';
+  } else {
+    rankWrap.style.display = 'none';
+  }
+  document.getElementById('boss-result').style.display = 'block';
+}
+
+function speak(e) {
+  if (e) e.stopPropagation();
+  let w = null;
+  const activeScreen = document.querySelector('.screen.active');
+  if (activeScreen && activeScreen.id === 'screen-weak') w = wwQueue[wwIdx] ? wwQueue[wwIdx].word : null;
+  else if (currentMode === 'quiz' || currentMode === 'sentence') w = queue[idx];
+  else w = words[lcIdx];
+  if (!w || !window.speechSynthesis) { notif('お使いのブラウザは発音機能に対応していません', 'err'); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(w.en.replace(/\(s\)|\(ed\)|\(es\)/g,''));
+  utt.lang = 'en-US'; utt.rate = 0.82; utt.pitch = 1.0;
+  const btn = e ? e.currentTarget : null;
+  if (btn) { btn.classList.add('playing'); utt.onend = () => btn.classList.remove('playing'); utt.onerror = () => btn.classList.remove('playing'); }
+  window.speechSynthesis.speak(utt);
+}
+
+// ══════════════════════════════════════════
+//  MISC UI
+// ══════════════════════════════════════════
+function scorePop(txt, color) {
+  const el = document.createElement('div');
+  el.className = 'score-pop'; el.textContent = txt; el.style.color = color;
+  document.body.appendChild(el);
+  setTimeout(() => el.classList.add('fade'), 80);
+  setTimeout(() => el.remove(), 850);
+}
+function notif(msg, type='ok') {
+  const el = document.getElementById('notif');
+  el.textContent = msg; el.className = 'notif ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════
+//  START
+// ══════════════════════════════════════════
+init();
+</script>
+<!-- 進捗をサーバーへ送るための共通モジュール（生徒登録が済んでいる場合のみ働く） -->
+<script src="進捗同期.js?v=20261012"></script>
+<script src="お知らせ.js?v=20261012"></script>
+<script>
+  // 上のモジュールが読み込まれた時点で、すでに作られている要約を送信する
+  if (window.ProgressSync) window.ProgressSync.sync(false);
+</script>
+</body>
+</html>
