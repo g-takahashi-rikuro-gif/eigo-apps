@@ -190,6 +190,19 @@
     return a;
   }
 
+  // 「ぜんぶ」のランダム用:テーマごとにシャッフルし、テーマを1つずつ順番に回して出題する
+  // (各テーマがかたよらず出る。1周ごとにテーマの順番もランダムに変える)
+  function shuffleByTheme(topics) {
+    const groups = {};
+    topics.forEach(t => (groups[t.theme] = groups[t.theme] || []).push(t));
+    const lists = Object.values(groups).map(shuffle);
+    const result = [];
+    while (lists.some(l => l.length > 0)) {
+      shuffle(lists.filter(l => l.length > 0)).forEach(l => result.push(l.shift()));
+    }
+    return result;
+  }
+
   // ホーム画面のカードを作る
   function buildCards() {
     const box = $("cards");
@@ -221,7 +234,7 @@
     pool = theme === ALL ? TOPICS.slice() : TOPICS.filter(t => t.theme === theme);
     if (pool.length === 0) return;
     index = 0;
-    if (mode === "random") queue = shuffle(pool);
+    if (mode === "random") queue = theme === ALL ? shuffleByTheme(pool) : shuffle(pool);
     show("practice");
     nextTopic();
   }
