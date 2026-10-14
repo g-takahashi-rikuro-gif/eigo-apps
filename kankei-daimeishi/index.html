@@ -74,7 +74,8 @@
   }
   @keyframes pop { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .actions .wide { grid-column: 1 / -1; }
+  .actions .wide, .actions .mark { grid-column: 1 / -1; }
+  .actions .mark.marked { background: #3fbf79; }
   .home-link { background: none; color: #777; font-size: 1rem; text-decoration: underline; padding: 8px; }
 
   /* お題一覧 */
@@ -93,7 +94,7 @@
   .finish .big { font-size: 5rem; }
   .finish .row { display: flex; flex-direction: column; gap: 14px; max-width: 360px; margin: 24px auto 0; }
 
-  @media (min-width: 600px) { .actions { grid-template-columns: repeat(3, 1fr); } .actions .wide { grid-column: auto; } }
+  @media (min-width: 600px) { .actions { grid-template-columns: repeat(3, 1fr); } .actions .mark { grid-column: auto; } }
 </style>
 </head>
 <body>
@@ -147,6 +148,7 @@
   <div class="actions">
     <button class="btn btn-orange" id="hintBtn">💡 ヒント</button>
     <button class="btn btn-gray" id="skipBtn">⏭️ スキップ</button>
+    <button class="btn btn-blue mark" id="markBtn">🔖 おぼえてない</button>
     <button class="btn btn-pink wide" id="nextBtn">次へ ▶</button>
   </div>
 </section>
@@ -176,7 +178,19 @@
   let currentTheme = ALL;
 
   const $ = id => document.getElementById(id);
+
+  // 「おぼえてない」お題の記録(このブラウザに保存。使えない環境ではその回だけ有効)
+  const WEAK_KEY = "rp_weak_topics";
+  const WEAK = "__weak__";
+  let weak = new Set();
+  try { weak = new Set(JSON.parse(localStorage.getItem(WEAK_KEY) || "[]")); } catch (e) {}
+  function saveWeak() {
+    try { localStorage.setItem(WEAK_KEY, JSON.stringify([...weak])); } catch (e) {}
+  }
+  const weakTopics = () => TOPICS.filter(t => weak.has(t.nameJa));
+
   function show(id) {
+    if (id === "home") buildCards();
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     $(id).classList.add("active");
     window.scrollTo(0, 0);
@@ -216,6 +230,7 @@
       box.appendChild(b);
     };
     make("🌈", "ぜんぶ", TOPICS.length, "#ffe3f1", ALL);
+    make("🔖", "おぼえてない", weakTopics().length, "#d6ecff", WEAK);
     THEMES.forEach(t => {
       const n = TOPICS.filter(x => x.theme === t.name).length;
       if (n > 0) make(t.icon, t.name, n, t.color, t.name);
@@ -231,8 +246,11 @@
 
   function start(theme) {
     currentTheme = theme;
-    pool = theme === ALL ? TOPICS.slice() : TOPICS.filter(t => t.theme === theme);
-    if (pool.length === 0) return;
+    pool = theme === ALL ? TOPICS.slice() : theme === WEAK ? weakTopics() : TOPICS.filter(t => t.theme === theme);
+    if (pool.length === 0) {
+      if (theme === WEAK) alert("「おぼえてない」お題はまだないよ。\n練習中に「🔖 おぼえてない」ボタンを押すと、ここにたまるよ!");
+      return;
+    }
     index = 0;
     if (mode === "random") queue = theme === ALL ? shuffleByTheme(pool) : shuffle(pool);
     show("practice");
@@ -255,8 +273,20 @@
     render();
   }
 
+  function updateMark() {
+    const on = weak.has(current.nameJa);
+    $("markBtn").textContent = on ? "✅ おぼえた!(リストからはずす)" : "🔖 おぼえてない";
+    $("markBtn").classList.toggle("marked", on);
+  }
+  $("markBtn").addEventListener("click", () => {
+    if (weak.has(current.nameJa)) weak.delete(current.nameJa); else weak.add(current.nameJa);
+    saveWeak();
+    updateMark();
+  });
+
   function render() {
     hintCount = 0;
+    updateMark();
     $("hintArea").innerHTML = "";
     $("hintBtn").disabled = false;
     $("themeTag").textContent = current.theme;
@@ -293,7 +323,8 @@
   $("retryBtn").addEventListener("click", () => start(currentTheme));
 
   function finish() {
-    $("finishText").textContent = `「${currentTheme}」の ${pool.length}問、おつかれさま!`;
+    const label = currentTheme === WEAK ? "おぼえてない" : currentTheme;
+    $("finishText").textContent = `「${label}」の ${pool.length}問、おつかれさま!`;
     show("finish");
   }
 
