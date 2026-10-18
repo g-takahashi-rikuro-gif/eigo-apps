@@ -275,8 +275,9 @@
       <div style="text-align:center;margin:10px 0 18px;">
         <div style="font-size:2.6em;">🏆</div>
         <div class="title-main" style="font-size:1.25em;margin:4px 0 2px;">最高正解数ランキング</div>
-        <div class="title-sub" style="margin-bottom:0;" id="rank-sub">1回のプレイで正解した数のベスト10（学年全体）</div>
+        <div class="title-sub" style="margin-bottom:0;" id="rank-sub">学年全体のベスト10</div>
       </div>
+      <div class="chips" id="rank-chips" style="justify-content:center;margin-bottom:16px;"></div>
       <div id="rank-body" style="font-size:.9em;color:var(--ink-soft);text-align:center;padding:20px 0;">
         読み込み中…
       </div>
@@ -515,8 +516,20 @@ function esc(s) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
   });
 }
-function openRanking() {
+var RANK_TABS = [
+  { id: 'max',      label: '総合（最高正解数）' },
+  { id: 'time',     label: '⏱️ タイムアタック' },
+  { id: 'survival', label: '♾️ 無限' },
+  { id: 'sprint',   label: '🏃 スプリント' },
+  { id: 'weak',     label: '🔥 弱点' }
+];
+var rankMetric = 'max';
+
+function openRanking(metric) {
+  rankMetric = metric || rankMetric;
   go('rank');
+  renderRankTabs();
+
   var body = document.getElementById('rank-body');
   body.textContent = '読み込み中…';
   if (!window.ProgressSync) { body.textContent = 'ランキングを読み込めませんでした。'; return; }
@@ -525,17 +538,35 @@ function openRanking() {
                      'トップページの「わたしの進捗」から登録してください。';
     return;
   }
+  var asked = rankMetric;
   window.ProgressSync.sync(true).then(function () {
-    return window.ProgressSync.fetchTypingRanking();
+    return window.ProgressSync.fetchTypingRanking(asked);
   }).then(function (res) {
+    if (asked !== rankMetric) return;          // 途中で切り替えられていたら捨てる
     if (!res || res.error) { body.textContent = res && res.error ? res.error : '読み込めませんでした。'; return; }
     renderRanking(res);
   }).catch(function () { body.textContent = '通信できませんでした。'; });
 }
+
+function renderRankTabs() {
+  var box = document.getElementById('rank-chips');
+  box.innerHTML = '';
+  RANK_TABS.forEach(function (t) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (t.id === rankMetric ? ' on' : '');
+    b.textContent = t.label;
+    b.onclick = function () { openRanking(t.id); };
+    box.appendChild(b);
+  });
+}
+
 function renderRanking(res) {
   var body = document.getElementById('rank-body');
+  var unit = res.unit || '問';
+  var grade = res.grade ? (res.grade + '年') : '学年';
   document.getElementById('rank-sub').textContent =
-    '1回のプレイで正解した数のベスト10（' + (res.grade || '学年') + '全体 ' + (res.gradeTotal || 0) + '人）';
+    (res.label || '') + '　' + grade + '全体のベスト10（記録のある人 ' + (res.gradeTotal || 0) + '人）';
 
   var rows = (res.top10 || []).map(function (s) {
     var medal = s.rank === 1 ? '🥇' : s.rank === 2 ? '🥈' : s.rank === 3 ? '🥉' : s.rank + '位';
@@ -543,12 +574,13 @@ function renderRanking(res) {
       (s.isMe ? 'background:var(--accent-soft);font-weight:800;' : '') + '">' +
       '<span style="width:42px;flex-shrink:0;">' + medal + '</span>' +
       '<span style="flex:1;text-align:left;">' + esc(s.cls) + ' ' + esc(s.num) + '番 ' + esc(s.name) + '</span>' +
-      '<span style="font-weight:900;color:var(--accent);">' + s.maxCorrect + '問</span></div>';
+      '<span style="font-weight:900;color:var(--accent);">' + s.value + unit + '</span></div>';
   }).join('');
 
   var mine = '<div style="margin-top:16px;padding:14px;border-radius:14px;background:#f4f5fb;text-align:center;">' +
-    'あなたの最高正解数 <b style="font-size:1.3em;color:var(--accent);">' + (res.myMaxCorrect || 0) + '問</b>' +
-    (res.myRank ? '（' + (res.grade || '') + 'で ' + res.myRank + '位）' : '（まだ記録がありません）') +
+    'あなたの記録 <b style="font-size:1.3em;color:var(--accent);">' +
+    (res.myValue ? (res.myValue + unit) : '—') + '</b>' +
+    (res.myRank ? '（' + grade + 'で ' + res.myRank + '位）' : '（まだ記録がありません）') +
     '</div>';
 
   body.innerHTML = (rows || '<div style="padding:16px;">まだ誰も記録がありません。</div>') + mine;
@@ -913,8 +945,8 @@ document.getElementById('type-input').addEventListener('keydown', function (e) {
 renderHome();
 </script>
 
-<script src="進捗同期.js?v=20261018f"></script>
-<script src="お知らせ.js?v=20261018f"></script>
+<script src="進捗同期.js?v=20261018g"></script>
+<script src="お知らせ.js?v=20261018g"></script>
 
 </body>
 </html>

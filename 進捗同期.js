@@ -89,6 +89,8 @@
       points:     Number(tc.totalPoints) || 0,
       plays:      Number(tc.plays) || 0,
       maxCorrect: Number(tc.maxCorrect) || 0,
+      bestTime: Math.max(n('time_n'), n('time_l')),
+      bestWeak: Math.max(n('weak_n'), n('weak_l')),
       bestSurvival: Math.max(
         n('survival1_n'), n('survival1_l'),
         n('survival2_n'), n('survival2_l'),
@@ -157,11 +159,14 @@
       .catch(function () { return { error: '通信できませんでした' }; });
   }
 
-  /** タイピングチャレンジ専用：最高正解数の学年ランキングを取得する */
-  function fetchTypingRanking() {
+  /**
+   * タイピングチャレンジ専用の学年ランキングを取得する
+   * metric: max（全モード最高正解数・既定）／ time ／ survival ／ sprint ／ weak
+   */
+  function fetchTypingRanking(metric) {
     var profile = getProfile();
     if (!profile) return Promise.resolve({ error: '未登録' });
-    return post({ mode: 'typing_rank', cls: profile.cls, num: profile.num })
+    return post({ mode: 'typing_rank', cls: profile.cls, num: profile.num, metric: metric || 'max' })
       .catch(function () { return { error: '通信できませんでした' }; });
   }
 
