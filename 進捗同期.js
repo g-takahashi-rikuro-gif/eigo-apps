@@ -82,16 +82,18 @@
     // （スプリントはタイムなのでポイントにせず、完走した回数だけ数える）
     var tc = readJSON(TYPING_KEY) || {};
     var tcBest = tc.best || {};
-    // 無限モードは「何ミスで終了するか」の設定ごとに別の記録として残る
+    // 記録は「モード × 出題のしかた（_n=ノーマル / _l=リスニング）」ごとに分かれている。
+    // 無限はさらに終了条件（ミス1〜3）ごと。
+    var n = function (k) { return Number(tcBest[k]) || 0; };
     var typing = {
-      time:         Number(tcBest.time)      || 0,
-      survival1:    Number(tcBest.survival1) || 0,
-      survival2:    Number(tcBest.survival2) || 0,
-      survival3:    Number(tcBest.survival3) || 0,
-      listen:       Number(tcBest.listen)    || 0,
-      weak:         Number(tcBest.weak)      || 0,
-      sprintSec:    Number(tcBest.sprint)    || 0,
-      sprintClears: Number(tc.sprintClears)  || 0
+      time_n: n('time_n'), time_l: n('time_l'),
+      s1n: n('survival1_n'), s1l: n('survival1_l'),
+      s2n: n('survival2_n'), s2l: n('survival2_l'),
+      s3n: n('survival3_n'), s3l: n('survival3_l'),
+      weak_n: n('weak_n'), weak_l: n('weak_l'),
+      sprintSec_n: n('sprint_n'), sprintSec_l: n('sprint_l'),
+      sprintClears_n: Number(tc.sprintClears_n) || 0,
+      sprintClears_l: Number(tc.sprintClears_l) || 0
     };
 
     return {

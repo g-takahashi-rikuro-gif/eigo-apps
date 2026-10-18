@@ -217,6 +217,11 @@
       </div>
 
       <div class="field">
+        <div class="field-label">出題のしかた</div>
+        <div class="chips" id="style-chips"></div>
+      </div>
+
+      <div class="field">
         <div class="field-label">♾️ 無限モードの終了条件</div>
         <div class="chips" id="lives-chips"></div>
       </div>
@@ -225,8 +230,8 @@
 
       <div class="pt-box">
         記録は<b>この端末に保存</b>されます。ベスト記録は<b>ランキングのポイント</b>にも加算されます。<br>
-        タイムアタック・リスニング・弱点は<b>ベスト記録×2点</b>、スプリントは<b>完走1回につき3点</b>（最大10回分）。<br>
-        無限はきびしい設定ほど高得点で、<b>ミス1は×3点／ミス2は×2点／ミス3は×1点</b>。3つのうち<b>いちばん点が高くなる記録だけ</b>が数えられます。
+        1問あたりの点は、<b>タイムアタック・弱点が2点</b>、<b>無限はミス1が3点／ミス2が2点／ミス3が1点</b>。スプリントは<b>完走1回につき3点</b>（最大10回分）。<br>
+        <b>リスニングはどれも1点多く</b>もらえます。各モードで<b>いちばん点が高くなる記録だけ</b>が数えられるので、何回も遊んで稼ぐことはできません。
       </div>
     </div>
 
@@ -345,9 +350,27 @@ try {
 function livesInfo(n) {
   return LIVES.filter(function (l) { return l.n === (n || survivalLives); })[0];
 }
-/** 無限モードはライフごとに別の記録として残す */
+
+// ---------- 出題のしかた（ノーマル／リスニング） ----------
+// リスニングは日本語のヒントがなく難しいので、1問あたりの点を1点多くする。
+var STYLE_KEY = 'typing_challenge_style';
+var currentStyle = 'normal';
+try {
+  var savedStyle = localStorage.getItem(STYLE_KEY);
+  if (savedStyle === 'listen') currentStyle = 'listen';
+} catch (e) {}
+function isListening() { return currentStyle === 'listen'; }
+function styleSuffix() { return isListening() ? '_l' : '_n'; }
+
+/** 記録は「モード × 出題のしかた」ごとに分けて残す（無限はさらにライフごと） */
 function bestKeyOf(modeKey) {
-  return (modeKey === 'survival') ? ('survival' + survivalLives) : MODES[modeKey].bestKey;
+  var base = (modeKey === 'survival') ? ('survival' + survivalLives) : MODES[modeKey].bestKey;
+  return base + styleSuffix();
+}
+/** 1問あたりの点（先生用スクリプトの計算と合わせてある） */
+function pointPerQuestion(modeKey) {
+  var base = (modeKey === 'survival') ? livesInfo().mult : 2;
+  return base + (isListening() ? 1 : 0);
 }
 
 /** いま選ばれている範囲の単語（同じつづりは1つにまとめる） */
@@ -400,10 +423,6 @@ var MODES = {
   weak: {
     icon: '🔥', title: '弱点チャレンジ', desc: 'まだ習得していない単語だけ。60秒、または全部クリアで終了。',
     limit: 60, bonus: 1, unit: '問', bestKey: 'weak', useWeak: true, clearAll: true
-  },
-  listen: {
-    icon: '🎧', title: 'リスニングタイピング', desc: '音声を聞いて英語を打つ。60秒。',
-    limit: 60, bonus: 1, unit: '問', bestKey: 'listen', listening: true
   }
 };
 
@@ -414,7 +433,7 @@ function readJSON(key) {
 function writeJSON(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
 }
-function loadBest() { return readJSON(BEST_KEY) || { best: {}, sprintClears: 0 }; }
+function loadBest() { return readJSON(BEST_KEY) || { best: {} }; }
 function saveBest(rec) { writeJSON(BEST_KEY, rec); }
 
 /**
@@ -430,7 +449,10 @@ function updateBest(modeKey, value) {
   var better = (prev === undefined || prev === null) ? true
              : (mode.lowerIsBetter ? value < prev : value > prev);
   if (better) rec.best[key] = value;
-  if (modeKey === 'sprint') rec.sprintClears = (rec.sprintClears || 0) + 1;
+  if (modeKey === 'sprint') {
+    var ck = 'sprintClears' + styleSuffix();
+    rec[ck] = (rec[ck] || 0) + 1;
+  }
   saveBest(rec);
   if (window.ProgressSync) window.ProgressSync.sync(false);
   return better;
@@ -467,6 +489,25 @@ function renderHome() {
     chips.appendChild(b);
   });
 
+  var schips = document.getElementById('style-chips');
+  schips.innerHTML = '';
+  [{ id: 'normal', label: '📖 ノーマル（日本語を見る）' },
+   { id: 'listen', label: '🎧 リスニング（音声を聞く・1問+1点）' }].forEach(function (s) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (s.id === currentStyle ? ' on' : '');
+    b.textContent = s.label;
+    b.onclick = function () {
+      if (s.id === 'listen' && !window.speechSynthesis) {
+        notif('お使いのブラウザは音声に対応していません', 'err'); return;
+      }
+      currentStyle = s.id;
+      try { localStorage.setItem(STYLE_KEY, s.id); } catch (e) {}
+      renderHome();
+    };
+    schips.appendChild(b);
+  });
+
   var lchips = document.getElementById('lives-chips');
   lchips.innerHTML = '';
   LIVES.forEach(function (l) {
@@ -496,12 +537,17 @@ function renderHome() {
     card.type = 'button';
     card.className = 'menu-card';
     var best = rec.best ? rec.best[bestKeyOf(key)] : undefined;
-    var bestLabel = (key === 'survival') ? ('ベスト ' + best + m.unit + '（' + livesInfo().label + '）') : ('ベスト ' + best + m.unit);
+    var styleName = isListening() ? 'リスニング' : 'ノーマル';
+    var bestLabel = 'ベスト ' + best + m.unit + '（' + styleName +
+      (key === 'survival' ? '・' + livesInfo().label : '') + '）';
     var bestHtml = (best === undefined || best === null) ? ''
       : '<span class="mc-best">' + bestLabel + '</span>';
-    var desc = (key === 'survival')
+    var pts = (key === 'sprint')
+      ? ('完走1回' + (isListening() ? 4 : 3) + '点')
+      : ('1問' + pointPerQuestion(key) + '点');
+    var desc = ((key === 'survival')
       ? ('いま「' + livesInfo().label + '」。何問正解できるか。')
-      : m.desc;
+      : m.desc) + '（' + styleName + '／' + pts + '）';
     var short = (key === 'weak' && weak === 0);
     card.innerHTML =
       '<div class="mc-icon">' + m.icon + '</div>' +
@@ -539,7 +585,7 @@ function startMode(key) {
   // （60秒モードは問題を使い切ると先頭に戻って繰り返すため、少なくても成り立つ）
   var minWords = m.useWeak ? 1 : 5;
   if (pool.length < minWords) { notif('この範囲には単語が足りません', 'err'); return; }
-  if (m.listening && !window.speechSynthesis) {
+  if (isListening() && !window.speechSynthesis) {
     notif('お使いのブラウザは音声に対応していません', 'err'); return;
   }
 
@@ -575,7 +621,7 @@ function loadWord() {
   var qja = document.getElementById('q-ja');
   var note = document.getElementById('q-note');
 
-  if (m.listening) {
+  if (isListening()) {
     qja.innerHTML = '<button class="speak-btn" type="button" onclick="replay()">🔊 もう一度聞く</button>';
     note.textContent = '聞こえた英語を入力しよう';
     speakWord(w);
@@ -583,7 +629,7 @@ function loadWord() {
     qja.textContent = w.ja;
     note.textContent = m.clearAll ? ('のこり ' + queue.length + '語') : '';
   }
-  if (m.listening && m.clearAll) note.textContent = 'のこり ' + queue.length + '語';
+  if (isListening() && m.clearAll) note.textContent = 'のこり ' + queue.length + '語';
 
   input.value = '';
   input.className = 'type-input';
@@ -775,8 +821,8 @@ document.getElementById('type-input').addEventListener('keydown', function (e) {
 renderHome();
 </script>
 
-<script src="進捗同期.js?v=20261018c"></script>
-<script src="お知らせ.js?v=20261018c"></script>
+<script src="進捗同期.js?v=20261018d"></script>
+<script src="お知らせ.js?v=20261018d"></script>
 
 </body>
 </html>
