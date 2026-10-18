@@ -230,8 +230,11 @@
 
       <div class="pt-box">
         記録は<b>この端末に保存</b>されます。ベスト記録は<b>ランキングのポイント</b>にも加算されます。<br>
-        1問あたりの点は、<b>タイムアタック・弱点が2点</b>、<b>無限はミス1が3点／ミス2が2点／ミス3が1点</b>。スプリントは<b>完走1回につき3点</b>（最大10回分）。<br>
-        <b>リスニングはどれも1点多く</b>もらえます。各モードで<b>いちばん点が高くなる記録だけ</b>が数えられるので、何回も遊んで稼ぐことはできません。
+        1問あたりの点（ノーマル → リスニング）<br>
+        ・タイムアタック／弱点チャレンジ … <b>1点 → 1.5点</b><br>
+        ・無限 ミス1 … <b>1.5点 → 1.8点</b>／ミス2 … <b>1点 → 1.2点</b>／ミス3 … <b>0.8点 → 1点</b><br>
+        ・スプリント30問 … 完走1回 <b>1.5点 → 2点</b>（最大10回分）<br>
+        各モードで<b>いちばん点が高くなる記録だけ</b>が数えられるので、何回も遊んで稼ぐことはできません。
       </div>
     </div>
 
@@ -337,10 +340,23 @@ var currentScope = 'all';
 // ミスを多く許すほどやさしくなるので、ポイントの倍率を下げてつり合いを取る。
 var LIVES_KEY = 'typing_challenge_lives';
 var LIVES = [
-  { n: 1, label: 'ミス1で終了', mult: 3 },
-  { n: 2, label: 'ミス2で終了', mult: 2 },
-  { n: 3, label: 'ミス3で終了', mult: 1 }
+  { n: 1, label: 'ミス1で終了' },
+  { n: 2, label: 'ミス2で終了' },
+  { n: 3, label: 'ミス3で終了' }
 ];
+
+// ---------- 1問あたりの点（先生用スクリプトの計算と同じ） ----------
+// リスニングは日本語のヒントがないぶん高く、無限はきびしい設定ほど高い。
+var RATES = {
+  time: { normal: 1, listen: 1.5 },
+  weak: { normal: 1, listen: 1.5 },
+  survival: {
+    1: { normal: 1.5, listen: 1.8 },
+    2: { normal: 1,   listen: 1.2 },
+    3: { normal: 0.8, listen: 1 }
+  },
+  sprintClear: { normal: 1.5, listen: 2 }   // スプリントは完走1回につき
+};
 var survivalLives = 1;
 try {
   var saved = Number(localStorage.getItem(LIVES_KEY));
@@ -367,10 +383,12 @@ function bestKeyOf(modeKey) {
   var base = (modeKey === 'survival') ? ('survival' + survivalLives) : MODES[modeKey].bestKey;
   return base + styleSuffix();
 }
-/** 1問あたりの点（先生用スクリプトの計算と合わせてある） */
+/** 1問あたりの点。スプリントだけは「完走1回あたり」の点を返す */
 function pointPerQuestion(modeKey) {
-  var base = (modeKey === 'survival') ? livesInfo().mult : 2;
-  return base + (isListening() ? 1 : 0);
+  var style = isListening() ? 'listen' : 'normal';
+  if (modeKey === 'sprint')   return RATES.sprintClear[style];
+  if (modeKey === 'survival') return RATES.survival[survivalLives][style];
+  return RATES[modeKey][style];
 }
 
 /** いま選ばれている範囲の単語（同じつづりは1つにまとめる） */
@@ -492,7 +510,7 @@ function renderHome() {
   var schips = document.getElementById('style-chips');
   schips.innerHTML = '';
   [{ id: 'normal', label: '📖 ノーマル（日本語を見る）' },
-   { id: 'listen', label: '🎧 リスニング（音声を聞く・1問+1点）' }].forEach(function (s) {
+   { id: 'listen', label: '🎧 リスニング（音声を聞く・高得点）' }].forEach(function (s) {
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'chip' + (s.id === currentStyle ? ' on' : '');
@@ -514,7 +532,7 @@ function renderHome() {
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'chip' + (l.n === survivalLives ? ' on' : '');
-    b.textContent = l.label + '（×' + l.mult + '点）';
+    b.textContent = l.label + '（1問' + RATES.survival[l.n][isListening() ? 'listen' : 'normal'] + '点）';
     b.onclick = function () {
       survivalLives = l.n;
       try { localStorage.setItem(LIVES_KEY, String(l.n)); } catch (e) {}
@@ -543,7 +561,7 @@ function renderHome() {
     var bestHtml = (best === undefined || best === null) ? ''
       : '<span class="mc-best">' + bestLabel + '</span>';
     var pts = (key === 'sprint')
-      ? ('完走1回' + (isListening() ? 4 : 3) + '点')
+      ? ('完走1回' + pointPerQuestion(key) + '点')
       : ('1問' + pointPerQuestion(key) + '点');
     var desc = ((key === 'survival')
       ? ('いま「' + livesInfo().label + '」。何問正解できるか。')
@@ -821,8 +839,8 @@ document.getElementById('type-input').addEventListener('keydown', function (e) {
 renderHome();
 </script>
 
-<script src="進捗同期.js?v=20261018d"></script>
-<script src="お知らせ.js?v=20261018d"></script>
+<script src="進捗同期.js?v=20261018e"></script>
+<script src="お知らせ.js?v=20261018e"></script>
 
 </body>
 </html>
