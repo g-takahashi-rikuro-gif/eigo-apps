@@ -82,18 +82,19 @@
     // （スプリントはタイムなのでポイントにせず、完走した回数だけ数える）
     var tc = readJSON(TYPING_KEY) || {};
     var tcBest = tc.best || {};
-    // 記録は「モード × 出題のしかた（_n=ノーマル / _l=リスニング）」ごとに分かれている。
-    // 無限はさらに終了条件（ミス1〜3）ごと。
+    // ポイントは遊ぶたびに加算された累計。maxCorrect は1回のプレイでの最高正解数。
     var n = function (k) { return Number(tcBest[k]) || 0; };
+    var sprintSecs = [n('sprint_n'), n('sprint_l')].filter(function (x) { return x > 0; });
     var typing = {
-      time_n: n('time_n'), time_l: n('time_l'),
-      s1n: n('survival1_n'), s1l: n('survival1_l'),
-      s2n: n('survival2_n'), s2l: n('survival2_l'),
-      s3n: n('survival3_n'), s3l: n('survival3_l'),
-      weak_n: n('weak_n'), weak_l: n('weak_l'),
-      sprintSec_n: n('sprint_n'), sprintSec_l: n('sprint_l'),
-      sprintClears_n: Number(tc.sprintClears_n) || 0,
-      sprintClears_l: Number(tc.sprintClears_l) || 0
+      points:     Number(tc.totalPoints) || 0,
+      plays:      Number(tc.plays) || 0,
+      maxCorrect: Number(tc.maxCorrect) || 0,
+      bestSurvival: Math.max(
+        n('survival1_n'), n('survival1_l'),
+        n('survival2_n'), n('survival2_l'),
+        n('survival3_n'), n('survival3_l')
+      ),
+      bestSprintSec: sprintSecs.length ? Math.min.apply(null, sprintSecs) : 0
     };
 
     return {
@@ -156,6 +157,14 @@
       .catch(function () { return { error: '通信できませんでした' }; });
   }
 
+  /** タイピングチャレンジ専用：最高正解数の学年ランキングを取得する */
+  function fetchTypingRanking() {
+    var profile = getProfile();
+    if (!profile) return Promise.resolve({ error: '未登録' });
+    return post({ mode: 'typing_rank', cls: profile.cls, num: profile.num })
+      .catch(function () { return { error: '通信できませんでした' }; });
+  }
+
   /** 先生用：全生徒のデータを取得する */
   function fetchAll(passcode) {
     return post({ mode: 'progress_list', passcode: passcode })
@@ -170,6 +179,7 @@
     collect: collect,
     sync: sync,
     fetchRanking: fetchRanking,
+    fetchTypingRanking: fetchTypingRanking,
     fetchAll: fetchAll
   };
 
