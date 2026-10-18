@@ -486,7 +486,10 @@ function startMode(key) {
   mode = key;
   var m = MODES[key];
   var pool = m.useWeak ? weakPool() : scopedPool();
-  if (pool.length < 5) { notif('この範囲には単語が足りません', 'err'); return; }
+  // 弱点チャレンジは残りが少なくなるのが普通なので、1語でも始められるようにする
+  // （60秒モードは問題を使い切ると先頭に戻って繰り返すため、少なくても成り立つ）
+  var minWords = m.useWeak ? 1 : 5;
+  if (pool.length < minWords) { notif('この範囲には単語が足りません', 'err'); return; }
   if (m.listening && !window.speechSynthesis) {
     notif('お使いのブラウザは音声に対応していません', 'err'); return;
   }
