@@ -216,11 +216,17 @@
         <div class="chips" id="scope-chips"></div>
       </div>
 
+      <div class="field">
+        <div class="field-label">♾️ 無限モードの終了条件</div>
+        <div class="chips" id="lives-chips"></div>
+      </div>
+
       <div class="menu-list" id="mode-list"></div>
 
       <div class="pt-box">
         記録は<b>この端末に保存</b>されます。ベスト記録は<b>ランキングのポイント</b>にも加算されます。<br>
-        タイムアタック・無限・リスニング・弱点はベスト記録×2点、スプリントは完走1回につき3点（最大10回分）です。
+        タイムアタック・リスニング・弱点は<b>ベスト記録×2点</b>、スプリントは<b>完走1回につき3点</b>（最大10回分）。<br>
+        無限はきびしい設定ほど高得点で、<b>ミス1は×3点／ミス2は×2点／ミス3は×1点</b>。3つのうち<b>いちばん点が高くなる記録だけ</b>が数えられます。
       </div>
     </div>
 
@@ -322,6 +328,28 @@ var SCOPES = [
 ];
 var currentScope = 'all';
 
+// ---------- 無限モードのライフ（何ミスで終了するか） ----------
+// ミスを多く許すほどやさしくなるので、ポイントの倍率を下げてつり合いを取る。
+var LIVES_KEY = 'typing_challenge_lives';
+var LIVES = [
+  { n: 1, label: 'ミス1で終了', mult: 3 },
+  { n: 2, label: 'ミス2で終了', mult: 2 },
+  { n: 3, label: 'ミス3で終了', mult: 1 }
+];
+var survivalLives = 1;
+try {
+  var saved = Number(localStorage.getItem(LIVES_KEY));
+  if (saved === 1 || saved === 2 || saved === 3) survivalLives = saved;
+} catch (e) {}
+
+function livesInfo(n) {
+  return LIVES.filter(function (l) { return l.n === (n || survivalLives); })[0];
+}
+/** 無限モードはライフごとに別の記録として残す */
+function bestKeyOf(modeKey) {
+  return (modeKey === 'survival') ? ('survival' + survivalLives) : MODES[modeKey].bestKey;
+}
+
 /** いま選ばれている範囲の単語（同じつづりは1つにまとめる） */
 function scopedPool() {
   var scope = SCOPES.filter(function (s) { return s.id === currentScope; })[0];
@@ -362,8 +390,8 @@ var MODES = {
     limit: 60, bonus: 1, unit: '問', bestKey: 'time'
   },
   survival: {
-    icon: '♾️', title: '無限（サバイバル）', desc: '1問でもまちがえたら終了。何問連続で正解できるか。',
-    limit: 0, unit: '問連続', bestKey: 'survival'
+    icon: '♾️', title: '無限（サバイバル）', desc: '決めた数だけミスしたら終了。何問正解できるか。',
+    limit: 0, unit: '問', bestKey: 'survival'
   },
   sprint: {
     icon: '🏃', title: 'スプリント30問', desc: '30問をどれだけ速く打てるか。タイムを競う。',
@@ -397,10 +425,11 @@ function updateBest(modeKey, value) {
   var rec = loadBest();
   if (!rec.best) rec.best = {};
   var mode = MODES[modeKey];
-  var prev = rec.best[mode.bestKey];
+  var key = bestKeyOf(modeKey);
+  var prev = rec.best[key];
   var better = (prev === undefined || prev === null) ? true
              : (mode.lowerIsBetter ? value < prev : value > prev);
-  if (better) rec.best[mode.bestKey] = value;
+  if (better) rec.best[key] = value;
   if (modeKey === 'sprint') rec.sprintClears = (rec.sprintClears || 0) + 1;
   saveBest(rec);
   if (window.ProgressSync) window.ProgressSync.sync(false);
@@ -438,6 +467,21 @@ function renderHome() {
     chips.appendChild(b);
   });
 
+  var lchips = document.getElementById('lives-chips');
+  lchips.innerHTML = '';
+  LIVES.forEach(function (l) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (l.n === survivalLives ? ' on' : '');
+    b.textContent = l.label + '（×' + l.mult + '点）';
+    b.onclick = function () {
+      survivalLives = l.n;
+      try { localStorage.setItem(LIVES_KEY, String(l.n)); } catch (e) {}
+      renderHome();
+    };
+    lchips.appendChild(b);
+  });
+
   var total = scopedPool().length;
   var weak = weakPool().length;
   document.getElementById('home-sub').innerHTML =
@@ -451,14 +495,18 @@ function renderHome() {
     var card = document.createElement('button');
     card.type = 'button';
     card.className = 'menu-card';
-    var best = rec.best ? rec.best[m.bestKey] : undefined;
+    var best = rec.best ? rec.best[bestKeyOf(key)] : undefined;
+    var bestLabel = (key === 'survival') ? ('ベスト ' + best + m.unit + '（' + livesInfo().label + '）') : ('ベスト ' + best + m.unit);
     var bestHtml = (best === undefined || best === null) ? ''
-      : '<span class="mc-best">ベスト ' + best + m.unit + '</span>';
+      : '<span class="mc-best">' + bestLabel + '</span>';
+    var desc = (key === 'survival')
+      ? ('いま「' + livesInfo().label + '」。何問正解できるか。')
+      : m.desc;
     var short = (key === 'weak' && weak === 0);
     card.innerHTML =
       '<div class="mc-icon">' + m.icon + '</div>' +
       '<div class="mc-body"><div class="mc-title">' + m.title + '</div>' +
-      '<div class="mc-desc">' + (short ? 'すべて習得済みです。おめでとう！' : m.desc) + '</div>' +
+      '<div class="mc-desc">' + (short ? 'すべて習得済みです。おめでとう！' : desc) + '</div>' +
       bestHtml + '</div>' +
       '<div class="mc-arrow">›</div>';
     if (short) card.disabled = true;
@@ -500,7 +548,7 @@ function startMode(key) {
   idx = 0; ok = 0; ng = 0; streak = 0; maxStreak = 0; misses = []; finished = false; allCleared = false;
 
   // サバイバルとスプリントは問題を使い切らないよう、足りなければ繰り返す
-  document.getElementById('st1-label').textContent = (key === 'survival') ? '連続' : '正解';
+  document.getElementById('st1-label').textContent = '正解';
   document.getElementById('st2-label').textContent = m.limit ? '残り' : (m.total ? '残り問数' : 'ミス');
   document.getElementById('timer-bar').style.display = m.limit ? '' : 'none';
 
@@ -555,9 +603,12 @@ function replay() { speakWord(currentWord()); }
 
 function updateStats() {
   var m = MODES[mode];
-  document.getElementById('st1-value').textContent = (mode === 'survival') ? streak : ok;
+  document.getElementById('st1-value').textContent = ok;
   var st2 = document.getElementById('st2-value');
-  if (m.limit) {
+  if (mode === 'survival') {
+    st2.textContent = ng + ' / ' + survivalLives;
+    document.getElementById('st2').classList.toggle('danger', ng >= survivalLives - 1);
+  } else if (m.limit) {
     st2.textContent = Math.ceil(timeLeft);
     document.getElementById('st2').classList.toggle('danger', timeLeft <= 10);
     var pct = Math.max(0, Math.min(100, timeLeft / m.limit * 100));
@@ -604,7 +655,9 @@ function submitWord() {
     if (mode === 'survival') {
       document.getElementById('fb').textContent = '✗ 正解は ' + answerOf(w);
       document.getElementById('fb').style.color = 'var(--bad)';
-      finish();
+      updateStats();
+      if (ng >= survivalLives) { finish(); return; }
+      next();                      // ライフが残っていれば次の単語へ
       return;
     }
     document.getElementById('fb').textContent = '✗ もう一度';
@@ -626,7 +679,9 @@ function skipWord() {
   if (mode === 'survival') {
     document.getElementById('fb').textContent = '✗ 正解は ' + answerOf(w);
     document.getElementById('fb').style.color = 'var(--bad)';
-    finish();
+    updateStats();
+    if (ng >= survivalLives) { finish(); return; }
+    next();                        // パスもミス1回ぶん。ライフが残っていれば続行
     return;
   }
   document.getElementById('fb').textContent = '正解：' + answerOf(w);
@@ -664,7 +719,7 @@ function finish() {
   var m = MODES[mode];
   var score, cleared = true;
   if (mode === 'survival') {
-    score = maxStreak;
+    score = ok;                    // ミスを許す設定があるので、正解した数で記録する
   } else if (mode === 'sprint') {
     cleared = (idx >= m.total);
     score = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
@@ -684,7 +739,8 @@ function finish() {
   document.getElementById('r-score').textContent = (mode === 'sprint' && !cleared) ? '—' : score;
   document.getElementById('r-unit').textContent =
     (mode === 'sprint' && !cleared) ? '30問を終える前にやめました'
-                                    : (m.title + '／' + score + m.unit);
+    : (mode === 'survival') ? (m.title + '（' + livesInfo().label + '）／' + score + m.unit)
+    : (m.title + '／' + score + m.unit);
   var notes = [];
   if (allCleared) notes.push('🎊 弱点をぜんぶクリア！');
   if (isNew) notes.push('★ ベスト記録を更新！');
@@ -719,8 +775,8 @@ document.getElementById('type-input').addEventListener('keydown', function (e) {
 renderHome();
 </script>
 
-<script src="進捗同期.js?v=20261018b"></script>
-<script src="お知らせ.js?v=20261018b"></script>
+<script src="進捗同期.js?v=20261018c"></script>
+<script src="お知らせ.js?v=20261018c"></script>
 
 </body>
 </html>

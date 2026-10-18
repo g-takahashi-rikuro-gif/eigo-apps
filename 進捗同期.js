@@ -82,9 +82,12 @@
     // （スプリントはタイムなのでポイントにせず、完走した回数だけ数える）
     var tc = readJSON(TYPING_KEY) || {};
     var tcBest = tc.best || {};
+    // 無限モードは「何ミスで終了するか」の設定ごとに別の記録として残る
     var typing = {
       time:         Number(tcBest.time)      || 0,
-      survival:     Number(tcBest.survival)  || 0,
+      survival1:    Number(tcBest.survival1) || 0,
+      survival2:    Number(tcBest.survival2) || 0,
+      survival3:    Number(tcBest.survival3) || 0,
       listen:       Number(tcBest.listen)    || 0,
       weak:         Number(tcBest.weak)      || 0,
       sprintSec:    Number(tcBest.sprint)    || 0,
