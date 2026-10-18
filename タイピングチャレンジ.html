@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>タイピングチャレンジ</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg1: #667eea;
+    --bg2: #764ba2;
+    --ink: #2b2b3a;
+    --ink-soft: #7a7a8c;
+    --line: #e2e5f5;
+    --accent: #5B6CF5;
+    --accent-soft: #eef0ff;
+    --good: #2e9e5b;
+    --good-soft: #e6f6ec;
+    --bad: #d8453c;
+    --bad-soft: #fdeceb;
+    --warn: #c98a12;
+    --gold: #d4a017;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+    min-height: 100vh;
+    padding: 20px 16px 48px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    color: var(--ink);
+  }
+
+  .app {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+    color: #fff;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: .3px; }
+  .hd-sub { font-size: .8em; opacity: .85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: .75em; font-weight: 700;
+    background: rgba(255,255,255,.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0; transition: background .15s;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,.32); }
+
+  .page { padding: 24px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== ホーム ===== */
+  .title-icon { font-size: 4em; text-align: center; }
+  .title-main { font-size: 1.55em; font-weight: 900; color: var(--accent); text-align: center; margin: 6px 0 4px; }
+  .title-sub { font-size: .9em; color: var(--ink-soft); text-align: center; margin-bottom: 22px; line-height: 1.6; }
+
+  .field { margin-bottom: 18px; }
+  .field-label { font-size: .82em; font-weight: 800; color: var(--ink-soft); margin-bottom: 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 2px solid var(--line); background: #fff; color: var(--ink);
+    border-radius: 50px; padding: 7px 16px; font-size: .85em; font-weight: 700;
+    font-family: inherit; cursor: pointer; transition: all .15s;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .menu-list { display: flex; flex-direction: column; gap: 12px; }
+  .menu-card {
+    display: flex; align-items: center; gap: 14px;
+    background: #f8f9ff; border: 2px solid var(--line); border-radius: 18px;
+    padding: 16px 18px; width: 100%; text-align: left;
+    font-family: inherit; cursor: pointer; transition: all .15s;
+  }
+  .menu-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(91,108,245,.15); }
+  .menu-card .mc-icon {
+    font-size: 1.9em; flex-shrink: 0; width: 56px; height: 56px; background: #fff;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .menu-card .mc-body { flex: 1; min-width: 0; }
+  .menu-card .mc-title { font-size: 1.02em; font-weight: 800; margin-bottom: 3px; }
+  .menu-card .mc-desc { font-size: .8em; color: var(--ink-soft); line-height: 1.5; }
+  .menu-card .mc-best {
+    font-size: .74em; font-weight: 800; color: var(--gold);
+    background: #fdf6e3; border-radius: 50px; padding: 2px 10px; margin-top: 6px; display: inline-block;
+  }
+  .menu-card .mc-arrow { font-size: 1.25em; color: var(--accent); flex-shrink: 0; }
+  .menu-card:disabled { opacity: .5; cursor: default; transform: none; box-shadow: none; }
+
+  .pt-box {
+    margin-top: 22px; background: var(--accent-soft); border-radius: 16px;
+    padding: 14px 18px; font-size: .8em; color: #4a4a6a; line-height: 1.8;
+  }
+  .pt-box b { color: var(--accent); }
+
+  /* ===== 出題画面 ===== */
+  .play-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; }
+  .back-btn {
+    background: none; border: none; color: var(--ink-soft); font-size: .85em;
+    font-family: inherit; cursor: pointer; padding: 4px 0;
+  }
+  .back-btn:hover { color: var(--accent); }
+  .stat-row { display: flex; gap: 8px; }
+  .stat {
+    background: #f4f5fb; border-radius: 12px; padding: 6px 12px; text-align: center; min-width: 64px;
+  }
+  .stat .s-label { font-size: .62em; color: var(--ink-soft); font-weight: 700; }
+  .stat .s-value { font-size: 1.05em; font-weight: 900; }
+  .stat.danger .s-value { color: var(--bad); }
+
+  .timer-bar { height: 8px; background: var(--line); border-radius: 50px; overflow: hidden; margin-bottom: 20px; }
+  .timer-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--bg2)); transition: width .25s linear; }
+  .timer-fill.low { background: linear-gradient(90deg, #f0864a, var(--bad)); }
+
+  .q-card {
+    background: #f8f9ff; border: 2px solid var(--line); border-radius: 20px;
+    padding: 26px 20px; text-align: center; margin-bottom: 16px;
+  }
+  .q-ja { font-size: 1.5em; font-weight: 800; line-height: 1.5; word-break: break-word; }
+  .q-note { font-size: .78em; color: var(--ink-soft); margin-top: 8px; }
+  .speak-btn {
+    background: var(--accent); color: #fff; border: none; border-radius: 50px;
+    padding: 14px 28px; font-size: 1.1em; font-family: inherit; font-weight: 800; cursor: pointer;
+  }
+  .speak-btn:hover { opacity: .9; }
+  .speak-btn.playing { opacity: .6; }
+
+  .type-input {
+    width: 100%; padding: 16px 18px; font-size: 1.25em; font-family: inherit;
+    border: 2px solid var(--line); border-radius: 16px; outline: none; text-align: center;
+    letter-spacing: .04em;
+  }
+  .type-input:focus { border-color: var(--accent); }
+  .type-input.ok { border-color: var(--good); background: var(--good-soft); }
+  .type-input.ng { border-color: var(--bad); background: var(--bad-soft); }
+
+  .fb { text-align: center; min-height: 26px; margin-top: 10px; font-weight: 800; font-size: .95em; }
+  .combo { text-align: center; font-size: .85em; font-weight: 800; color: var(--warn); min-height: 20px; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 14px; }
+  .btn {
+    flex: 1; padding: 13px 0; border: none; border-radius: 50px; cursor: pointer;
+    font-size: .92em; font-weight: 800; font-family: inherit;
+  }
+  .btn-main { background: linear-gradient(135deg, var(--bg1), var(--bg2)); color: #fff; }
+  .btn-ghost { background: #f0f1f8; color: var(--ink-soft); }
+  .btn:hover { opacity: .92; }
+
+  /* ===== 結果画面 ===== */
+  .result-head { text-align: center; margin-bottom: 20px; }
+  .result-icon { font-size: 3.4em; }
+  .result-score { font-size: 2.6em; font-weight: 900; color: var(--accent); line-height: 1.2; }
+  .result-unit { font-size: .9em; color: var(--ink-soft); }
+  .result-new { color: var(--gold); font-weight: 900; font-size: .95em; margin-top: 6px; }
+
+  .r-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .r-cell { background: #f4f5fb; border-radius: 14px; padding: 12px 6px; text-align: center; }
+  .r-cell .rc-label { font-size: .68em; color: var(--ink-soft); font-weight: 700; }
+  .r-cell .rc-value { font-size: 1.2em; font-weight: 900; }
+
+  .miss-box { border: 2px solid var(--line); border-radius: 16px; padding: 14px 16px; margin-bottom: 18px; }
+  .miss-title { font-size: .85em; font-weight: 800; margin-bottom: 10px; }
+  .miss-list { display: flex; flex-direction: column; gap: 7px; max-height: 240px; overflow-y: auto; }
+  .miss-item { display: flex; justify-content: space-between; gap: 10px; font-size: .85em; padding-bottom: 6px; border-bottom: 1px dashed var(--line); }
+  .miss-item:last-child { border-bottom: none; }
+  .miss-en { font-weight: 800; color: var(--bad); }
+  .miss-ja { color: var(--ink-soft); text-align: right; }
+
+  .notif {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+    background: var(--ink); color: #fff; padding: 11px 22px; border-radius: 50px;
+    font-size: .85em; font-weight: 700; z-index: 999; opacity: 0; transition: opacity .2s;
+    pointer-events: none; max-width: 90vw; text-align: center;
+  }
+  .notif.show { opacity: 1; }
+  .notif.err { background: var(--bad); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title">タイピングチャレンジ</div>
+      <div class="hd-sub">3年間の発信語彙で腕試し</div>
+    </div>
+    <a class="hd-home-link" href="単語学習.html">🏠 戻る</a>
+  </div>
+
+  <div class="page">
+
+    <!-- ===== ホーム ===== -->
+    <div class="screen active" id="screen-home">
+      <div class="title-icon">⌨️</div>
+      <div class="title-main">タイピングチャレンジ</div>
+      <div class="title-sub" id="home-sub">読み込み中…</div>
+
+      <div class="field">
+        <div class="field-label">出題する範囲</div>
+        <div class="chips" id="scope-chips"></div>
+      </div>
+
+      <div class="menu-list" id="mode-list"></div>
+
+      <div class="pt-box">
+        記録は<b>この端末に保存</b>されます。ベスト記録は<b>ランキングのポイント</b>にも加算されます。<br>
+        タイムアタック・無限・リスニング・弱点はベスト記録×2点、スプリントは完走1回につき3点（最大10回分）です。
+      </div>
+    </div>
+
+    <!-- ===== 出題 ===== -->
+    <div class="screen" id="screen-play">
+      <div class="play-top">
+        <button class="back-btn" type="button" onclick="quitPlay()">← やめる</button>
+        <div class="stat-row">
+          <div class="stat"><div class="s-label" id="st1-label">正解</div><div class="s-value" id="st1-value">0</div></div>
+          <div class="stat" id="st2"><div class="s-label" id="st2-label">残り</div><div class="s-value" id="st2-value">60</div></div>
+        </div>
+      </div>
+
+      <div class="timer-bar" id="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
+
+      <div class="q-card">
+        <div class="q-ja" id="q-ja">—</div>
+        <div class="q-note" id="q-note"></div>
+      </div>
+
+      <input class="type-input" id="type-input" type="text" autocomplete="off"
+             autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="英語を入力してEnter">
+      <div class="fb" id="fb"></div>
+      <div class="combo" id="combo"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" type="button" onclick="skipWord()">⏭️ パス</button>
+        <button class="btn btn-main" type="button" onclick="submitWord()">✅ 答える</button>
+      </div>
+    </div>
+
+    <!-- ===== 結果 ===== -->
+    <div class="screen" id="screen-result">
+      <div class="result-head">
+        <div class="result-icon" id="r-icon">🎉</div>
+        <div class="result-score" id="r-score">0</div>
+        <div class="result-unit" id="r-unit"></div>
+        <div class="result-new" id="r-new"></div>
+      </div>
+      <div class="r-grid">
+        <div class="r-cell"><div class="rc-label">正解</div><div class="rc-value" id="r-ok">0</div></div>
+        <div class="r-cell"><div class="rc-label">ミス</div><div class="rc-value" id="r-ng">0</div></div>
+        <div class="r-cell"><div class="rc-label">最大コンボ</div><div class="rc-value" id="r-combo">0</div></div>
+      </div>
+      <div class="miss-box" id="miss-box">
+        <div class="miss-title">📕 まちがえた単語</div>
+        <div class="miss-list" id="miss-list"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" type="button" onclick="go('home')">🏠 もどる</button>
+        <button class="btn btn-main" type="button" onclick="retry()">🔄 もう一度</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script src="単語データ_1年.js?v=20261018b"></script>
+<script src="単語データ_2年.js?v=20261018b"></script>
+<script src="単語データ_3年.js?v=20261018b"></script>
+
+<script>
+// ══════════════════════════════════════════
+//  タイピングチャレンジ
+//  3学年の発信語彙（太字の重要語）だけを対象にしたタイピング練習。
+//  単語データは 単語データ_1年.js などを読み込んで使う。
+//  各学年のアプリと同じ判定・同じ習得基準を使っている。
+// ══════════════════════════════════════════
+'use strict';
+
+var BEST_KEY = 'typing_challenge';   // ベスト記録の保存先
+var MASTERY_STREAK = 2;              // 各学年アプリと同じ「2回連続正解で習得」
+
+// ---------- 単語プール ----------
+// 学年ごとに、発信語彙（productive）だけを取り出す。
+// unitId は各学年アプリの学習記録を読むときに使う。
+function poolOf(units) {
+  var out = [];
+  units.forEach(function (u) {
+    if (u.isSummary) return;          // まとめは他の単元と重複するので除く
+    u.words.forEach(function (w) {
+      if (w.productive) out.push({ word: w, unitId: u.id });
+    });
+  });
+  return out;
+}
+var POOLS = {
+  g1: poolOf(G1_UNITS),
+  g2: poolOf(G2_UNITS),
+  g3: poolOf(G3_UNITS)
+};
+var SCOPES = [
+  { id: 'all', label: '3年間ぜんぶ', grades: ['g1', 'g2', 'g3'] },
+  { id: 'g1',  label: '1年',        grades: ['g1'] },
+  { id: 'g2',  label: '2年',        grades: ['g2'] },
+  { id: 'g3',  label: '3年',        grades: ['g3'] }
+];
+var currentScope = 'all';
+
+/** いま選ばれている範囲の単語（同じつづりは1つにまとめる） */
+function scopedPool() {
+  var scope = SCOPES.filter(function (s) { return s.id === currentScope; })[0];
+  var seen = {}, out = [];
+  scope.grades.forEach(function (g) {
+    POOLS[g].forEach(function (item) {
+      var key = answerOf(item.word).toLowerCase();
+      if (seen[key]) return;
+      seen[key] = true;
+      out.push(item);
+    });
+  });
+  return out;
+}
+
+/** 学習記録から、まだ習得していない単語だけを取り出す */
+function weakPool() {
+  return scopedPool().filter(function (item) {
+    var dict = readJSON('wscroll_' + item.unitId + '_typing') || {};
+    var p = dict[item.word.en];
+    return !(p && p.streak >= MASTERY_STREAK);
+  });
+}
+
+// ---------- 判定（各学年アプリと同じ作法） ----------
+/** 画面に出す・入力してほしいつづり。"holiday(s)" のような表記を実際に打てる形にする */
+function answerOf(w) { return w.accept ? w.accept[0] : w.en; }
+function checkAnswer(w, ans) {
+  var a = String(ans).trim().toLowerCase();
+  var accepted = w.accept || [w.en];
+  return accepted.some(function (x) { return String(x).trim().toLowerCase() === a; });
+}
+
+// ---------- モード ----------
+var MODES = {
+  time: {
+    icon: '⏱️', title: 'タイムアタック', desc: '60秒で何問正解できるか。正解するたび1秒追加。',
+    limit: 60, bonus: 1, unit: '問', bestKey: 'time'
+  },
+  survival: {
+    icon: '♾️', title: '無限（サバイバル）', desc: '1問でもまちがえたら終了。何問連続で正解できるか。',
+    limit: 0, unit: '問連続', bestKey: 'survival'
+  },
+  sprint: {
+    icon: '🏃', title: 'スプリント30問', desc: '30問をどれだけ速く打てるか。タイムを競う。',
+    total: 30, unit: '秒', bestKey: 'sprint', lowerIsBetter: true
+  },
+  weak: {
+    icon: '🔥', title: '弱点チャレンジ', desc: 'まだ習得していない単語だけを60秒で練習。',
+    limit: 60, bonus: 1, unit: '問', bestKey: 'weak', useWeak: true
+  },
+  listen: {
+    icon: '🎧', title: 'リスニングタイピング', desc: '音声を聞いて英語を打つ。60秒。',
+    limit: 60, bonus: 1, unit: '問', bestKey: 'listen', listening: true
+  }
+};
+
+// ---------- 保存 ----------
+function readJSON(key) {
+  try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
+}
+function writeJSON(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+}
+function loadBest() { return readJSON(BEST_KEY) || { best: {}, sprintClears: 0 }; }
+function saveBest(rec) { writeJSON(BEST_KEY, rec); }
+
+/**
+ * ベスト記録を更新する。更新できたら true。
+ * スプリントだけはタイムが短いほど良い記録。
+ */
+function updateBest(modeKey, value) {
+  var rec = loadBest();
+  if (!rec.best) rec.best = {};
+  var mode = MODES[modeKey];
+  var prev = rec.best[mode.bestKey];
+  var better = (prev === undefined || prev === null) ? true
+             : (mode.lowerIsBetter ? value < prev : value > prev);
+  if (better) rec.best[mode.bestKey] = value;
+  if (modeKey === 'sprint') rec.sprintClears = (rec.sprintClears || 0) + 1;
+  saveBest(rec);
+  if (window.ProgressSync) window.ProgressSync.sync(false);
+  return better;
+}
+
+// ---------- 画面 ----------
+function go(name) {
+  ['home', 'play', 'result'].forEach(function (s) {
+    document.getElementById('screen-' + s).classList.toggle('active', s === name);
+  });
+  if (name === 'home') renderHome();
+}
+var notifTimer = null;
+function notif(msg, kind) {
+  var el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = 'notif show' + (kind === 'err' ? ' err' : '');
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(function () { el.className = 'notif'; }, 2200);
+}
+
+function renderHome() {
+  var chips = document.getElementById('scope-chips');
+  chips.innerHTML = '';
+  SCOPES.forEach(function (s) {
+    var n = (s.id === 'all')
+      ? SCOPES[0].grades.reduce(function (a, g) { return a + POOLS[g].length; }, 0)
+      : POOLS[s.id].length;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (s.id === currentScope ? ' on' : '');
+    b.textContent = s.label + '（' + n + '語）';
+    b.onclick = function () { currentScope = s.id; renderHome(); };
+    chips.appendChild(b);
+  });
+
+  var total = scopedPool().length;
+  var weak = weakPool().length;
+  document.getElementById('home-sub').innerHTML =
+    '日本語の意味を見て、英語のつづりを入力しよう。<br>いまの範囲は <b>' + total + '語</b>、まだ習得していないのは <b>' + weak + '語</b>。';
+
+  var rec = loadBest();
+  var list = document.getElementById('mode-list');
+  list.innerHTML = '';
+  Object.keys(MODES).forEach(function (key) {
+    var m = MODES[key];
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'menu-card';
+    var best = rec.best ? rec.best[m.bestKey] : undefined;
+    var bestHtml = (best === undefined || best === null) ? ''
+      : '<span class="mc-best">ベスト ' + best + m.unit + '</span>';
+    var short = (key === 'weak' && weak === 0);
+    card.innerHTML =
+      '<div class="mc-icon">' + m.icon + '</div>' +
+      '<div class="mc-body"><div class="mc-title">' + m.title + '</div>' +
+      '<div class="mc-desc">' + (short ? 'すべて習得済みです。おめでとう！' : m.desc) + '</div>' +
+      bestHtml + '</div>' +
+      '<div class="mc-arrow">›</div>';
+    if (short) card.disabled = true;
+    else card.onclick = function () { startMode(key); };
+    list.appendChild(card);
+  });
+}
+
+// ---------- 出題 ----------
+var mode = null, queue = [], idx = 0;
+var ok = 0, ng = 0, streak = 0, maxStreak = 0;
+var misses = [];
+var timeLeft = 0, startedAt = 0, ticker = null, finished = false;
+
+function shuffle(a) {
+  var r = a.slice();
+  for (var i = r.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = r[i]; r[i] = r[j]; r[j] = t;
+  }
+  return r;
+}
+
+function startMode(key) {
+  mode = key;
+  var m = MODES[key];
+  var pool = m.useWeak ? weakPool() : scopedPool();
+  if (pool.length < 5) { notif('この範囲には単語が足りません', 'err'); return; }
+  if (m.listening && !window.speechSynthesis) {
+    notif('お使いのブラウザは音声に対応していません', 'err'); return;
+  }
+
+  queue = shuffle(pool);
+  if (m.total) queue = queue.slice(0, m.total);
+  idx = 0; ok = 0; ng = 0; streak = 0; maxStreak = 0; misses = []; finished = false;
+
+  // サバイバルとスプリントは問題を使い切らないよう、足りなければ繰り返す
+  document.getElementById('st1-label').textContent = (key === 'survival') ? '連続' : '正解';
+  document.getElementById('st2-label').textContent = m.limit ? '残り' : (m.total ? '残り問数' : 'ミス');
+  document.getElementById('timer-bar').style.display = m.limit ? '' : 'none';
+
+  if (m.limit) {
+    timeLeft = m.limit;
+    ticker = setInterval(tick, 250);
+  }
+  startedAt = Date.now();
+  go('play');
+  loadWord();
+}
+
+function currentWord() { return queue[idx % queue.length].word; }
+
+function loadWord() {
+  var m = MODES[mode];
+  var w = currentWord();
+  var input = document.getElementById('type-input');
+  var qja = document.getElementById('q-ja');
+  var note = document.getElementById('q-note');
+
+  if (m.listening) {
+    qja.innerHTML = '<button class="speak-btn" type="button" onclick="replay()">🔊 もう一度聞く</button>';
+    note.textContent = '聞こえた英語を入力しよう';
+    speakWord(w);
+  } else {
+    qja.textContent = w.ja;
+    note.textContent = m.useWeak ? 'まだ習得していない単語です' : '';
+  }
+
+  input.value = '';
+  input.className = 'type-input';
+  document.getElementById('fb').textContent = '';
+  updateStats();
+  setTimeout(function () { input.focus(); }, 50);
+}
+
+function speakWord(w) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(answerOf(w));
+  utt.lang = 'en-US'; utt.rate = 0.82; utt.pitch = 1.0;
+  window.speechSynthesis.speak(utt);
+}
+function replay() { speakWord(currentWord()); }
+
+function updateStats() {
+  var m = MODES[mode];
+  document.getElementById('st1-value').textContent = (mode === 'survival') ? streak : ok;
+  var st2 = document.getElementById('st2-value');
+  if (m.limit) {
+    st2.textContent = Math.ceil(timeLeft);
+    document.getElementById('st2').classList.toggle('danger', timeLeft <= 10);
+    var pct = Math.max(0, Math.min(100, timeLeft / m.limit * 100));
+    var fill = document.getElementById('timer-fill');
+    fill.style.width = pct + '%';
+    fill.classList.toggle('low', timeLeft <= 10);
+  } else if (m.total) {
+    st2.textContent = Math.max(0, m.total - idx);
+  } else {
+    st2.textContent = ng;
+  }
+  var c = document.getElementById('combo');
+  c.textContent = streak >= 3 ? ('🔥 ' + streak + ' コンボ！') : '';
+}
+
+function tick() {
+  timeLeft -= 0.25;
+  if (timeLeft <= 0) { timeLeft = 0; updateStats(); finish(); return; }
+  updateStats();
+}
+
+function submitWord() {
+  if (finished) return;
+  var input = document.getElementById('type-input');
+  if (!input.value.trim()) return;
+  var w = currentWord();
+  var m = MODES[mode];
+
+  if (checkAnswer(w, input.value)) {
+    ok++; streak++; if (streak > maxStreak) maxStreak = streak;
+    input.className = 'type-input ok';
+    document.getElementById('fb').textContent = '✓ ' + answerOf(w);
+    document.getElementById('fb').style.color = 'var(--good)';
+    if (m.bonus) timeLeft = Math.min(timeLeft + m.bonus, m.limit);
+    next();
+  } else {
+    ng++; streak = 0;
+    recordMiss(w);
+    input.className = 'type-input ng';
+    if (mode === 'survival') {
+      document.getElementById('fb').textContent = '✗ 正解は ' + answerOf(w);
+      document.getElementById('fb').style.color = 'var(--bad)';
+      finish();
+      return;
+    }
+    document.getElementById('fb').textContent = '✗ もう一度';
+    document.getElementById('fb').style.color = 'var(--bad)';
+    setTimeout(function () {
+      if (finished) return;
+      input.value = ''; input.className = 'type-input';
+      document.getElementById('fb').textContent = '';
+    }, 700);
+    updateStats();
+  }
+}
+
+function skipWord() {
+  if (finished) return;
+  var w = currentWord();
+  ng++; streak = 0;
+  recordMiss(w);
+  if (mode === 'survival') {
+    document.getElementById('fb').textContent = '✗ 正解は ' + answerOf(w);
+    document.getElementById('fb').style.color = 'var(--bad)';
+    finish();
+    return;
+  }
+  document.getElementById('fb').textContent = '正解：' + answerOf(w);
+  document.getElementById('fb').style.color = 'var(--ink-soft)';
+  next();
+}
+
+function recordMiss(w) {
+  if (misses.some(function (x) { return x.en === w.en; })) return;
+  misses.push({ en: answerOf(w), ja: w.ja });
+}
+
+function next() {
+  idx++;
+  var m = MODES[mode];
+  if (m.total && idx >= m.total) { finish(); return; }
+  setTimeout(function () { if (!finished) loadWord(); }, 260);
+}
+
+function quitPlay() {
+  finished = true;
+  clearInterval(ticker); ticker = null;
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  go('home');
+}
+
+// ---------- 結果 ----------
+function finish() {
+  if (finished) return;
+  finished = true;
+  clearInterval(ticker); ticker = null;
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+  var m = MODES[mode];
+  var score, cleared = true;
+  if (mode === 'survival') {
+    score = maxStreak;
+  } else if (mode === 'sprint') {
+    cleared = (idx >= m.total);
+    score = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+  } else {
+    score = ok;
+  }
+
+  var isNew = false;
+  if (mode === 'sprint') {
+    if (cleared) isNew = updateBest(mode, score);
+  } else if (score > 0) {
+    isNew = updateBest(mode, score);
+  }
+
+  document.getElementById('r-icon').textContent = isNew ? '🏆' : (ok > ng ? '🎉' : '💪');
+  document.getElementById('r-score').textContent = (mode === 'sprint' && !cleared) ? '—' : score;
+  document.getElementById('r-unit').textContent =
+    (mode === 'sprint' && !cleared) ? '30問を終える前にやめました'
+                                    : (m.title + '／' + score + m.unit);
+  document.getElementById('r-new').textContent = isNew ? '★ ベスト記録を更新！' : '';
+  document.getElementById('r-ok').textContent = ok;
+  document.getElementById('r-ng').textContent = ng;
+  document.getElementById('r-combo').textContent = maxStreak;
+
+  var box = document.getElementById('miss-box');
+  var list = document.getElementById('miss-list');
+  list.innerHTML = '';
+  if (misses.length) {
+    box.style.display = '';
+    misses.forEach(function (x) {
+      var row = document.createElement('div');
+      row.className = 'miss-item';
+      row.innerHTML = '<span class="miss-en">' + x.en + '</span><span class="miss-ja">' + x.ja + '</span>';
+      list.appendChild(row);
+    });
+  } else {
+    box.style.display = 'none';
+  }
+  go('result');
+}
+
+function retry() { startMode(mode); }
+
+// ---------- 起動 ----------
+document.getElementById('type-input').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') { e.preventDefault(); submitWord(); }
+});
+renderHome();
+</script>
+
+<script src="進捗同期.js?v=20261018b"></script>
+<script src="お知らせ.js?v=20261018b"></script>
+
+</body>
+</html>

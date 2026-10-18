@@ -16,6 +16,7 @@
   var PROFILE_KEY   = 'student_profile';
   var LAST_SYNC_KEY = 'last_sync_payload';
   var VOCAB_KEY     = 'vocab_summary';
+  var TYPING_KEY    = 'typing_challenge';
 
   var EIKEN_LEVELS = {
     'eiken_records_3kyu':    '3級',
@@ -77,9 +78,23 @@
       });
     });
 
+    // タイピングチャレンジのベスト記録
+    // （スプリントはタイムなのでポイントにせず、完走した回数だけ数える）
+    var tc = readJSON(TYPING_KEY) || {};
+    var tcBest = tc.best || {};
+    var typing = {
+      time:         Number(tcBest.time)      || 0,
+      survival:     Number(tcBest.survival)  || 0,
+      listen:       Number(tcBest.listen)    || 0,
+      weak:         Number(tcBest.weak)      || 0,
+      sprintSec:    Number(tcBest.sprint)    || 0,
+      sprintClears: Number(tc.sprintClears)  || 0
+    };
+
     return {
       vocab: vocab,
-      eiken: { mockCount: mockCount, bestScore: bestScore, latestVerdict: latestVerdict }
+      eiken: { mockCount: mockCount, bestScore: bestScore, latestVerdict: latestVerdict },
+      typing: typing
     };
   }
 
