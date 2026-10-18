@@ -370,8 +370,8 @@ var MODES = {
     total: 30, unit: '秒', bestKey: 'sprint', lowerIsBetter: true
   },
   weak: {
-    icon: '🔥', title: '弱点チャレンジ', desc: 'まだ習得していない単語だけを60秒で練習。',
-    limit: 60, bonus: 1, unit: '問', bestKey: 'weak', useWeak: true
+    icon: '🔥', title: '弱点チャレンジ', desc: 'まだ習得していない単語だけ。60秒、または全部クリアで終了。',
+    limit: 60, bonus: 1, unit: '問', bestKey: 'weak', useWeak: true, clearAll: true
   },
   listen: {
     icon: '🎧', title: 'リスニングタイピング', desc: '音声を聞いて英語を打つ。60秒。',
@@ -472,6 +472,7 @@ var mode = null, queue = [], idx = 0;
 var ok = 0, ng = 0, streak = 0, maxStreak = 0;
 var misses = [];
 var timeLeft = 0, startedAt = 0, ticker = null, finished = false;
+var allCleared = false;   // 弱点チャレンジで、出題された単語を全部正解したか
 
 function shuffle(a) {
   var r = a.slice();
@@ -496,7 +497,7 @@ function startMode(key) {
 
   queue = shuffle(pool);
   if (m.total) queue = queue.slice(0, m.total);
-  idx = 0; ok = 0; ng = 0; streak = 0; maxStreak = 0; misses = []; finished = false;
+  idx = 0; ok = 0; ng = 0; streak = 0; maxStreak = 0; misses = []; finished = false; allCleared = false;
 
   // サバイバルとスプリントは問題を使い切らないよう、足りなければ繰り返す
   document.getElementById('st1-label').textContent = (key === 'survival') ? '連続' : '正解';
@@ -512,7 +513,12 @@ function startMode(key) {
   loadWord();
 }
 
-function currentWord() { return queue[idx % queue.length].word; }
+// clearAll のモード（弱点チャレンジ）は、正解した単語を取り除きながら先頭から出す。
+// それ以外は一覧を順に出し、使い切ったら先頭に戻って繰り返す。
+function currentWord() {
+  if (MODES[mode].clearAll) return queue[0].word;
+  return queue[idx % queue.length].word;
+}
 
 function loadWord() {
   var m = MODES[mode];
@@ -527,8 +533,9 @@ function loadWord() {
     speakWord(w);
   } else {
     qja.textContent = w.ja;
-    note.textContent = m.useWeak ? 'まだ習得していない単語です' : '';
+    note.textContent = m.clearAll ? ('のこり ' + queue.length + '語') : '';
   }
+  if (m.listening && m.clearAll) note.textContent = 'のこり ' + queue.length + '語';
 
   input.value = '';
   input.className = 'type-input';
@@ -585,6 +592,10 @@ function submitWord() {
     document.getElementById('fb').textContent = '✓ ' + answerOf(w);
     document.getElementById('fb').style.color = 'var(--good)';
     if (m.bonus) timeLeft = Math.min(timeLeft + m.bonus, m.limit);
+    if (m.clearAll) {
+      queue.shift();                                  // 正解した単語は出題から外す
+      if (queue.length === 0) { allCleared = true; finish(); return; }
+    }
     next();
   } else {
     ng++; streak = 0;
@@ -620,6 +631,7 @@ function skipWord() {
   }
   document.getElementById('fb').textContent = '正解：' + answerOf(w);
   document.getElementById('fb').style.color = 'var(--ink-soft)';
+  if (MODES[mode].clearAll) queue.push(queue.shift());   // パスした単語はあとでもう一度出す
   next();
 }
 
@@ -667,12 +679,16 @@ function finish() {
     isNew = updateBest(mode, score);
   }
 
-  document.getElementById('r-icon').textContent = isNew ? '🏆' : (ok > ng ? '🎉' : '💪');
+  document.getElementById('r-icon').textContent =
+    allCleared ? '🎊' : (isNew ? '🏆' : (ok > ng ? '🎉' : '💪'));
   document.getElementById('r-score').textContent = (mode === 'sprint' && !cleared) ? '—' : score;
   document.getElementById('r-unit').textContent =
     (mode === 'sprint' && !cleared) ? '30問を終える前にやめました'
                                     : (m.title + '／' + score + m.unit);
-  document.getElementById('r-new').textContent = isNew ? '★ ベスト記録を更新！' : '';
+  var notes = [];
+  if (allCleared) notes.push('🎊 弱点をぜんぶクリア！');
+  if (isNew) notes.push('★ ベスト記録を更新！');
+  document.getElementById('r-new').textContent = notes.join('　');
   document.getElementById('r-ok').textContent = ok;
   document.getElementById('r-ng').textContent = ng;
   document.getElementById('r-combo').textContent = maxStreak;
