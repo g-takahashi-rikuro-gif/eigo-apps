@@ -37,8 +37,9 @@
     if (p && p.cls && (p.num || p.num === 0)) return p;
     return null;
   }
-  function saveProfile(cls, num, name) {
+  function saveProfile(cls, num, name, code) {
     var p = { cls: String(cls).trim(), num: Number(num), name: String(name || '').trim() };
+    if (code) p.code = String(code).trim();
     writeJSON(PROFILE_KEY, p);
     return p;
   }
@@ -47,6 +48,127 @@
       localStorage.removeItem(PROFILE_KEY);
       localStorage.removeItem(LAST_SYNC_KEY);
     } catch (e) {}
+  }
+
+  // ================================================================
+  //  端末の引き継ぎ（バックアップと復元）
+  //
+  //  学習記録はこの端末のブラウザの中にしかないので、まるごとサーバーに
+  //  預けておき、別の端末で取り出せるようにする。
+  //  ・単語名を鍵にしているので、あとから単語が増えてもズレない
+  //  ・{correct,wrong,streak} は [c,w,s] の配列に縮めて容量を抑える
+  //  ・学年ごと＋その他の4つに分けて預ける（1つが大きくなりすぎないように）
+  // ================================================================
+  var BACKUP_PARTS = ['g1', 'g2', 'g3', 'etc'];
+
+  /** この保存キーが、どのまとまりに入るか */
+  function partOf(key) {
+    if (key.indexOf('wscroll_g1_') === 0) return 'g1';
+    if (key.indexOf('wscroll_g2_') === 0) return 'g2';
+    if (key.indexOf('wscroll_') === 0) return 'g3';   // 3年の単元idには接頭辞が無い
+    return 'etc';
+  }
+  /** 引き継ぎの対象にする保存キーか */
+  function isBackupKey(key) {
+    return key.indexOf('wscroll_') === 0
+        || key.indexOf('vocab_summary') === 0
+        || key.indexOf('eiken_records_') === 0
+        || key.indexOf('typing_challenge') === 0;
+  }
+  /** 単語ごとの記録を {en:[正解,不正解,連続]} に縮める／戻す */
+  function packWords(obj) {
+    var o = {};
+    Object.keys(obj).forEach(function (en) {
+      var p = obj[en] || {};
+      o[en] = [Number(p.correct) || 0, Number(p.wrong) || 0, Number(p.streak) || 0];
+    });
+    return o;
+  }
+  function unpackWords(obj) {
+    var o = {};
+    Object.keys(obj).forEach(function (en) {
+      var a = obj[en];
+      if (Array.isArray(a)) o[en] = { correct: a[0] || 0, wrong: a[1] || 0, streak: a[2] || 0 };
+      else o[en] = a;
+    });
+    return o;
+  }
+  var WORD_DICT = /_(qzp|typ|stp)$/;
+
+  /** いまの端末の記録を、預ける形にまとめる */
+  function buildBackup() {
+    var parts = { g1: {}, g2: {}, g3: {}, etc: {} };
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (!key || !isBackupKey(key)) continue;
+      var raw = localStorage.getItem(key);
+      var box = parts[partOf(key)];
+      if (WORD_DICT.test(key)) {
+        var d = readJSON(key);
+        box[key] = (d && typeof d === 'object') ? packWords(d) : raw;
+      } else {
+        box[key] = raw;
+      }
+    }
+    var out = {};
+    BACKUP_PARTS.forEach(function (p) { out[p] = JSON.stringify({ v: 1, d: parts[p] }); });
+    return out;
+  }
+
+  /** 預けた記録を、この端末に書き戻す */
+  function applyBackup(parts) {
+    var restored = 0;
+    BACKUP_PARTS.forEach(function (p) {
+      var text = parts && parts[p];
+      if (!text) return;
+      var box;
+      try { box = JSON.parse(text); } catch (e) { return; }
+      var d = (box && box.d) || {};
+      Object.keys(d).forEach(function (key) {
+        try {
+          if (WORD_DICT.test(key) && typeof d[key] === 'object') {
+            localStorage.setItem(key, JSON.stringify(unpackWords(d[key])));
+          } else {
+            localStorage.setItem(key, d[key]);
+          }
+          restored++;
+        } catch (e) {}
+      });
+    });
+    return restored;
+  }
+
+  /** この端末に学習の記録があるか（復元で上書きしてよいかの判断に使う） */
+  function hasLocalProgress() {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf('wscroll_') === 0 && WORD_DICT.test(k)) {
+        var d = readJSON(k);
+        if (d && Object.keys(d).length) return true;
+      }
+    }
+    return false;
+  }
+
+  /** 記録をサーバーに預ける */
+  function backupSave() {
+    var p = getProfile();
+    if (!p || !p.code) return Promise.resolve({ skipped: '合言葉が未設定' });
+    var body = { mode: 'backup_save', cls: p.cls, num: p.num, name: p.name, code: p.code };
+    var parts = buildBackup();
+    BACKUP_PARTS.forEach(function (k) { body[k] = parts[k]; });
+    return post(body).catch(function () { return { error: '通信できませんでした' }; });
+  }
+
+  /** 預けた記録を取り出して、この端末に戻す */
+  function backupRestore(cls, num, code) {
+    return post({ mode: 'backup_load', cls: cls, num: num, code: code })
+      .then(function (res) {
+        if (!res || res.error) return res || { error: '通信できませんでした' };
+        var n = applyBackup(res);
+        return { ok: true, restored: n, updated: res.updated || '' };
+      })
+      .catch(function () { return { error: '通信できませんでした' }; });
   }
 
   // ---------- 学習データの集計 ----------
@@ -143,6 +265,8 @@
     return post(payload).then(function (res) {
       if (res && res.ok) {
         try { localStorage.setItem(LAST_SYNC_KEY, fingerprint); } catch (e) {}
+        // 集計が変わったときだけ、引き継ぎ用の記録も預け直す
+        backupSave();
       }
       return res;
     }).catch(function () {
@@ -183,6 +307,9 @@
     clearProfile: clearProfile,
     collect: collect,
     sync: sync,
+    hasLocalProgress: hasLocalProgress,
+    backupSave: backupSave,
+    backupRestore: backupRestore,
     fetchRanking: fetchRanking,
     fetchTypingRanking: fetchTypingRanking,
     fetchAll: fetchAll

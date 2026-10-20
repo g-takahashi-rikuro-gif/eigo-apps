@@ -338,17 +338,29 @@
       <input type="text" id="in-name" placeholder="高橋 太郎" maxlength="20">
     </div>
 
+    <div class="field" style="margin-bottom:14px;">
+      <label>合言葉（数字4けた）</label>
+      <input type="text" id="in-code" placeholder="0000" maxlength="8"
+             inputmode="numeric" autocomplete="off">
+      <div class="modal-note" style="margin-top:6px;">
+        べつの端末で続きをするときに使います。<b>わすれないようにしてください。</b>
+      </div>
+    </div>
+
     <div class="modal-err" id="modal-err"></div>
 
     <button class="btn btn-primary btn-block" id="btn-save-profile">この内容で始める</button>
+    <button class="btn btn-gray btn-block" id="btn-restore" style="margin-top:8px;">
+      📥 べつの端末の記録を引きつぐ
+    </button>
     <button class="btn btn-gray btn-block" id="btn-cancel-profile" style="display:none;">キャンセル</button>
 
     <div class="modal-note">入力した内容はこの端末に保存され、先生の集計表にも送られます。</div>
   </div>
 </div>
 
-<script src="進捗同期.js?v=20261020"></script>
-<script src="お知らせ.js?v=20261020"></script>
+<script src="進捗同期.js?v=20261020b"></script>
+<script src="お知らせ.js?v=20261020b"></script>
 <script>
 // ================================================================
 //  画面切り替え
@@ -403,13 +415,17 @@ function openProfileModal(isEdit) {
     }
     numSelect.value = p.num;
     document.getElementById('in-name').value = p.name || '';
+    document.getElementById('in-code').value = p.code || '';
   } else {
     // 新規登録のときは、すべて未選択の状態から始める
     document.getElementById('in-grade').value = '';
     classSelect.value = '';
     numSelect.value = '';
     document.getElementById('in-name').value = '';
+    document.getElementById('in-code').value = '';
   }
+  // 引きつぎボタンは、新規登録のときだけ出す（変更画面では紛らわしいので隠す）
+  document.getElementById('btn-restore').style.display = isEdit ? 'none' : 'block';
   modal.classList.add('show');
 }
 function closeProfileModal() { modal.classList.remove('show'); }
@@ -442,10 +458,52 @@ document.getElementById('btn-save-profile').addEventListener('click', () => {
     return;
   }
 
-  ProgressSync.saveProfile(grade + '年' + cls + '組', num, name);
+  var code = (document.getElementById('in-code').value || '').trim();
+  if (!/^\d{4,8}$/.test(code)) {
+    err.textContent = '合言葉を数字4けたで入れてください。';
+    err.classList.add('show');
+    return;
+  }
+
+  ProgressSync.saveProfile(grade + '年' + cls + '組', num, name, code);
   closeProfileModal();
   renderStudentBar();
   ProgressSync.sync(true);
+});
+
+// ---------- べつの端末の記録を引きつぐ ----------
+document.getElementById('btn-restore').addEventListener('click', function () {
+  const err = document.getElementById('modal-err');
+  const grade = document.getElementById('in-grade').value;
+  const cls   = document.getElementById('in-class').value;
+  const num   = parseInt(document.getElementById('in-num').value, 10);
+  const code  = (document.getElementById('in-code').value || '').trim();
+
+  const show = function (msg) { err.textContent = msg; err.classList.add('show'); };
+  if (!grade || !cls || !Number.isInteger(num)) { show('学年・組・出席番号を選んでください。'); return; }
+  if (!code) { show('前の端末で決めた合言葉を入れてください。'); return; }
+
+  if (ProgressSync.hasLocalProgress() &&
+      !confirm('この端末にも学習の記録があります。\n引きつぐと、この端末の記録は上書きされます。\n続けますか？')) {
+    return;
+  }
+
+  const btn = document.getElementById('btn-restore');
+  btn.disabled = true;
+  btn.textContent = '引きつぎ中…';
+  show('');
+  err.classList.remove('show');
+
+  const fullCls = grade + '年' + cls + '組';
+  ProgressSync.backupRestore(fullCls, num, code).then(function (res) {
+    btn.disabled = false;
+    btn.textContent = '📥 べつの端末の記録を引きつぐ';
+    if (!res || res.error) { show(res && res.error ? res.error : '引きつげませんでした。'); return; }
+    const name = (document.getElementById('in-name').value || '').trim() || res.name || '';
+    ProgressSync.saveProfile(fullCls, num, name, code);
+    alert('引きつぎました。\n（' + (res.updated || '') + ' の記録）\nページを読み込み直します。');
+    location.reload();
+  });
 });
 
 document.getElementById('btn-cancel-profile').addEventListener('click', closeProfileModal);
