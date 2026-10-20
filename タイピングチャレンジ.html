@@ -425,7 +425,8 @@ function scopedPool() {
 /** 学習記録から、まだ習得していない単語だけを取り出す */
 function weakPool() {
   return scopedPool().filter(function (item) {
-    var dict = readJSON('wscroll_' + item.unitId + '_typing') || {};
+    // 各学年アプリは Typing の記録を 'wscroll_<単元id>_typ' に保存している
+    var dict = readJSON('wscroll_' + item.unitId + '_typ') || {};
     var p = dict[item.word.en];
     return !(p && p.streak >= MASTERY_STREAK);
   });
@@ -945,8 +946,8 @@ document.getElementById('type-input').addEventListener('keydown', function (e) {
 renderHome();
 </script>
 
-<script src="進捗同期.js?v=20261018g"></script>
-<script src="お知らせ.js?v=20261018g"></script>
+<script src="進捗同期.js?v=20261020"></script>
+<script src="お知らせ.js?v=20261020"></script>
 
 </body>
 </html>
