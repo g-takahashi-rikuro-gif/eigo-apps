@@ -359,8 +359,8 @@
   </div>
 </div>
 
-<script src="進捗同期.js?v=20261020b"></script>
-<script src="お知らせ.js?v=20261020b"></script>
+<script src="進捗同期.js?v=20261022"></script>
+<script src="お知らせ.js?v=20261022"></script>
 <script>
 // ================================================================
 //  画面切り替え
@@ -465,11 +465,34 @@ document.getElementById('btn-save-profile').addEventListener('click', () => {
     return;
   }
 
-  ProgressSync.saveProfile(grade + '年' + cls + '組', num, name, code);
+  const fullCls = grade + '年' + cls + '組';
+
+  // この端末に記録が無いのに、サーバーに預かり記録があるときは
+  // そのまま始めると前の記録を引きつぎそこねる。先に知らせる。
+  if (!ProgressSync.hasLocalProgress()) {
+    const btn = document.getElementById('btn-save-profile');
+    btn.disabled = true;
+    ProgressSync.backupExists(fullCls, num).then(function (res) {
+      btn.disabled = false;
+      if (res && res.exists &&
+          confirm('前の端末の記録が見つかりました。\n（' + (res.updated || '') + ' までの記録）\n\n'
+                + '引きつぎますか？\n「キャンセル」を選ぶと、最初から始めます。')) {
+        document.getElementById('btn-restore').click();
+        return;
+      }
+      finishProfileSave(fullCls, num, name, code);
+    });
+    return;
+  }
+  finishProfileSave(fullCls, num, name, code);
+});
+
+function finishProfileSave(fullCls, num, name, code) {
+  ProgressSync.saveProfile(fullCls, num, name, code);
   closeProfileModal();
   renderStudentBar();
   ProgressSync.sync(true);
-});
+}
 
 // ---------- べつの端末の記録を引きつぐ ----------
 document.getElementById('btn-restore').addEventListener('click', function () {

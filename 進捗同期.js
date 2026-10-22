@@ -150,14 +150,40 @@
     return false;
   }
 
-  /** 記録をサーバーに預ける */
+  var BACKUP_FP_KEY = 'last_backup_payload';
+
+  /**
+   * 記録をサーバーに預ける
+   * この端末に学習の記録が無いときは預けない。
+   * 端末を替えた直後に空の記録で預けてしまうと、前の端末の記録が消えてしまうため。
+   */
   function backupSave() {
     var p = getProfile();
     if (!p || !p.code) return Promise.resolve({ skipped: '合言葉が未設定' });
+    if (!hasLocalProgress()) return Promise.resolve({ skipped: 'この端末に記録が無い' });
+
     var body = { mode: 'backup_save', cls: p.cls, num: p.num, name: p.name, code: p.code };
     var parts = buildBackup();
     BACKUP_PARTS.forEach(function (k) { body[k] = parts[k]; });
-    return post(body).catch(function () { return { error: '通信できませんでした' }; });
+
+    // 中身が前回と同じなら送らない（通信の無駄打ち防止）
+    var fp = JSON.stringify(parts);
+    try {
+      if (localStorage.getItem(BACKUP_FP_KEY) === fp) {
+        return Promise.resolve({ skipped: '変化なし' });
+      }
+    } catch (e) {}
+
+    return post(body).then(function (res) {
+      if (res && res.ok) { try { localStorage.setItem(BACKUP_FP_KEY, fp); } catch (e) {} }
+      return res;
+    }).catch(function () { return { error: '通信できませんでした' }; });
+  }
+
+  /** その番号の預かり記録があるかだけを調べる（合言葉は不要。中身は返らない） */
+  function backupExists(cls, num) {
+    return post({ mode: 'backup_exists', cls: cls, num: num })
+      .catch(function () { return { error: '通信できませんでした' }; });
   }
 
   /** 預けた記録を取り出して、この端末に戻す */
@@ -257,6 +283,9 @@
     if (!force) {
       try {
         if (localStorage.getItem(LAST_SYNC_KEY) === fingerprint) {
+          // 集計は変わっていなくても、単語ごとの記録は進んでいることがあるので
+          // 引き継ぎ用の記録だけは預け直す（中身が同じなら中で送らない）
+          backupSave();
           return Promise.resolve({ skipped: '変化なし' });
         }
       } catch (e) {}
@@ -310,6 +339,7 @@
     hasLocalProgress: hasLocalProgress,
     backupSave: backupSave,
     backupRestore: backupRestore,
+    backupExists: backupExists,
     fetchRanking: fetchRanking,
     fetchTypingRanking: fetchTypingRanking,
     fetchAll: fetchAll
