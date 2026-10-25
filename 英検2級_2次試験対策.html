@@ -140,8 +140,20 @@
   .card-box .cb-label { font-size: 0.72em; font-weight: 800; color: #5B6CF5; margin-bottom: 8px; }
   .passage-text { font-size: 0.95em; line-height: 1.8; color: #222; margin-bottom: 14px; }
   .illustration-wrap { width: 100%; border-radius: 12px; overflow: hidden; background: #eaf4ff; }
-  .illustration-wrap svg { width: 100%; height: auto; display: block; }
-
+  .illustration-wrap img { width: 100%; height: auto; display: block; }
+  /* 絵カードの①②は画像に焼き込まず、CSSで上に重ねている
+     （画像生成AIは数字を崩すため。位置は markers の % 指定で調整する） */
+  .pic-frame { position: relative; line-height: 0; }
+  .pic-mark {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 30px; height: 30px; line-height: 26px;
+    border-radius: 50%; background: #5B6CF5; color: #fff; border: 2px solid #fff;
+    font-size: 16px; font-weight: 800; text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  }
+  @media (max-width: 480px) {
+    .pic-mark { width: 24px; height: 24px; line-height: 20px; font-size: 13px; }
+  }
   .no-card-note {
     background: #fff8ec; border: 2px solid #ffd98a; border-radius: 14px; padding: 12px 16px; margin-bottom: 18px;
     font-size: 0.82em; color: #8a6113; text-align: center; font-weight: 700;
@@ -327,53 +339,8 @@ const CARD_SETS = [
   {
     icon: "🔌", title: "電気自動車の普及", desc: "The Growth of Electric Vehicles",
     passage: "Electric vehicles have become increasingly popular in recent years as more people become concerned about air pollution and climate change. Many governments now offer financial incentives, such as tax reductions, to encourage citizens to purchase electric cars instead of traditional gasoline vehicles. However, some drivers are still hesitant because of the limited number of charging stations in certain areas.",
-    illustration: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
-      <defs>
-        <linearGradient id="e-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9edff"/><stop offset="1" stop-color="#b8d9f5"/></linearGradient>
-        <linearGradient id="e-road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa2ab"/><stop offset="1" stop-color="#7a828b"/></linearGradient>
-        <radialGradient id="e-skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#ffe9cf"/><stop offset="1" stop-color="#eeba85"/></radialGradient>
-        <linearGradient id="e-shirt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74dcf0"/><stop offset="1" stop-color="#289cb8"/></linearGradient>
-        <linearGradient id="e-pants" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6c7bea"/><stop offset="1" stop-color="#38449e"/></linearGradient>
-        <linearGradient id="e-car" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8fa3"/><stop offset="1" stop-color="#e8506e"/></linearGradient>
-        <linearGradient id="e-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3d24"/><stop offset="1" stop-color="#2e1e10"/></linearGradient>
-      </defs>
-      <rect width="400" height="130" fill="url(#e-sky)"/>
-      <rect y="130" width="400" height="90" fill="url(#e-road)"/>
-      <rect x="0" y="128" width="400" height="4" fill="#ffd200" opacity="0.7"/>
-      <rect x="15" y="55" width="60" height="75" fill="#e0d6c8"/>
-      <rect x="22" y="65" width="14" height="14" fill="#bfe3ff"/>
-      <rect x="42" y="65" width="14" height="14" fill="#bfe3ff"/>
-      <rect x="22" y="85" width="14" height="14" fill="#bfe3ff"/>
-      <ellipse cx="230" cy="213" rx="105" ry="6" fill="#3a3f45" opacity="0.2"/>
-      <rect x="70" y="120" width="16" height="65" rx="3" fill="url(#e-shirt)"/>
-      <rect x="58" y="100" width="40" height="28" rx="4" fill="#333"/>
-      <rect x="63" y="105" width="30" height="14" rx="2" fill="#4fd1c5"/>
-      <path d="M78,128 Q105,150 141,168" stroke="#222" stroke-width="3" fill="none"/>
-      <rect x="185" y="130" width="90" height="30" rx="10" fill="url(#e-car)"/>
-      <rect x="150" y="155" width="160" height="35" rx="14" fill="url(#e-car)"/>
-      <rect x="193" y="136" width="30" height="18" rx="3" fill="#cfe8ff"/>
-      <rect x="228" y="136" width="38" height="18" rx="3" fill="#cfe8ff"/>
-      <circle cx="180" cy="195" r="16" fill="#333"/>
-      <circle cx="180" cy="195" r="7" fill="#999"/>
-      <circle cx="270" cy="195" r="16" fill="#333"/>
-      <circle cx="270" cy="195" r="7" fill="#999"/>
-      <rect x="144" y="163" width="8" height="10" fill="#222"/>
-      <line x1="99" y1="134" x2="90" y2="166" stroke="url(#e-skin)" stroke-width="12" stroke-linecap="round"/>
-      <line x1="141" y1="134" x2="148" y2="168" stroke="url(#e-skin)" stroke-width="11" stroke-linecap="round"/>
-      <rect x="103" y="180" width="14" height="30" rx="5" fill="url(#e-pants)"/>
-      <rect x="121" y="180" width="14" height="30" rx="5" fill="url(#e-pants)"/>
-      <rect x="101" y="207" width="18" height="9" rx="3" fill="#222"/>
-      <rect x="119" y="207" width="18" height="9" rx="3" fill="#222"/>
-      <rect x="97" y="124" width="44" height="56" rx="16" fill="url(#e-shirt)"/>
-      <rect x="113" y="114" width="12" height="12" fill="url(#e-skin)"/>
-      <circle cx="119" cy="97" r="21" fill="url(#e-skin)"/>
-      <path d="M99,90 Q119,64 139,90 L136,81 Q119,68 102,81 Z" fill="url(#e-hair)"/>
-      <circle cx="113" cy="96" r="2.5" fill="#333"/>
-      <circle cx="125" cy="96" r="2.5" fill="#333"/>
-      <path d="M111,104 Q119,109 127,104" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <circle cx="119" cy="60" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
-      <text x="119" y="65" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">1</text>
-    </svg>`,
+    image: '絵/eiken2_01_ev.webp',
+    markers: [{ n:1, x:50.8, y:10.5 }],
     people: ["① 電気自動車に充電ケーブルをつないでいる男性"],
     questions: [
       { no:"No.1", type:"passage", en:"Look at the passage. Why do some drivers hesitate to buy electric vehicles?", hint:"パッセージの内容から、電気自動車の購入をためらう理由を答えよう。", model:"Because there are a limited number of charging stations in certain areas." },
@@ -386,50 +353,8 @@ const CARD_SETS = [
   {
     icon: "💻", title: "リモートワークの広がり", desc: "The Shift to Remote Work",
     passage: "Since the pandemic, many companies have allowed their employees to work from home instead of commuting to an office every day. While some workers enjoy the flexibility and extra time this provides, others find it difficult to stay motivated without face-to-face contact with their colleagues. Many companies are now experimenting with hybrid models that combine both remote and in-office work.",
-    illustration: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
-      <defs>
-        <linearGradient id="w-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdf6ec"/><stop offset="1" stop-color="#f3e4cd"/></linearGradient>
-        <linearGradient id="w-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0c9a6"/><stop offset="1" stop-color="#c7a978"/></linearGradient>
-        <radialGradient id="w-skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#ffe9cf"/><stop offset="1" stop-color="#eeba85"/></radialGradient>
-        <linearGradient id="w-dress" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a3ff"/><stop offset="1" stop-color="#9257e0"/></linearGradient>
-        <linearGradient id="w-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c98a4b"/><stop offset="1" stop-color="#8a5a30"/></linearGradient>
-        <linearGradient id="w-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3d24"/><stop offset="1" stop-color="#2e1e10"/></linearGradient>
-      </defs>
-      <rect width="400" height="150" fill="url(#w-wall)"/>
-      <rect y="150" width="400" height="70" fill="url(#w-floor)"/>
-      <rect x="290" y="20" width="90" height="70" rx="4" fill="#cfe8ff" stroke="#8fb8d9" stroke-width="3"/>
-      <line x1="335" y1="20" x2="335" y2="90" stroke="#8fb8d9" stroke-width="3"/>
-      <line x1="290" y1="55" x2="380" y2="55" stroke="#8fb8d9" stroke-width="3"/>
-      <ellipse cx="30" cy="150" rx="22" ry="8" fill="#8a5a30"/>
-      <path d="M30,150 Q10,120 20,90 Q30,110 30,90 Q30,115 40,90 Q48,120 30,150 Z" fill="#5a9a3d"/>
-      <ellipse cx="190" cy="213" rx="95" ry="6" fill="#5a3d24" opacity="0.15"/>
-      <rect x="100" y="175" width="200" height="12" rx="2" fill="url(#w-wood)"/>
-      <rect x="108" y="187" width="8" height="28" fill="#8a5a30"/>
-      <rect x="284" y="187" width="8" height="28" fill="#8a5a30"/>
-      <rect x="260" y="163" width="16" height="14" fill="#fff" stroke="#ccc" stroke-width="1"/>
-      <rect x="264" y="150" width="8" height="15" fill="#8a5a30"/>
-      <rect x="170" y="128" width="100" height="52" rx="4" fill="#333"/>
-      <rect x="175" y="133" width="90" height="38" fill="#eef0ff"/>
-      <circle cx="195" cy="148" r="9" fill="#e8b88a"/>
-      <circle cx="220" cy="148" r="9" fill="#d99a6c"/>
-      <circle cx="245" cy="148" r="9" fill="#f0c9a0"/>
-      <circle cx="207" cy="163" r="9" fill="#c98a5a"/>
-      <rect x="150" y="184" width="120" height="6" rx="2" fill="#666"/>
-      <line x1="128" y1="128" x2="112" y2="108" stroke="url(#w-skin)" stroke-width="11" stroke-linecap="round"/>
-      <line x1="172" y1="132" x2="185" y2="158" stroke="url(#w-skin)" stroke-width="12" stroke-linecap="round"/>
-      <rect x="138" y="178" width="14" height="18" rx="4" fill="url(#w-dress)"/>
-      <rect x="156" y="178" width="14" height="18" rx="4" fill="url(#w-dress)"/>
-      <rect x="124" y="122" width="52" height="58" rx="16" fill="url(#w-dress)"/>
-      <rect x="144" y="112" width="12" height="12" fill="url(#w-skin)"/>
-      <circle cx="150" cy="94" r="23" fill="url(#w-skin)"/>
-      <path d="M126,86 Q150,58 174,86 L171,77 Q150,64 129,77 Z" fill="url(#w-hair)"/>
-      <ellipse cx="177" cy="98" rx="7" ry="14" fill="url(#w-hair)"/>
-      <circle cx="143" cy="93" r="2.5" fill="#333"/>
-      <circle cx="157" cy="93" r="2.5" fill="#333"/>
-      <path d="M141,102 Q150,107 159,102" stroke="#7a4a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <circle cx="150" cy="56" r="14" fill="#5B6CF5" stroke="#fff" stroke-width="2"/>
-      <text x="150" y="61" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">1</text>
-    </svg>`,
+    image: '絵/eiken2_02_remote.webp',
+    markers: [{ n:1, x:65.0, y:12.5 }],
     people: ["① オンライン会議をしている女性"],
     questions: [
       { no:"No.1", type:"passage", en:"Look at the passage. What kind of work model are many companies now experimenting with?", hint:"パッセージの内容から、多くの企業が試している働き方を答えよう。", model:"A hybrid model that combines remote and in-office work." },
@@ -442,6 +367,17 @@ const CARD_SETS = [
 ];
 
 // AI採点用（英作文アプリと同じGASウェブアプリURL）
+/**
+ * 絵カードのHTMLを組み立てる。
+ * ①②の番号は画像に描かせず、ここで上に重ねている。
+ * （画像生成AIは数字を崩してしまうため）
+ */
+function buildIllustration(set) {
+  const marks = (set.markers || []).map(function (m) {
+    return '<span class="pic-mark" style="left:' + m.x + '%;top:' + m.y + '%">' + m.n + '</span>';
+  }).join('');
+  return '<div class="pic-frame"><img src="' + set.image + '" alt="' + set.title + 'の絵">' + marks + '</div>';
+}
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxhCBU9aZ5eymIXqsAhtQoUvgaGJwEEt67UAN_ysTeZGGSLc1gXvWP-tSZHvDopKITJmg/exec';
 
 // 模試の記録（英検2級対策.htmlの「これまでの記録」と同じキーに書き込む）
@@ -546,7 +482,7 @@ function showQuestion() {
   document.getElementById('no-card-note').style.display = needsCard ? 'none' : 'block';
   if (needsCard) {
     document.getElementById('passage-text').textContent = currentSet.passage;
-    document.getElementById('illustration-wrap').innerHTML = currentSet.illustration;
+    document.getElementById('illustration-wrap').innerHTML = buildIllustration(currentSet);
   }
 
   document.getElementById('question-no').textContent = q.no;
@@ -608,7 +544,7 @@ document.getElementById('btn-ai-check').addEventListener('click', async () => {
         type: q.type,
         prompt: q.en,
         passage: needsCard ? currentSet.passage : '',
-        reference: q.model,
+        reference: q.alt ? (q.model + '\n（次の答えも正解とすること: ' + q.alt + '）') : q.model,
         answer: answer,
         level: '2級'
       })
@@ -744,8 +680,8 @@ if (new URLSearchParams(location.search).get('mode') === 'mock') {
   startPractice();
 }
 </script>
-<script src="進捗同期.js?v=20261022"></script>
-<script src="お知らせ.js?v=20261022"></script>
+<script src="進捗同期.js?v=20261025"></script>
+<script src="お知らせ.js?v=20261025"></script>
 
 </body>
 </html>
