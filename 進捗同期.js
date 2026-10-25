@@ -15,6 +15,7 @@
 
   var PROFILE_KEY   = 'student_profile';
   var TEACHER_KEY   = 'teacher_code';
+  var TEACHER_META_KEY = 'teacher_meta';
   var LAST_SYNC_KEY = 'last_sync_payload';
   var VOCAB_KEY     = 'vocab_summary';
   var TYPING_KEY    = 'typing_challenge';
@@ -51,6 +52,19 @@
     } catch (e) {
       return '';
     }
+  }
+
+  /**
+   * 選んだ先生の名前と学校を端末に覚えておく。
+   * 先生一覧の取得はサーバー往復で数秒かかるので、それを待たずに
+   * 登録画面へ前回の内容を出すために使う。
+   */
+  function getTeacherMeta() {
+    var m = readJSON(TEACHER_META_KEY);
+    return (m && m.school) ? m : null;
+  }
+  function setTeacherMeta(school, name) {
+    writeJSON(TEACHER_META_KEY, { school: String(school || ''), name: String(name || '') });
   }
 
   /** 先生コードを手で設定し直す（登録画面から使う） */
@@ -385,6 +399,8 @@
     GAS_URL: GAS_URL,
     getTeacherCode: getTeacherCode,
     setTeacherCode: setTeacherCode,
+    getTeacherMeta: getTeacherMeta,
+    setTeacherMeta: setTeacherMeta,
     fetchTeacherInfo: fetchTeacherInfo,
     fetchTeacherList: fetchTeacherList,
     getProfile: getProfile,

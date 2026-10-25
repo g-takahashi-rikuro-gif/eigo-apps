@@ -371,8 +371,8 @@
   </div>
 </div>
 
-<script src="進捗同期.js?v=20261025b"></script>
-<script src="お知らせ.js?v=20261025b"></script>
+<script src="進捗同期.js?v=20261026"></script>
+<script src="お知らせ.js?v=20261026"></script>
 <script>
 // ================================================================
 //  画面切り替え
@@ -462,26 +462,48 @@ function fillTeacherSelect(keepCode) {
  */
 function setupSchoolAndTeacher() {
   fillSchoolSelect();
-  const wanted = ProgressSync.getTeacherCode() || OWNER_FALLBACK_CODE;
+  // この端末がまだ何も覚えていないときは、あえて空のままにする。
+  // 勝手に高森台中学校が入っていると、よその学校の生徒が気づかずに
+  // 登録してしまう。登録ずみの生徒には読み込み時にコードが入るので、
+  // ここが空になるのは「初めてこの端末で登録する人」だけ。
+  const wanted = ProgressSync.getTeacherCode();
+  const meta = wanted ? ProgressSync.getTeacherMeta() : null;
+
+  // 先生一覧はサーバーから取るので数秒かかる。待っているあいだに保存されると
+  // 「学校を選んでください」で弾かれてしまうし、通信できないときは
+  // 登録ずみの生徒がいつまでも保存できなくなる。
+  // そこで、前回選んだ内容を端末から読んで先に出しておく。
+  if (meta) {
+    teacherList = [{ code: wanted, name: meta.name || '担当', school: meta.school }];
+    document.getElementById('in-school').value = meta.school;
+    fillTeacherSelect(wanted);
+  }
 
   return ProgressSync.fetchTeacherList().then(function (res) {
-    teacherList = (res && res.teachers) || [];
-    const hit = teacherList.filter(t => t.code === wanted)[0];
-    if (hit) document.getElementById('in-school').value = hit.school;
-    fillTeacherSelect(wanted);
+    const list = (res && res.teachers) || [];
+    if (!list.length) return;          // 取れなければ、いま出しているものを残す
+    teacherList = list;
+    const keepCode = document.getElementById('in-teacher').value || wanted;
+    const hit = keepCode ? teacherList.filter(t => t.code === keepCode)[0] : null;
+    const sel = document.getElementById('in-school');
+    if (!sel.value && hit) sel.value = hit.school;
+    fillTeacherSelect(keepCode);
   });
 }
 
-// この機能より前から使っている生徒の既定（高森台中学校・高橋先生）
-const OWNER_FALLBACK_CODE = 'takahashi';
+// この機能より前から使っている生徒の既定
+const OWNER_FALLBACK = { code: 'takahashi', name: '高橋', school: '高森台中学校' };
 
 document.getElementById('in-school').addEventListener('change', () => fillTeacherSelect());
 
 // すでに登録ずみなのに先生を選んでいない生徒は、高森台中学校・高橋先生とみなす。
 // この機能ができる前から使っている生徒が対象。サーバー側も ?t= 無しは
 // 作成者の生徒として扱うので、見た目と実際が食い違わない。
-if (ProgressSync.getProfile() && !ProgressSync.getTeacherCode()) {
-  ProgressSync.setTeacherCode(OWNER_FALLBACK_CODE);
+if (ProgressSync.getProfile()) {
+  if (!ProgressSync.getTeacherCode()) ProgressSync.setTeacherCode(OWNER_FALLBACK.code);
+  if (!ProgressSync.getTeacherMeta() && ProgressSync.getTeacherCode() === OWNER_FALLBACK.code) {
+    ProgressSync.setTeacherMeta(OWNER_FALLBACK.school, OWNER_FALLBACK.name);
+  }
 }
 
 function openProfileModal(isEdit) {
@@ -582,6 +604,9 @@ document.getElementById('btn-save-profile').addEventListener('click', () => {
   // 先生コードを確定させる。生徒IDが「先生コード:クラス-番号」なので、
   // このあとの引き継ぎの確認より前に決まっていないと、別人の記録を見にいってしまう。
   ProgressSync.setTeacherCode(teacher);
+  // 次に開いたとき、サーバーの応答を待たずに出せるように覚えておく
+  const 選んだ先生 = teacherList.filter(t => t.code === teacher)[0];
+  ProgressSync.setTeacherMeta(school, 選んだ先生 ? 選んだ先生.name : '');
 
   // この端末に記録が無いのに、サーバーに預かり記録があるときは
   // そのまま始めると前の記録を引きつぎそこねる。先に知らせる。
