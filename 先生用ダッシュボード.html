@@ -70,6 +70,15 @@
 
   /* ===== 統計 ===== */
   .stat-row { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+
+  /* いま誰の生徒を見ているか */
+  .scope-bar {
+    background: #eef0ff; border: 2px solid #c9cffa; border-radius: 12px;
+    padding: 10px 16px; margin-bottom: 16px; font-size: 0.85em; color: #4a57c9; line-height: 1.7;
+  }
+  .scope-bar.owner { background: #fff6e5; border-color: #f5d79a; color: #8a6113; }
+  .scope-bar .sb-teachers { margin-top: 6px; font-size: 0.95em; }
+  .scope-bar .sb-teachers span { display: inline-block; margin-right: 14px; white-space: nowrap; }
   .stat-box {
     flex: 1; min-width: 130px; background: linear-gradient(135deg,#eef0ff,#f6f2ff);
     border: 2px solid #d5daf8; border-radius: 16px; padding: 14px 16px;
@@ -142,6 +151,9 @@
 
   <!-- ===== 一覧 ===== -->
   <div id="page-list" class="page">
+    <!-- 誰のデータを見ているか。作成者のときは先生ごとの人数も出す -->
+    <div class="scope-bar" id="scope-bar" style="display:none;"></div>
+
     <div class="stat-row">
       <div class="stat-box"><div class="sb-label">登録人数</div><div class="sb-value" id="stat-count">-</div></div>
       <div class="stat-box"><div class="sb-label">単語達成率の平均</div><div class="sb-value" id="stat-rate">-</div></div>
@@ -185,7 +197,7 @@
   </div>
 </div>
 
-<script src="進捗同期.js?v=20261025"></script>
+<script src="進捗同期.js?v=20261025b"></script>
 <script>
 let allStudents = [];
 let sortKey = 'points';
@@ -262,9 +274,39 @@ document.getElementById('btn-reload').addEventListener('click', () => {
 // ================================================================
 //  データ適用
 // ================================================================
+/**
+ * 誰の生徒を見ているかを出す。
+ * 作成者は全先生分が見えてしまうので、どこまで見えているかを明示する。
+ */
+function renderScopeBar(res) {
+  const bar = document.getElementById('scope-bar');
+  const me = res.me || null;
+  if (!me) { bar.style.display = 'none'; return; }
+
+  bar.style.display = 'block';
+  if (res.isOwner) {
+    bar.className = 'scope-bar owner';
+    let html = '<b>作成者として表示しています。すべての先生の生徒が見えています。</b>';
+    const ts = res.teachers || [];
+    if (ts.length) {
+      html += '<div class="sb-teachers">' + ts.map(function (t) {
+        return '<span>' + escapeHtml(t.name) + (t.school ? '（' + escapeHtml(t.school) + '）' : '')
+             + ' ' + t.count + '人</span>';
+      }).join('') + '</div>';
+    }
+    bar.innerHTML = html;
+  } else {
+    bar.className = 'scope-bar';
+    bar.innerHTML = '<b>' + escapeHtml(me.name) + '先生</b>'
+      + (me.school ? '（' + escapeHtml(me.school) + '）' : '')
+      + ' の生徒のみ表示しています。';
+  }
+}
+
 function applyData(res) {
   allStudents = res.students || [];
   if (res.sheetUrl) document.getElementById('link-sheet').href = res.sheetUrl;
+  renderScopeBar(res);
 
   // 絞り込み候補を作る。「○年（学年全体）」を選べば、
   // 生徒側のランキングと同じ範囲・同じ順位で確認できる。

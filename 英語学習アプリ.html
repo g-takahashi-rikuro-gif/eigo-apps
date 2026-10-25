@@ -203,6 +203,7 @@
   .modal-err.show { display: block; }
   .modal-note { font-size: 0.75em; color: #aaa; line-height: 1.6; margin-top: 14px; text-align: center; }
 
+
   @media (max-width: 420px) {
     .category-grid { grid-template-columns: 1fr; }
   }
@@ -313,6 +314,17 @@
     <h2 id="modal-title">はじめに、あなたのことを教えてください</h2>
     <div class="m-sub">先生が学習の進み具合を確認するために使います。<br>一度入力すれば、次回からは入力不要です。</div>
 
+    <div class="field" style="margin-bottom:14px;">
+      <label>学校</label>
+      <select id="in-school"><option value="">選択</option></select>
+    </div>
+
+    <div class="field" style="margin-bottom:14px;">
+      <label>担当の先生</label>
+      <select id="in-teacher"><option value="">先に学校を選んでください</option></select>
+      <div class="modal-note" id="teacher-note" style="margin-top:6px; display:none;"></div>
+    </div>
+
     <div class="field-row">
       <div class="field">
         <label>学年</label>
@@ -359,8 +371,8 @@
   </div>
 </div>
 
-<script src="進捗同期.js?v=20261025"></script>
-<script src="お知らせ.js?v=20261025"></script>
+<script src="進捗同期.js?v=20261025b"></script>
+<script src="お知らせ.js?v=20261025b"></script>
 <script>
 // ================================================================
 //  画面切り替え
@@ -399,12 +411,86 @@ fillSelect(numSelect, 40, '番');
 
 const modal = document.getElementById('profile-modal');
 
+// ---------- 学校と担当の先生 ----------
+//
+// 学校の一覧。学校が増えたらここに足す（GAS側の SCHOOLS と同じ内容にすること）。
+const SCHOOLS = [
+  '東部中学校', '中部中学校', '西部中学校', '坂下中学校', '高蔵寺中学校',
+  '藤山台中学校', '知多中学校', '鷹来中学校', '松原中学校', '高森台中学校',
+  '柏原中学校', '味美中学校', '南城中学校', '石尾台中学校', '岩成台中学校'
+];
+
+// サーバーから取った先生の一覧（[{code, name, school}]）
+let teacherList = [];
+
+function fillSchoolSelect() {
+  const sel = document.getElementById('in-school');
+  sel.innerHTML = '<option value="">選択</option>'
+    + SCHOOLS.map(s => '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>').join('');
+}
+
+/** 選んだ学校の先生だけをプルダウンに出す */
+function fillTeacherSelect(keepCode) {
+  const school = document.getElementById('in-school').value;
+  const sel = document.getElementById('in-teacher');
+  const note = document.getElementById('teacher-note');
+  note.style.display = 'none';
+
+  if (!school) {
+    sel.innerHTML = '<option value="">先に学校を選んでください</option>';
+    return;
+  }
+  const mine = teacherList.filter(t => t.school === school);
+  if (!mine.length) {
+    sel.innerHTML = '<option value="">—</option>';
+    note.style.display = 'block';
+    note.innerHTML = 'この学校の先生はまだ登録されていません。<br>先生に聞いてみてください。';
+    return;
+  }
+  sel.innerHTML = '<option value="">選択</option>'
+    + mine.map(t => '<option value="' + escapeHtml(t.code) + '">'
+        + escapeHtml(t.name) + '先生</option>').join('');
+  if (keepCode && mine.some(t => t.code === keepCode)) sel.value = keepCode;
+}
+
+/**
+ * 登録画面を開いたときに、学校と先生の欄を用意する。
+ *
+ * 選ぶ順番は 学校 → 先生。すでに登録ずみの生徒は、いまの登録内容を選んだ状態で出す。
+ * まだ先生を選んでいない生徒（この機能より前から使っている人）は、
+ * 作成者＝高森台中学校・高橋先生として扱う。
+ */
+function setupSchoolAndTeacher() {
+  fillSchoolSelect();
+  const wanted = ProgressSync.getTeacherCode() || OWNER_FALLBACK_CODE;
+
+  return ProgressSync.fetchTeacherList().then(function (res) {
+    teacherList = (res && res.teachers) || [];
+    const hit = teacherList.filter(t => t.code === wanted)[0];
+    if (hit) document.getElementById('in-school').value = hit.school;
+    fillTeacherSelect(wanted);
+  });
+}
+
+// この機能より前から使っている生徒の既定（高森台中学校・高橋先生）
+const OWNER_FALLBACK_CODE = 'takahashi';
+
+document.getElementById('in-school').addEventListener('change', () => fillTeacherSelect());
+
+// すでに登録ずみなのに先生を選んでいない生徒は、高森台中学校・高橋先生とみなす。
+// この機能ができる前から使っている生徒が対象。サーバー側も ?t= 無しは
+// 作成者の生徒として扱うので、見た目と実際が食い違わない。
+if (ProgressSync.getProfile() && !ProgressSync.getTeacherCode()) {
+  ProgressSync.setTeacherCode(OWNER_FALLBACK_CODE);
+}
+
 function openProfileModal(isEdit) {
   const p = ProgressSync.getProfile();
   document.getElementById('modal-title').textContent =
     isEdit ? '登録内容の変更' : 'はじめに、あなたのことを教えてください';
   document.getElementById('btn-cancel-profile').style.display = isEdit ? 'block' : 'none';
   document.getElementById('modal-err').classList.remove('show');
+  setupSchoolAndTeacher();
 
   if (p) {
     // 「3年1組」の形から学年と組を取り出す
@@ -437,6 +523,19 @@ document.getElementById('btn-save-profile').addEventListener('click', () => {
   const name  = document.getElementById('in-name').value.trim();
   const err   = document.getElementById('modal-err');
 
+  const school  = document.getElementById('in-school').value;
+  const teacher = document.getElementById('in-teacher').value;
+
+  if (!school) {
+    err.textContent = '学校を選んでください。';
+    err.classList.add('show');
+    return;
+  }
+  if (!teacher) {
+    err.textContent = '担当の先生を選んでください。';
+    err.classList.add('show');
+    return;
+  }
   if (!grade) {
     err.textContent = '学年を選んでください。';
     err.classList.add('show');
@@ -464,6 +563,10 @@ document.getElementById('btn-save-profile').addEventListener('click', () => {
     err.classList.add('show');
     return;
   }
+
+  // 先生コードを先に確定させる。生徒IDが「先生コード:クラス-番号」なので、
+  // このあとの引き継ぎの確認より前に決まっていないと、別人の記録を見にいってしまう。
+  ProgressSync.setTeacherCode(teacher);
 
   const fullCls = grade + '年' + cls + '組';
 

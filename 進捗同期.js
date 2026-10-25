@@ -14,6 +14,7 @@
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbxhCBU9aZ5eymIXqsAhtQoUvgaGJwEEt67UAN_ysTeZGGSLc1gXvWP-tSZHvDopKITJmg/exec';
 
   var PROFILE_KEY   = 'student_profile';
+  var TEACHER_KEY   = 'teacher_code';
   var LAST_SYNC_KEY = 'last_sync_payload';
   var VOCAB_KEY     = 'vocab_summary';
   var TYPING_KEY    = 'typing_challenge';
@@ -29,6 +30,49 @@
   }
   function writeJSON(key, val) {
     try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+  }
+
+  // ---------- どの先生のクラスか ----------
+  //
+  // 先生ごとに配るURLを変える。
+  //   .../英語学習アプリ.html?t=yamada
+  // 一度開けばこの端末に覚えるので、以降はふつうのURLでもよい。
+  // ?t= が無く、覚えてもいない生徒は、作成者のクラス扱いになる
+  // （これまでのURLを使っている生徒がそのまま続けられるようにするため）。
+  function getTeacherCode() {
+    try {
+      var m = String(location.search || '').match(/[?&]t=([A-Za-z0-9_-]{1,32})/);
+      if (m) {
+        var code = m[1].toLowerCase();
+        localStorage.setItem(TEACHER_KEY, code);
+        return code;
+      }
+      return localStorage.getItem(TEACHER_KEY) || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /** 先生コードを手で設定し直す（登録画面から使う） */
+  function setTeacherCode(code) {
+    var c = String(code || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    try {
+      if (c) localStorage.setItem(TEACHER_KEY, c);
+      else localStorage.removeItem(TEACHER_KEY);
+    } catch (e) {}
+    return c;
+  }
+
+  /** そのコードが誰のものかをサーバーに聞く（登録画面の確認表示用） */
+  function fetchTeacherInfo(code) {
+    return post({ mode: 'teacher_info', t: code || getTeacherCode() })
+      .catch(function () { return { error: '通信できませんでした' }; });
+  }
+
+  /** 登録画面の「担当の先生」に出す一覧を取る */
+  function fetchTeacherList() {
+    return post({ mode: 'teacher_list' })
+      .catch(function () { return { error: '通信できませんでした', teachers: [] }; });
   }
 
   // ---------- 生徒情報 ----------
@@ -258,7 +302,15 @@
   // GASのウェブアプリはCORSのプリフライトに対応していないため、
   // Content-Typeを指定せず text/plain のまま送る（他のアプリと同じ作法）。
   function post(payloadObj) {
-    return fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payloadObj) })
+    // どのリクエストにも先生コードを付ける。付け忘れると、
+    // ほかの学校の同じクラス・同じ出席番号の生徒と記録が混ざってしまう。
+    var body = {};
+    for (var k in payloadObj) {
+      if (Object.prototype.hasOwnProperty.call(payloadObj, k)) body[k] = payloadObj[k];
+    }
+    if (!body.t) body.t = getTeacherCode();
+
+    return fetch(GAS_URL, { method: 'POST', body: JSON.stringify(body) })
       .then(function (res) { return res.json(); });
   }
 
@@ -331,6 +383,10 @@
 
   window.ProgressSync = {
     GAS_URL: GAS_URL,
+    getTeacherCode: getTeacherCode,
+    setTeacherCode: setTeacherCode,
+    fetchTeacherInfo: fetchTeacherInfo,
+    fetchTeacherList: fetchTeacherList,
     getProfile: getProfile,
     saveProfile: saveProfile,
     clearProfile: clearProfile,
@@ -344,6 +400,11 @@
     fetchTypingRanking: fetchTypingRanking,
     fetchAll: fetchAll
   };
+
+  // URLに ?t= が付いていたら、この時点で端末に覚えておく。
+  // 未登録の生徒は sync() が何も送らないので、送信時まかせにすると
+  // いちばん肝心な「初めて開いたとき」に取りこぼす。
+  getTeacherCode();
 
   // ページを開いたときに自動で同期する（登録済みのときだけ）
   if (document.readyState === 'loading') {
