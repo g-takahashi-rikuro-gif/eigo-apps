@@ -564,11 +564,24 @@ document.getElementById('btn-save-profile').addEventListener('click', () => {
     return;
   }
 
-  // 先生コードを先に確定させる。生徒IDが「先生コード:クラス-番号」なので、
+  const fullCls = grade + '年' + cls + '組';
+
+  // クラスや出席番号を変えようとしているときは、必ず確認する。
+  // この端末の記録がまるごと「変えた先の番号の生徒の記録」として送られるため、
+  // 番号を打ちまちがえると、ほかの人の記録を消してしまう。
+  const before = ProgressSync.getProfile();
+  if (before && (before.cls !== fullCls || Number(before.num) !== num)) {
+    const ok = confirm(
+      '登録を ' + before.cls + ' ' + before.num + '番 から '
+      + fullCls + ' ' + num + '番 に変えようとしています。\n\n'
+      + 'この端末の学習の記録は、すべて ' + fullCls + ' ' + num + '番 の記録として先生に送られます。\n'
+      + '自分の番号で合っているか確認してください。\n\n変更しますか？');
+    if (!ok) return;
+  }
+
+  // 先生コードを確定させる。生徒IDが「先生コード:クラス-番号」なので、
   // このあとの引き継ぎの確認より前に決まっていないと、別人の記録を見にいってしまう。
   ProgressSync.setTeacherCode(teacher);
-
-  const fullCls = grade + '年' + cls + '組';
 
   // この端末に記録が無いのに、サーバーに預かり記録があるときは
   // そのまま始めると前の記録を引きつぎそこねる。先に知らせる。
@@ -594,7 +607,14 @@ function finishProfileSave(fullCls, num, name, code) {
   ProgressSync.saveProfile(fullCls, num, name, code);
   closeProfileModal();
   renderStudentBar();
-  ProgressSync.sync(true);
+  ProgressSync.sync(true).then(function (res) {
+    // サーバーが断ったときは黙って終わらせない。
+    // 別の人の番号で保存しようとした場合などに、本人が気づけるようにする。
+    if (res && res.error) {
+      alert('先生への記録の送信ができませんでした。\n\n' + res.error);
+      openProfileModal(true);
+    }
+  });
 }
 
 // ---------- べつの端末の記録を引きつぐ ----------
