@@ -379,6 +379,35 @@
   </div>
 </div>
 
+<!-- 合言葉がまだ決まっていない生徒に出す画面。
+     合言葉がないと引きつぎ用の記録が作られないため、端末が壊れると
+     学習の記録がまるごと消えてしまう。 -->
+<div class="modal-overlay" id="code-modal">
+  <div class="modal">
+    <h2>合言葉を決めてください</h2>
+    <div class="m-sub">
+      いまのままだと、<b>この端末が壊れたときに学習の記録がすべて消えます。</b><br>
+      合言葉を決めておくと記録が自動で預けられ、新しい端末で続きができます。
+    </div>
+
+    <div class="field" style="margin-bottom:14px;">
+      <label>合言葉（数字4けた）</label>
+      <input type="text" id="in-code2" placeholder="0000" maxlength="8"
+             inputmode="numeric" autocomplete="off">
+      <div class="modal-note" style="margin-top:6px;">
+        たんじょう日など、<b>自分がわすれない数字</b>にしてください。
+      </div>
+    </div>
+
+    <div class="modal-err" id="code-err"></div>
+
+    <button class="btn btn-primary btn-block" id="btn-save-code">これで決める</button>
+    <button class="btn btn-gray btn-block" id="btn-skip-code">あとで</button>
+
+    <div class="modal-note">あとで決めることもできますが、次にひらいたときにまた出ます。</div>
+  </div>
+</div>
+
 <script src="進捗同期.js?v=20261108"></script>
 <script src="お知らせ.js?v=20261108"></script>
 <script>
@@ -795,6 +824,57 @@ renderStudentBar();
 if (!ProgressSync.getProfile()) {
   openProfileModal(false);
 }
+
+// ================================================================
+//  合言葉のうながし
+//
+//  合言葉がないと引きつぎ用の記録が作られない（進捗同期.js の backupSave）。
+//  この機能ができる前から使っている生徒は合言葉が空のままなので、
+//  端末が壊れると学習の記録がまるごと消えてしまう。
+//  アプリを開いたときに決めてもらう。「あとで」も押せるが、次回また出す。
+// ================================================================
+const codeModal = document.getElementById('code-modal');
+
+function needsCode() {
+  const p = ProgressSync.getProfile();
+  return !!(p && !p.code);
+}
+
+/** 他の画面が出ているときは重ねず、閉じるのを待ってから出す */
+function maybePromptCode(tries) {
+  tries = tries || 0;
+  if (!needsCode()) return;
+  if (tries > 40) return;                       // 20秒であきらめる（次に開いたときに出す）
+  const busy = document.querySelector('.modal-overlay.show, .upd-overlay');
+  if (busy) { setTimeout(() => maybePromptCode(tries + 1), 500); return; }
+  document.getElementById('in-code2').value = '';
+  document.getElementById('code-err').classList.remove('show');
+  codeModal.classList.add('show');
+}
+
+document.getElementById('btn-save-code').addEventListener('click', () => {
+  const err = document.getElementById('code-err');
+  const code = (document.getElementById('in-code2').value || '').trim();
+  if (!/^\d{4,8}$/.test(code)) {
+    err.textContent = '合言葉を数字4けたで入れてください。';
+    err.classList.add('show');
+    return;
+  }
+  const p = ProgressSync.getProfile();
+  if (!p) { codeModal.classList.remove('show'); return; }
+  ProgressSync.saveProfile(p.cls, p.num, p.name, code);
+  codeModal.classList.remove('show');
+  // すぐに預けておく。ここで預けないと、次に記録が変わるまで預からない。
+  ProgressSync.sync(true);
+  alert('合言葉を「' + code + '」にしました。\nわすれないようにしてください。\n\nこれで端末が変わっても続きができます。');
+});
+
+document.getElementById('btn-skip-code').addEventListener('click', () => {
+  codeModal.classList.remove('show');
+});
+
+// お知らせが先に出るので、それが閉じてから出す
+setTimeout(() => maybePromptCode(0), 900);
 </script>
 
 </body>
