@@ -222,6 +222,17 @@
     display:inline-block; background:linear-gradient(135deg,#43e97b,#38f9d7); color:#fff;
     border-radius:50px; padding:8px 22px; font-size:1.05em; font-weight:800; margin-bottom:24px;
   }
+  .result-trophy {
+    background:#fff9e6; border:2px solid #ffc107; border-radius:14px;
+    padding:12px 16px; margin:0 0 20px; font-size:0.95em; color:#6d4c00; line-height:1.9;
+  }
+  /* 一覧・メニューに出すトロフィー */
+  .trophy-mark { font-size:1em; letter-spacing:-2px; margin-left:4px; }
+  .trophy-hint {
+    background:#fffbee; border:1.5px dashed #ffc107; border-radius:12px;
+    padding:10px 14px; margin-bottom:14px; font-size:0.82em; color:#6d4c00; line-height:1.7;
+  }
+  .trophy-hint.done { background:#e8fff5; border-color:#43e97b; color:#1a7a45; font-weight:700; }
 
   @media (max-width: 480px) {
     .menu-card .mc-icon, .item-card .ic-icon { font-size:1.6em; width:38px; }
@@ -273,6 +284,7 @@
       <div class="progress-info"><span id="menu-done">クリア 0 / 0問</span><span id="menu-pt">🏅 0 点</span></div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" id="menu-bar" style="width:0%"></div></div>
     </div>
+    <div class="trophy-hint" id="menu-trophy"></div>
     <div class="menu-list" id="menu-list"></div>
     <button class="btn btn-gray btn-block" onclick="showPage('page-explain')">📖 説明をもう一度読む</button>
   </div>
@@ -306,14 +318,15 @@
     <div class="result-main" id="result-main">よくできました！</div>
     <div class="result-score" id="result-score"></div>
     <div class="result-pt" id="result-pt">+0 点</div>
+    <div class="result-trophy" id="result-trophy" style="display:none;"></div>
     <button class="btn btn-orange btn-block" id="btn-retry-wrong" onclick="retryWrong()" style="display:none;">❌ まちがえた問題だけやり直す</button>
     <button class="btn btn-primary btn-block" onclick="showPage('page-menu')">メニューにもどる</button>
     <button class="btn btn-gray btn-block" onclick="retryQuiz()">ぜんぶもう一度やる</button>
   </div>
 </div>
 
-<script src="進捗同期.js?v=20261107b"></script>
-<script src="お知らせ.js?v=20261107b"></script>
+<script src="進捗同期.js?v=20261108"></script>
+<script src="お知らせ.js?v=20261108"></script>
 <script>
 /**
  * 文法学習の問題データ（中学3年）
@@ -1532,10 +1545,43 @@ function clearedMax(it) { return it.sentences.length * MODE_ORDER.length; }
 /**
  * 項目の累計ポイント。
  * 正解するたびに加算し、上限は設けない（同じ問題を解き直しても増える）。
+ * トロフィーのぶん（1回きり）もここに含める。
  */
 function itemPoints(it) {
   const p = loadRecord(it.id).pts || {};
-  return MODE_ORDER.reduce((s, k) => s + (Number(p[k]) || 0), 0);
+  return Object.keys(p).reduce((s, k) => s + (Number(p[k]) || 0), 0);
+}
+
+// ================================================================
+//  トロフィー
+//
+//  銀 … やさしい3つのモードを全問クリア
+//  金 … 5つのモードすべてを全問クリア
+//  どちらも1回きりのボーナス。取ったあとは減らない。
+// ================================================================
+const SILVER_MODES = ['choice', 'sort', 'find'];
+const TROPHY_PT = { silver: 5, gold: 10 };
+
+function allCleared(it, modes) {
+  return modes.every(k => clearedCount(it.id, k) === it.sentences.length);
+}
+function hasTrophy(it, kind) { return loadRecord(it.id)[kind] === true; }
+
+/** 条件を満たしていれば渡す。新しく取れたトロフィーの名前を返す。 */
+function checkTrophies(it) {
+  const got = [];
+  [['silver', SILVER_MODES], ['gold', MODE_ORDER]].forEach(([kind, modes]) => {
+    if (hasTrophy(it, kind) || !allCleared(it, modes)) return;
+    const rec = loadRecord(it.id);
+    rec[kind] = true;
+    saveRecord(it.id, rec);
+    addPoints(it.id, 'trophy_' + kind, TROPHY_PT[kind]);
+    got.push(kind);
+  });
+  return got;
+}
+function trophyMark(it) {
+  return (hasTrophy(it, 'gold') ? '🥇' : '') + (hasTrophy(it, 'silver') ? '🥈' : '');
 }
 function addPoints(id, modeKey, n) {
   const rec = loadRecord(id);
@@ -1550,11 +1596,13 @@ function addPoints(id, modeKey, n) {
  * 先生用ダッシュボードはこの要約だけを読めばよい。
  */
 function saveGrammarSummary() {
-  const sum = { points: 0, cleared: 0, total: 0, items: ITEMS.length };
+  const sum = { points: 0, cleared: 0, total: 0, items: ITEMS.length, silver: 0, gold: 0 };
   ITEMS.forEach(it => {
     sum.points  += itemPoints(it);
     sum.cleared += clearedTotal(it);
     sum.total   += clearedMax(it);
+    if (hasTrophy(it, 'silver')) sum.silver++;
+    if (hasTrophy(it, 'gold'))   sum.gold++;
   });
   try { localStorage.setItem('grammar_summary_g' + GRADE, JSON.stringify(sum)); } catch (e) {}
   if (window.ProgressSync) window.ProgressSync.sync(false);
@@ -1603,7 +1651,8 @@ function renderItems() {
     return '<button class="item-card" onclick="openItem(' + i + ')">'
       + '<div class="ic-icon">' + it.icon + '</div>'
       + '<div class="ic-body">'
-      +   '<div class="ic-title">' + it.title + '</div>'
+      +   '<div class="ic-title">' + it.title
+      +     '<span class="trophy-mark">' + trophyMark(it) + '</span></div>'
       +   '<div class="ic-sub">' + it.sub + '</div>'
       +   '<div class="ic-bar-bg"><div class="ic-bar" style="width:' + (done / max * 100) + '%"></div></div>'
       + '</div>'
@@ -1652,6 +1701,19 @@ function renderMenu() {
       + '<div class="mc-pt">1問 ' + m.pt + '点</div>'
       + '</div>';
   }).join('');
+  // あと何をすればトロフィーかを出す
+  const tg = document.getElementById('menu-trophy');
+  if (hasTrophy(item, 'gold')) {
+    tg.className = 'trophy-hint done';
+    tg.innerHTML = '🥇🥈 トロフィーをぜんぶ集めました！';
+  } else if (hasTrophy(item, 'silver')) {
+    tg.className = 'trophy-hint';
+    tg.innerHTML = '🥈 獲得ずみ　／　🥇 <b>のこり2つのモード</b>も全問クリアすると金（+10点）';
+  } else {
+    tg.className = 'trophy-hint';
+    tg.innerHTML = '🥈 <b>上の3つのモード</b>を全問クリアすると銀（+5点）　／　🥇 5つ全部で金（+10点）';
+  }
+
   const done = clearedTotal(item), max = clearedMax(item);
   document.getElementById('menu-done').textContent = 'クリア ' + done + ' / ' + max + '問';
   document.getElementById('menu-pt').textContent = '🏅 ' + itemPoints(item) + ' 点';
@@ -1663,6 +1725,7 @@ function renderMenu() {
 // ================================================================
 let mode = null, order = [], qIndex = 0, correctCount = 0, answered = false;
 let sortPicked = [], wrongList = [];
+let newTrophies = [];    // この回で新しく取れたトロフィー
 
 function shuffle(a) {
   const b = a.slice();
@@ -1681,7 +1744,7 @@ function shuffle(a) {
 function startQuiz(modeKey, only) {
   mode = MODES[modeKey];
   order = shuffle(only && only.length ? only : SENTENCES.map((_, i) => i));
-  qIndex = 0; correctCount = 0; wrongList = [];
+  qIndex = 0; correctCount = 0; wrongList = []; newTrophies = [];
   document.getElementById('quiz-title').textContent =
     mode.title + ((only && only.length) ? '（にがて）' : '');
   document.getElementById('quiz-badge').textContent = mode.badge;
@@ -1888,6 +1951,7 @@ function finishQuestion(ok, correctText, why) {
     saveRecord(item.id, rec);
     addPoints(item.id, mode.key, mode.pt); // ポイントは正解するたびに加算（上限なし）
     markWeak(item.id, mode.key, order[qIndex], false);   // にがてを卒業
+    newTrophies = newTrophies.concat(checkTrophies(item));
   } else {
     if (wrongList.indexOf(order[qIndex]) < 0) wrongList.push(order[qIndex]);
     markWeak(item.id, mode.key, order[qIndex], true);
@@ -1933,7 +1997,18 @@ function showResult() {
     pct === 100 ? 'ぜんぶ正解！' : (pct >= 70 ? 'よくできました！' : 'もう一度ちょうせん！');
   document.getElementById('result-score').textContent =
     mode.title + '　' + correctCount + ' / ' + order.length + '問 正解（' + pct + '%）';
-  document.getElementById('result-pt').textContent = '+' + (correctCount * mode.pt) + ' 点';
+  const 名 = { silver: '🥈 銀トロフィー', gold: '🥇 金トロフィー' };
+  const bonus = newTrophies.reduce((s, k) => s + TROPHY_PT[k], 0);
+  document.getElementById('result-pt').textContent = '+' + (correctCount * mode.pt + bonus) + ' 点';
+
+  const tb = document.getElementById('result-trophy');
+  if (newTrophies.length) {
+    tb.style.display = 'block';
+    tb.innerHTML = newTrophies.map(k =>
+      '<div>' + 名[k] + ' を手に入れた！　<b>+' + TROPHY_PT[k] + '点</b></div>').join('');
+  } else {
+    tb.style.display = 'none';
+  }
 
   const btn = document.getElementById('btn-retry-wrong');
   if (wrongList.length) {
@@ -1961,6 +2036,11 @@ document.addEventListener('keydown', function (e) {
   if (answered) nextQuestion();
   else if (mode && mode.key !== 'choice' && mode.key !== 'find') checkAnswer();
 });
+
+// トロフィーが始まる前にクリアしていた項目にも、あとからトロフィーを付ける
+(function awardPastTrophies() {
+  try { ITEMS.forEach(it => checkTrophies(it)); } catch (e) {}
+})();
 
 renderItems();
 saveGrammarSummary();   // 開いた時点の状態も先生に送る（登録済みのときだけ送られる）
