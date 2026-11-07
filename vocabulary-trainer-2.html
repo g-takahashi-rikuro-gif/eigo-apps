@@ -1438,8 +1438,17 @@ function migrateToStreak() {
 // quizProgress/typingProgress/sentenceProgress/silverTrophyEarned globals,
 // which only reflect whichever Unit is currently selected) so this can
 // summarize every Unit at once regardless of which one the student is on.
-function computeUnitStats(u) {
-  let qzp = {}, typ = {}, stp = {};
+// その単語辞書に記録されている「正解した回数」の合計。
+// 習得数とちがって、同じ単語を何度正解しても増えていく。
+// ポイントを「やったぶんだけ加算」にするために使う。
+function sumCorrect(dict, wordList) {
+  return wordList.reduce(function (n, w) {
+    var v = dict[w.en];
+    return n + ((v && typeof v === 'object') ? (Number(v.correct) || 0) : 0);
+  }, 0);
+}
+
+function computeUnitStats(u) {  let qzp = {}, typ = {}, stp = {};
   try { qzp = JSON.parse(localStorage.getItem(lsFor(u.id, 'qzp'))) || {}; } catch(e) {}
   try { typ = JSON.parse(localStorage.getItem(lsFor(u.id, 'typ'))) || {}; } catch(e) {}
   try { stp = JSON.parse(localStorage.getItem(lsFor(u.id, 'stp'))) || {}; } catch(e) {}
@@ -1452,6 +1461,7 @@ function computeUnitStats(u) {
     qzMastered, qzTotal: u.words.length,
     tyMastered, tyTotal: typingWords.length,
     stMastered, stTotal: sentenceWords.length,
+    correctTotal: sumCorrect(qzp, u.words) + sumCorrect(typ, typingWords) + sumCorrect(stp, sentenceWords),
     silver: localStorage.getItem(lsFor(u.id, 'trophy_silver')) === '1',
     gold: localStorage.getItem(lsFor(u.id, 'trophy_gold')) === '1',
     bossCleared: localStorage.getItem(lsFor(u.id, 'boss_cleared')) === '1',
@@ -1468,11 +1478,12 @@ function saveVocabSummary() {
       a.qzMastered += s.qzMastered; a.qzTotal += s.qzTotal;
       a.tyMastered += s.tyMastered; a.tyTotal += s.tyTotal;
       a.stMastered += s.stMastered; a.stTotal += s.stTotal;
+      a.correctTotal += s.correctTotal;
       if (s.silver) a.silver++;
       if (s.gold) a.gold++;
       if (s.bossCleared) a.boss++;
       return a;
-    }, { qzMastered:0, qzTotal:0, tyMastered:0, tyTotal:0, stMastered:0, stTotal:0, silver:0, gold:0, boss:0 });
+    }, { qzMastered:0, qzTotal:0, tyMastered:0, tyTotal:0, stMastered:0, stTotal:0, correctTotal:0, silver:0, gold:0, boss:0 });
     agg.unitCount = realUnits().length;
     localStorage.setItem('vocab_summary_g2', JSON.stringify(agg));
   } catch(e) {}
@@ -3279,8 +3290,8 @@ function notif(msg, type='ok') {
 init();
 </script>
 <!-- 進捗をサーバーへ送るための共通モジュール（生徒登録が済んでいる場合のみ働く） -->
-<script src="進捗同期.js?v=20261026"></script>
-<script src="お知らせ.js?v=20261026"></script>
+<script src="進捗同期.js?v=20261107b"></script>
+<script src="お知らせ.js?v=20261107b"></script>
 <script>
   // 上のモジュールが読み込まれた時点で、すでに作られている要約を送信する
   if (window.ProgressSync) window.ProgressSync.sync(false);

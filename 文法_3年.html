@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文法学習 3年</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    display: flex; justify-content: center; align-items: flex-start;
+  }
+  .app {
+    background: #fff; border-radius: 24px; width: 100%; max-width: 680px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.35); overflow: hidden;
+  }
+  .app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white; padding: 16px 24px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  }
+  .app-header .hd-title { font-size: 1.05em; font-weight: 800; letter-spacing: 0.3px; }
+  .app-header .hd-sub { font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+  .hd-home-link {
+    color: #fff; text-decoration: none; font-size: 0.75em; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 50px; padding: 6px 14px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .hd-home-link:hover { background: rgba(255,255,255,0.32); }
+
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== ボタン ===== */
+  .btn {
+    display: inline-block; padding: 13px 28px; border-radius: 50px; border: none;
+    font-size: 0.95em; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-green   { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .btn-orange  { background: linear-gradient(135deg,#f7971e,#ffd200); color:#fff; }
+  .btn-gray    { background: #f0f0f0; color:#555; }
+  .btn-block   { display:block; width:100%; margin-bottom:10px; text-align:center; }
+
+  /* ===== 項目えらび ===== */
+  .page-title  { font-size:1.2em; font-weight:800; color:#333; margin-bottom:6px; }
+  .page-sub    { font-size:0.88em; color:#888; margin-bottom:20px; }
+  .item-list   { display:flex; flex-direction:column; gap:12px; }
+  .item-card {
+    display:flex; align-items:center; gap:14px; width:100%; text-align:left;
+    border:2.5px solid #e8e8e8; border-radius:16px; padding:14px 16px;
+    cursor:pointer; transition:all 0.18s; background:#fff; font-family:inherit;
+  }
+  .item-card:hover { border-color:#5B6CF5; background:#f8f9ff; transform:translateY(-2px); box-shadow:0 6px 20px rgba(91,108,245,0.15); }
+  .item-card .ic-icon { font-size:1.9em; flex-shrink:0; width:50px; text-align:center; }
+  .item-card .ic-body { flex:1; min-width:0; }
+  .item-card .ic-title { font-weight:800; color:#333; font-size:1em; }
+  .item-card .ic-sub   { font-size:0.78em; color:#888; margin-top:2px; }
+  .item-card .ic-bar-bg { background:#eee; border-radius:10px; height:6px; margin-top:8px; overflow:hidden; }
+  .item-card .ic-bar    { background:linear-gradient(90deg,#667eea,#764ba2); height:100%; border-radius:10px; }
+  .item-card .ic-pt { flex-shrink:0; text-align:right; white-space:nowrap; }
+  .item-card .ic-pt-num { font-size:0.95em; font-weight:800; color:#5B6CF5; }
+  .item-card .ic-pt-sub { font-size:0.72em; color:#aaa; margin-top:2px; }
+
+  /* ===== 文法の説明 ===== */
+  .grammar-section { background:#f8f9ff; border-radius:16px; padding:18px 20px; margin-bottom:16px; }
+  .grammar-section h3 { font-size:1em; font-weight:800; color:#5B6CF5; margin-bottom:12px; }
+  .g-lead { font-size:0.9em; color:#555; line-height:1.9; margin-bottom:12px; }
+  .formula-box {
+    background:#5B6CF5; color:#fff; border-radius:12px; padding:13px 18px;
+    font-size:0.98em; font-weight:700; text-align:center; margin-bottom:12px; line-height:1.8;
+  }
+  .formula-box span { opacity:0.75; font-weight:400; font-size:0.85em; }
+  .example-row { background:#fff; border-left:4px solid #43e97b; border-radius:8px; padding:10px 14px; margin-bottom:8px; }
+  .example-row.bad { border-left-color:#ff416c; }
+  .example-row .en { font-weight:700; color:#333; font-size:0.95em; }
+  .example-row .en em { color:#5B6CF5; font-style:normal; }
+  .example-row .en .x { color:#ff416c; }
+  .example-row .ja { color:#777; font-size:0.83em; margin-top:3px; }
+  .kw-table { width:100%; border-collapse:collapse; font-size:0.88em; margin-top:8px; }
+  .kw-table th { background:#5B6CF5; color:#fff; padding:7px 12px; text-align:left; }
+  .kw-table td { padding:7px 12px; border-bottom:1px solid #eee; background:#fff; }
+  .kw-table tr:last-child td { border-bottom:none; }
+  .kw { background:#fff3cd; border-radius:4px; padding:2px 7px; font-weight:700; color:#856404; }
+  .notice { background:#fff9c4; border:1px solid #ffe082; border-radius:10px; padding:10px 14px; font-size:0.85em; color:#6d4c00; margin-top:12px; line-height:1.7; }
+  .notice strong { color:#5B6CF5; }
+
+  /* ===== 練習メニュー ===== */
+  .menu-list  { display:flex; flex-direction:column; gap:12px; margin-bottom:14px; }
+  .menu-card {
+    display:flex; align-items:center; gap:14px;
+    border:2.5px solid #e8e8e8; border-radius:16px; padding:14px 16px;
+    cursor:pointer; transition:all 0.18s; background:#fff; text-align:left; width:100%;
+  }
+  .menu-card:hover { border-color:#5B6CF5; background:#f8f9ff; transform:translateY(-2px); box-shadow:0 6px 20px rgba(91,108,245,0.15); }
+  .menu-card .mc-icon { font-size:1.9em; flex-shrink:0; width:50px; text-align:center; }
+  .menu-card .mc-body { flex:1; }
+  .menu-card .mc-title { font-weight:800; color:#333; font-size:0.97em; }
+  .menu-card .mc-desc  { font-size:0.78em; color:#888; margin-top:2px; }
+  .menu-card .mc-pt {
+    flex-shrink:0; font-size:0.72em; font-weight:800; color:#5B6CF5;
+    background:#eef0ff; border-radius:50px; padding:3px 10px; white-space:nowrap;
+  }
+  .mc-achievement {
+    display:inline-block; margin-top:6px; padding:2px 11px; border-radius:20px;
+    font-size:0.76em; font-weight:800; background:#f0f0f0; color:#bbb;
+  }
+  .mc-achievement.low    { background:#fff0f3; color:#e05; }
+  .mc-achievement.mid    { background:#fff9c4; color:#856404; }
+  .mc-achievement.high   { background:#e8fff5; color:#1a7a45; }
+  .mc-achievement.perfect{ background:linear-gradient(135deg,#43e97b,#38f9d7); color:#fff; }
+  .mc-weak {
+    display:inline-block; margin-top:6px; margin-left:6px; padding:3px 12px;
+    border:none; border-radius:20px; cursor:pointer;
+    font-size:0.76em; font-weight:800; font-family:inherit;
+    background:linear-gradient(135deg,#f7971e,#ffd200); color:#fff;
+  }
+  .mc-weak:hover { filter:brightness(1.07); }
+
+  /* ===== 進み具合 ===== */
+  .progress-area { margin-bottom:18px; }
+  .progress-info { display:flex; justify-content:space-between; font-size:0.8em; color:#888; margin-bottom:6px; }
+  .progress-bar-bg { background:#e8e8e8; border-radius:10px; height:7px; overflow:hidden; }
+  .progress-bar-fill { background:linear-gradient(90deg,#667eea,#764ba2); height:100%; border-radius:10px; transition:width 0.4s ease; }
+
+  /* ===== 問題画面 ===== */
+  .quiz-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .back-btn { background:none; border:none; font-size:1.4em; cursor:pointer; color:#bbb; padding:2px; line-height:1; }
+  .back-btn:hover { color:#5B6CF5; }
+  .quiz-header-title { font-size:1em; font-weight:800; color:#333; }
+  .quiz-type-badge { margin-left:auto; background:#f0f2ff; color:#5B6CF5; font-size:0.75em; font-weight:700; padding:4px 10px; border-radius:20px; }
+
+  .q-card { background:#f8f9ff; border-radius:16px; padding:18px 20px; margin-bottom:16px; }
+  .q-label { font-size:0.75em; font-weight:700; color:#5B6CF5; letter-spacing:1px; margin-bottom:6px; }
+  .q-text  { font-size:1.05em; font-weight:700; color:#333; line-height:1.8; }
+  .q-ja    { font-size:0.85em; color:#888; margin-top:6px; }
+  .q-sub   { font-size:0.84em; color:#666; margin-top:8px; line-height:1.7; }
+  .q-blank { color:#5B6CF5; font-weight:900; }
+
+  /* 並べ替え */
+  .sort-area-label { font-size:0.78em; color:#888; margin-bottom:5px; }
+  .answer-area { display:flex; flex-wrap:wrap; gap:7px; padding:14px; background:#fff9e6; border-radius:12px; border:2px dashed #ffc107; min-height:54px; margin-bottom:10px; }
+  .word-bank   { display:flex; flex-wrap:wrap; gap:7px; padding:14px; background:#fff; border-radius:12px; border:2px dashed #ddd; min-height:54px; margin-bottom:14px; }
+  .word-chip {
+    background:#5B6CF5; color:#fff; border:none; border-radius:20px; padding:7px 14px;
+    font-size:0.9em; font-weight:700; cursor:pointer; transition:all 0.12s; user-select:none; font-family:inherit;
+  }
+  .word-chip:hover:not(:disabled) { background:#4a5bd4; transform:scale(1.05); }
+  .word-chip.in-answer { background:#f7971e; }
+  .word-chip:disabled { cursor:not-allowed; }
+
+  /* まちがいさがしは、文をそのまま読ませる */
+  .find-sentence {
+    background:#fff; border:2px dashed #ddd; border-radius:12px;
+    padding:18px 20px; margin-bottom:14px;
+    font-size:1.2em; font-weight:700; color:#333; line-height:2.2;
+  }
+  .find-word {
+    display:inline; border:none; background:none; padding:3px 4px;
+    font:inherit; color:inherit; cursor:pointer;
+    border-radius:6px; border-bottom:2px dotted #c9cffa;
+  }
+  .find-word:hover:not(:disabled) { background:#eef0ff; border-bottom-color:#5B6CF5; }
+  .find-word:disabled { cursor:default; }
+  .find-word.is-answer { background:#d9f8e8; color:#1a7a45; border-bottom:2px solid #43e97b; }
+  .find-word.is-bad    { background:#ffe3e9; color:#c0392b; border-bottom:2px solid #ff416c; }
+
+  /* 選択 */
+  .choice-list { display:grid; gap:9px; margin-bottom:14px; }
+  .choice-btn {
+    display:block; width:100%; padding:13px 16px; background:#fff; border:2px solid #ddd;
+    border-radius:12px; text-align:left; font-size:0.95em; font-weight:600; cursor:pointer;
+    transition:all 0.12s; color:#333; font-family:inherit;
+  }
+  .choice-btn:hover:not(:disabled) { border-color:#5B6CF5; background:#f0f2ff; }
+  .choice-btn.correct { border-color:#43e97b!important; background:#e8fff5!important; color:#1a7a45!important; }
+  .choice-btn.wrong   { border-color:#ff416c!important; background:#fff0f3!important; color:#c0392b!important; }
+  .choice-mark { float:right; font-size:1.1em; }
+
+  /* 入力 */
+  .ans-input {
+    width:100%; padding:13px 15px; border:2px solid #ddd; border-radius:12px;
+    font-size:1em; font-family:inherit; margin-bottom:12px;
+  }
+  .ans-input:focus { outline:none; border-color:#5B6CF5; }
+  .blank-input {
+    border:none; border-bottom:2.5px solid #5B6CF5; background:#f8f9ff;
+    font-size:1em; font-family:inherit; font-weight:700; color:#5B6CF5;
+    width:110px; text-align:center; padding:3px 4px; margin:0 3px;
+  }
+  .blank-input:focus { outline:none; background:#eef0ff; }
+  .tmpl-line { font-size:1.05em; font-weight:700; color:#333; line-height:2.4; margin-bottom:14px; }
+
+  /* フィードバック */
+  .feedback { border-radius:12px; padding:12px 16px; margin-bottom:14px; font-weight:700; font-size:0.92em; line-height:1.6; display:none; }
+  .feedback.correct { background:#e8fff5; color:#1a7a45; border-left:4px solid #43e97b; display:block; }
+  .feedback.wrong   { background:#fff0f3; color:#c0392b; border-left:4px solid #ff416c; display:block; }
+  .feedback .fb-ans { display:block; margin-top:6px; color:#333; font-weight:800; }
+  .feedback .fb-why { display:block; margin-top:6px; color:#555; font-weight:400; font-size:0.95em; }
+
+  .hint-box { background:#fffbee; border:1.5px dashed #ffc107; border-radius:12px; padding:11px 14px; font-size:0.87em; color:#6d4c00; margin-bottom:12px; display:none; }
+  .hint-box.visible { display:block; }
+
+  .btn-row { display:flex; gap:10px; align-items:center; }
+  .btn-row .spacer { flex:1; }
+
+  /* 結果 */
+  #page-result { text-align:center; padding-top:30px; }
+  .result-icon { font-size:4.5em; margin-bottom:10px; }
+  .result-main { font-size:1.5em; font-weight:900; color:#5B6CF5; margin-bottom:6px; }
+  .result-score { font-size:0.95em; color:#888; margin-bottom:8px; }
+  .result-pt {
+    display:inline-block; background:linear-gradient(135deg,#43e97b,#38f9d7); color:#fff;
+    border-radius:50px; padding:8px 22px; font-size:1.05em; font-weight:800; margin-bottom:24px;
+  }
+
+  @media (max-width: 480px) {
+    .menu-card .mc-icon, .item-card .ic-icon { font-size:1.6em; width:38px; }
+    .blank-input { width:90px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="hd-title" id="hd-title">📘 文法学習</div>
+      <div class="hd-sub" id="hd-sub">中学3年</div>
+    </div>
+    <a class="hd-home-link" href="英語学習アプリ.html">🏠 トップ</a>
+  </div>
+
+  <!-- ===== 項目えらび ===== -->
+  <div id="page-items" class="page active">
+    <div class="page-title">文法学習　3年</div>
+    <div class="page-sub">学習したい文法を選んでください。</div>
+    <div class="notice" id="storage-warn" style="display:none; margin:0 0 16px;">
+      ⚠ <strong>この開き方では記録が保存されません。</strong><br>
+      画面を閉じると「クリア」や「にがて」が消えます。
+      ファイルを保存してから Edge や Chrome で開きなおしてください。
+    </div>
+    <div class="item-list" id="item-list"></div>
+  </div>
+
+  <!-- ===== 文法の説明 ===== -->
+  <div id="page-explain" class="page">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="showPage('page-items')">←</button>
+      <div class="quiz-header-title" id="explain-title">説明</div>
+    </div>
+    <div id="explain-body"></div>
+    <button class="btn btn-primary btn-block" onclick="showPage('page-menu')">練習をはじめる →</button>
+  </div>
+
+  <!-- ===== 練習メニュー ===== -->
+  <div id="page-menu" class="page">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="showPage('page-items')">←</button>
+      <div class="quiz-header-title" id="menu-title">練習メニュー</div>
+    </div>
+    <div class="page-sub">やりたい練習を選んでね！　下にいくほど難しくなります。</div>
+    <div class="progress-area">
+      <div class="progress-info"><span id="menu-done">クリア 0 / 0問</span><span id="menu-pt">🏅 0 点</span></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="menu-bar" style="width:0%"></div></div>
+    </div>
+    <div class="menu-list" id="menu-list"></div>
+    <button class="btn btn-gray btn-block" onclick="showPage('page-explain')">📖 説明をもう一度読む</button>
+  </div>
+
+  <!-- ===== 問題 ===== -->
+  <div id="page-quiz" class="page">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="confirmBack()">←</button>
+      <div class="quiz-header-title" id="quiz-title">練習</div>
+      <div class="quiz-type-badge" id="quiz-badge">MODE</div>
+    </div>
+    <div class="progress-area">
+      <div class="progress-info"><span id="quiz-count">問題 1 / 12</span><span id="quiz-score">正解 0</span></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-bar" style="width:0%"></div></div>
+    </div>
+    <div id="quiz-body"></div>
+    <div class="hint-box" id="hint-box"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="btn btn-gray" id="btn-hint" onclick="toggleHint()">💡 ヒント</button>
+      <div class="spacer"></div>
+      <button class="btn btn-gray" id="btn-reset" onclick="resetAnswer()" style="display:none;">リセット</button>
+      <button class="btn btn-primary" id="btn-check" onclick="checkAnswer()">答え合わせ</button>
+      <button class="btn btn-green" id="btn-next" onclick="nextQuestion()" style="display:none;">次へ →</button>
+    </div>
+  </div>
+
+  <!-- ===== 結果 ===== -->
+  <div id="page-result" class="page">
+    <div class="result-icon" id="result-icon">🎉</div>
+    <div class="result-main" id="result-main">よくできました！</div>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-pt" id="result-pt">+0 点</div>
+    <button class="btn btn-orange btn-block" id="btn-retry-wrong" onclick="retryWrong()" style="display:none;">❌ まちがえた問題だけやり直す</button>
+    <button class="btn btn-primary btn-block" onclick="showPage('page-menu')">メニューにもどる</button>
+    <button class="btn btn-gray btn-block" onclick="retryQuiz()">ぜんぶもう一度やる</button>
+  </div>
+</div>
+
+<script src="進捗同期.js?v=20261107b"></script>
+<script src="お知らせ.js?v=20261107b"></script>
+<script>
+/**
+ * 文法学習の問題データ（中学3年）
+ *
+ * 文法_3年.html から読み込む。アプリ本体には手を入れずに、
+ * ここに項目を足していけば練習が増える。
+ *
+ * ===== 1つの文につける情報 =====
+ *   en      … 正しい英文（語順ならべかえ・日本語⇒英語で使う）
+ *   ja      … 日本語訳
+ *   accept  … 日本語⇒英語で、ほかにも正解としてよい言い方
+ *   choice  … ①形をえらぶ　{ text（(　)が空所）, options, answer, why }
+ *   find    … ③まちがいさがし { wrong, bad（まちがった語）, correct, why }
+ *   change  … ④文をかえる   { task, from, tmpl（___が空所）, answers, why }
+ *
+ * ②語順ならべかえ と ⑤日本語⇒英語 は en と ja から自動で作る。
+ */
+const G3_GRAMMAR = [
+
+// ================================================================
+//  1. 現在完了（経験）
+// ================================================================
+{
+  id: 'g3_keiken',
+  icon: '🗺️',
+  title: '現在完了（経験）',
+  sub: 'have / has ＋ 過去分詞 ― 「〜したことがある」',
+  intro: `
+    <div class="grammar-section">
+      <h3>🗺️ 「〜したことがある」の言い方</h3>
+      <p class="g-lead">いままでの経験を言うときは <b>have ＋ 過去分詞</b> を使います。
+      主語が he / she / my brother などのときは <b>has</b> になります。</p>
+      <div class="formula-box">主語 ＋ have / has ＋ 過去分詞 <span>〜したことがある</span></div>
+      <div class="example-row">
+        <div class="en">I <em>have watched</em> the game many times.</div>
+        <div class="ja">私はその試合を何度も見たことがあります。</div>
+      </div>
+      <div class="example-row">
+        <div class="en">Eddy <em>has</em> never <em>watched</em> a sumo match.</div>
+        <div class="ja">エディは相撲の試合を一度も見たことがありません。</div>
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>📌 いっしょによく使うことば</h3>
+      <table class="kw-table">
+        <tr><th>ことば</th><th>意味</th><th>置く場所</th></tr>
+        <tr><td><span class="kw">ever</span></td><td>今までに</td><td>疑問文で have のうしろ</td></tr>
+        <tr><td><span class="kw">never</span></td><td>一度も〜ない</td><td>have と過去分詞の間</td></tr>
+        <tr><td><span class="kw">once / twice</span></td><td>1回／2回</td><td>文の終わり</td></tr>
+        <tr><td><span class="kw">many times</span></td><td>何度も</td><td>文の終わり</td></tr>
+        <tr><td><span class="kw">before</span></td><td>以前に</td><td>文の終わり</td></tr>
+      </table>
+    </div>
+    <div class="grammar-section">
+      <h3>⚠️ 気をつけること</h3>
+      <div class="example-row bad">
+        <div class="en">✗ I have visited the museum <b class="x">yesterday</b>.</div>
+        <div class="ja">yesterday や last week など<b>過去の一時点</b>とはいっしょに使えません。</div>
+      </div>
+      <div class="example-row bad">
+        <div class="en">✗ Have you ever <b class="x">gone</b> to Kyoto?</div>
+        <div class="ja">have gone to は「行ってしまって今いない」。経験は <b>have been to</b>。</div>
+      </div>
+    </div>`,
+  sentences: [
+    { en:'I have watched the game many times.', ja:'私はその試合を何度も見たことがあります。', accept:[],
+      choice:{ text:'I (　) watched the game many times.', options:['have','has','am','was'], answer:0,
+               why:'主語が I なので have。' },
+      find:{ wrong:'I has watched the game many times.', bad:'has', correct:'have',
+             why:'has を使うのは he / she などのとき。I には have。' },
+      change:{ task:'never を使って「一度も見たことがない」という文に', from:'I have watched the game many times.',
+               tmpl:'I have ___ ___ the game.', answers:['never','watched'],
+               why:'never は have と過去分詞の間に入れる。' } },
+
+    { en:'Eddy has never watched a sumo match.', ja:'エディは相撲の試合を一度も見たことがありません。', accept:[],
+      choice:{ text:'Eddy (　) never watched a sumo match.', options:['has','have','is','did'], answer:0,
+               why:'Eddy は3人称単数なので has。' },
+      find:{ wrong:'Eddy have never watched a sumo match.', bad:'have', correct:'has',
+             why:'主語が Eddy（3人称単数）なので has。' },
+      change:{ task:'ever を使って「今までに見たことがありますか」とたずねる文に', from:'Eddy has never watched a sumo match.',
+               tmpl:'Has Eddy ___ ___ a sumo match?', answers:['ever','watched'],
+               why:'たずねる文では never のかわりに ever を使う。' } },
+
+    { en:'Have you ever been to Kyoto?', ja:'あなたは京都に行ったことがありますか。', accept:[],
+      choice:{ text:'Have you ever (　) to Kyoto?', options:['been','gone','go','went'], answer:0,
+               why:'「行ったことがある」は have been to。' },
+      find:{ wrong:'Have you ever gone to Kyoto?', bad:'gone', correct:'been',
+             why:'have gone to は「行ってしまって今ここにいない」。経験は have been to。' },
+      change:{ task:'「一度も行ったことがない」と答える文に', from:'Have you ever been to Kyoto?',
+               tmpl:'I have ___ ___ to Kyoto.', answers:['never','been'],
+               why:'ever を never に変えて答える。' } },
+
+    { en:'I have visited the museum twice.', ja:'私はその博物館に2回行ったことがあります。', accept:[],
+      choice:{ text:'I have visited the museum (　).', options:['twice','two','second','twin'], answer:0,
+               why:'「2回」は twice。1回は once。' },
+      find:{ wrong:'I have visited the museum yesterday.', bad:'yesterday', correct:'（いらない）',
+             why:'現在完了は yesterday など過去の一時点とはいっしょに使えない。' },
+      change:{ task:'never を使って「一度も行ったことがない」という文に', from:'I have visited the museum twice.',
+               tmpl:'I have ___ ___ the museum.', answers:['never','visited'],
+               why:'回数を表すことばは消して、never を入れる。' } },
+
+    { en:'She has read the book before.', ja:'彼女はその本を前に読んだことがあります。', accept:[],
+      choice:{ text:'She has (　) the book before.', options:['read','reads','reading','readed'], answer:0,
+               why:'read の過去分詞は read。形は同じで、発音は「レッド」。' },
+      find:{ wrong:'She has readed the book before.', bad:'readed', correct:'read',
+             why:'read は read - read - read。readed という形はない。' },
+      change:{ task:'ever を使ってたずねる文に', from:'She has read the book before.',
+               tmpl:'Has she ___ ___ the book?', answers:['ever','read'],
+               why:'before は消して、ever を入れる。' } },
+
+    { en:'My brother has never eaten natto.', ja:'私の兄は納豆を食べたことが一度もありません。', accept:[],
+      choice:{ text:'My brother has never (　) natto.', options:['eaten','ate','eat','eating'], answer:0,
+               why:'have / has のあとは過去分詞。eat - ate - eaten。' },
+      find:{ wrong:'My brother has never ate natto.', bad:'ate', correct:'eaten',
+             why:'ate は過去形。has のあとは過去分詞 eaten。' },
+      change:{ task:'ever を使ってたずねる文に', from:'My brother has never eaten natto.',
+               tmpl:'Has your brother ___ ___ natto?', answers:['ever','eaten'],
+               why:'never を ever に変える。' } },
+
+    { en:'Have you ever seen a koala?', ja:'あなたはコアラを見たことがありますか。', accept:[],
+      choice:{ text:'Have you (　) seen a koala?', options:['ever','never','already','yet'], answer:0,
+               why:'「今までに〜したことがありますか」は ever。' },
+      find:{ wrong:'Did you ever seen a koala?', bad:'Did', correct:'Have',
+             why:'過去分詞 seen を使うので、文のはじめは Have。' },
+      change:{ task:'「一度も見たことがない」と答える文に', from:'Have you ever seen a koala?',
+               tmpl:'I have ___ ___ a koala.', answers:['never','seen'],
+               why:'ever を never に変えて答える。' } },
+
+    { en:'We have met his family once.', ja:'私たちは彼の家族に一度会ったことがあります。', accept:[],
+      choice:{ text:'We have (　) his family once.', options:['met','meet','meeting','meted'], answer:0,
+               why:'meet - met - met。have のあとは過去分詞 met。' },
+      find:{ wrong:'We have meet his family once.', bad:'meet', correct:'met',
+             why:'have のあとは過去分詞。meet ではなく met。' },
+      change:{ task:'never を使った文に', from:'We have met his family once.',
+               tmpl:'We have ___ ___ his family.', answers:['never','met'],
+               why:'once は消して never を入れる。' } },
+
+    { en:'I have never played the guitar.', ja:'私はギターを弾いたことが一度もありません。', accept:[],
+      choice:{ text:'I have (　) played the guitar.', options:['never','ever','yet','just'], answer:0,
+               why:'「一度も〜ない」は never。' },
+      find:{ wrong:'I have not never played the guitar.', bad:'not', correct:'（いらない）',
+             why:'never だけで「一度もない」を表す。not といっしょには使わない。' },
+      change:{ task:'ever を使ってたずねる文に', from:'I have never played the guitar.',
+               tmpl:'Have you ___ ___ the guitar?', answers:['ever','played'],
+               why:'never を ever に変えてたずねる。' } },
+
+    { en:'Has he ever climbed Mt. Fuji?', ja:'彼は富士山に登ったことがありますか。', accept:[],
+      choice:{ text:'(　) he ever climbed Mt. Fuji?', options:['Has','Have','Does','Did'], answer:0,
+               why:'主語が he なので Has。' },
+      find:{ wrong:'Have he ever climbed Mt. Fuji?', bad:'Have', correct:'Has',
+             why:'主語が he（3人称単数）なので Has。' },
+      change:{ task:'「一度も登ったことがない」と答える文に', from:'Has he ever climbed Mt. Fuji?',
+               tmpl:'He has ___ ___ Mt. Fuji.', answers:['never','climbed'],
+               why:'ever を never に変えて答える。' } },
+
+    { en:'My sister has heard that song many times.', ja:'私の姉はその歌を何度も聞いたことがあります。', accept:[],
+      choice:{ text:'My sister has (　) that song many times.', options:['heard','hear','hearing','heared'], answer:0,
+               why:'hear - heard - heard。have / has のあとは過去分詞。' },
+      find:{ wrong:'My sister have heard that song many times.', bad:'have', correct:'has',
+             why:'My sister は3人称単数なので has。' },
+      change:{ task:'ever を使ってたずねる文に', from:'My sister has heard that song many times.',
+               tmpl:'Has your sister ___ ___ that song?', answers:['ever','heard'],
+               why:'many times は消して ever を入れる。' } },
+
+    { en:'Have they ever tried Japanese food?', ja:'彼らは日本の食べ物を食べてみたことがありますか。', accept:[],
+      choice:{ text:'Have they ever (　) Japanese food?', options:['tried','try','trying','tryed'], answer:0,
+               why:'try の過去分詞は tried。y を i に変えて ed。' },
+      find:{ wrong:'Have they ever try Japanese food?', bad:'try', correct:'tried',
+             why:'Have のあとは過去分詞 tried。' },
+      change:{ task:'「一度も食べてみたことがない」と答える文に', from:'Have they ever tried Japanese food?',
+               tmpl:'They have ___ ___ Japanese food.', answers:['never','tried'],
+               why:'ever を never に変えて答える。' } }
+  ]
+},
+
+// ================================================================
+//  2. 「〜を…にする」「〜に…をあげる」（SVOC・SVOO）
+// ================================================================
+{
+  id: 'g3_svoc',
+  icon: '😊',
+  title: '「〜を…にする」「〜に…をあげる」',
+  sub: 'make / call ＋ 人 ＋ 状態　／　give / show ＋ 人 ＋ もの',
+  intro: `
+    <div class="grammar-section">
+      <h3>😊 「〜を…にする」（動詞 ＋ 人 ＋ 状態）</h3>
+      <p class="g-lead">make / call / name は、うしろに<b>「だれを」＋「どんな状態か」</b>を続けます。
+      状態を表すのは<b>形容詞</b>（happy, sad）か<b>名前</b>（Ken, Momo）です。</p>
+      <div class="formula-box">make ＋ 人 ＋ <b>形容詞</b> <span>〜を…にする</span></div>
+      <div class="example-row">
+        <div class="en">This song makes <em>me happy</em>.</div>
+        <div class="ja">この歌は<b>私を幸せに</b>します。</div>
+      </div>
+      <div class="example-row">
+        <div class="en">We call <em>him Ken</em>.</div>
+        <div class="ja">私たちは<b>彼をケンと</b>呼びます。</div>
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>🎁 「〜に…をあげる」（動詞 ＋ 人 ＋ もの）</h3>
+      <div class="formula-box">give / show / teach / tell ＋ <b>人</b> ＋ <b>もの</b></div>
+      <div class="example-row">
+        <div class="en">My father gave <em>me a watch</em>.</div>
+        <div class="ja">父は<b>私に腕時計を</b>くれました。</div>
+      </div>
+      <div class="notice">
+        順番を入れかえるときは <strong>to</strong> がいります。<br>
+        My father gave <b>me a watch</b>. ＝ My father gave <b>a watch to me</b>.
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>📌 「〜ということを」は that</h3>
+      <div class="example-row">
+        <div class="en">The story shows me <em>that friends are important</em>.</div>
+        <div class="ja">その話は、<b>友達が大切だということを</b>私に教えてくれます。</div>
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>⚠️ よくあるまちがい</h3>
+      <div class="example-row bad">
+        <div class="en">✗ This song makes me <b class="x">happily</b>.</div>
+        <div class="ja">状態を表すのは形容詞。happily（副詞）ではなく <b>happy</b>。</div>
+      </div>
+      <div class="example-row bad">
+        <div class="en">✗ My father gave <b class="x">to</b> me a watch.</div>
+        <div class="ja">「人 ＋ もの」の順のときは to はいりません。</div>
+      </div>
+    </div>`,
+  sentences: [
+    { en:'This song makes me happy.', ja:'この歌は私を幸せにします。', accept:[],
+      choice:{ text:'This song makes me (　).', options:['happy','happily','happiness','to happy'], answer:0,
+               why:'状態を表すのは形容詞 happy。' },
+      find:{ wrong:'This song makes me happily.', bad:'happily', correct:'happy',
+             why:'happily は副詞。「どんな状態か」は形容詞で表す。' },
+      change:{ task:'「〜を…にする」の形で言いかえよう', from:'I am happy when I hear this song.',
+               tmpl:'This song ___ ___ happy.', answers:['makes','me'],
+               why:'「この歌が私を幸せにする」と考える。' } },
+
+    { en:'We call him Ken.', ja:'私たちは彼をケンと呼びます。', accept:[],
+      choice:{ text:'We call (　) Ken.', options:['him','he','his','himself'], answer:0,
+               why:'動詞のうしろなので he ではなく him。' },
+      find:{ wrong:'We call he Ken.', bad:'he', correct:'him',
+             why:'動詞のうしろに来る「彼を」は him。' },
+      change:{ task:'「〜を…と呼ぶ」の形に', from:'His name is Ken.',
+               tmpl:'We ___ ___ Ken.', answers:['call','him'],
+               why:'call ＋ 人 ＋ 名前 の順。' } },
+
+    { en:'The news made us sad.', ja:'その知らせは私たちを悲しくさせました。', accept:[],
+      choice:{ text:'The news (　) us sad.', options:['made','make','makes','making'], answer:0,
+               why:'「させました」なので過去形 made。' },
+      find:{ wrong:'The news made us sadly.', bad:'sadly', correct:'sad',
+             why:'状態を表すのは形容詞 sad。' },
+      change:{ task:'「〜を…にする」の形で言いかえよう', from:'We were sad because of the news.',
+               tmpl:'The news ___ ___ sad.', answers:['made','us'],
+               why:'「その知らせが私たちを悲しくさせた」と考える。' } },
+
+    { en:'My parents named the dog Momo.', ja:'両親はその犬をモモと名づけました。', accept:[],
+      choice:{ text:'My parents (　) the dog Momo.', options:['named','name','names','naming'], answer:0,
+               why:'過去のことなので named。' },
+      find:{ wrong:'My parents named the dog to Momo.', bad:'to', correct:'（いらない）',
+             why:'name ＋ 人やもの ＋ 名前 の順。to はいらない。' },
+      change:{ task:'「〜を…と名づけた」の形に', from:"The dog's name is Momo.\nMy parents chose it.",
+               tmpl:'My parents ___ the dog ___.', answers:['named','Momo'],
+               why:'name ＋ もの ＋ 名前 の順。' } },
+
+    { en:'The story shows me that friends are important.', ja:'その話は、友達が大切だということを私に教えてくれます。', accept:[],
+      choice:{ text:'The story shows (　) that friends are important.', options:['me','my','I','mine'], answer:0,
+               why:'「私に」は me。' },
+      find:{ wrong:'The story shows to me that friends are important.', bad:'to', correct:'（いらない）',
+             why:'show ＋ 人 ＋ 内容 の順のときは to はいらない。' },
+      change:{ task:'that を使って1つの文にまとめよう', from:'The story shows me something.\nFriends are important.',
+               tmpl:'The story shows me ___ friends ___ important.', answers:['that','are'],
+               why:'「〜ということを」は that でつなぐ。' } },
+
+    { en:'She told me that she was tired.', ja:'彼女は疲れていると私に言いました。', accept:[],
+      choice:{ text:'She told me (　) she was tired.', options:['that','what','which','who'], answer:0,
+               why:'「〜ということを」は that。' },
+      find:{ wrong:'She told me that she is tired.', bad:'is', correct:'was',
+             why:'言ったのは過去なので、うしろの文も過去形にそろえる。' },
+      change:{ task:'that を使って1つの文にまとめよう', from:'She told me something.\nShe was tired.',
+               tmpl:'She told me ___ she ___ tired.', answers:['that','was'],
+               why:'told が過去なので was にそろえる。' } },
+
+    { en:'Mr. Sato teaches us English.', ja:'佐藤先生は私たちに英語を教えます。', accept:[],
+      choice:{ text:'Mr. Sato teaches (　) English.', options:['us','we','our','ours'], answer:0,
+               why:'「私たちに」は us。' },
+      find:{ wrong:'Mr. Sato teaches we English.', bad:'we', correct:'us',
+             why:'動詞のうしろに来る「私たちに」は us。' },
+      change:{ task:'to を使った形に言いかえよう', from:'Mr. Sato teaches us English.',
+               tmpl:'Mr. Sato teaches English ___ ___.', answers:['to','us'],
+               why:'「もの ＋ 人」の順にすると to がいる。' } },
+
+    { en:'My father gave me a watch.', ja:'父は私に腕時計をくれました。', accept:[],
+      choice:{ text:'My father gave (　) a watch.', options:['me','my','I','mine'], answer:0,
+               why:'「私に」は me。' },
+      find:{ wrong:'My father gave to me a watch.', bad:'to', correct:'（いらない）',
+             why:'「人 ＋ もの」の順のときは to はいらない。' },
+      change:{ task:'to を使った形に言いかえよう', from:'My father gave me a watch.',
+               tmpl:'My father gave a watch ___ ___.', answers:['to','me'],
+               why:'「もの ＋ 人」の順にすると to がいる。' } },
+
+    { en:'The movie made him famous.', ja:'その映画は彼を有名にしました。', accept:[],
+      choice:{ text:'The movie made him (　).', options:['famous','fame','famously','to famous'], answer:0,
+               why:'状態を表すのは形容詞 famous。' },
+      find:{ wrong:'The movie made him famously.', bad:'famously', correct:'famous',
+             why:'famously は副詞。ここは形容詞 famous。' },
+      change:{ task:'「〜を…にする」の形で言いかえよう', from:'He became famous because of the movie.',
+               tmpl:'The movie ___ ___ famous.', answers:['made','him'],
+               why:'「その映画が彼を有名にした」と考える。' } },
+
+    { en:'Please call me Taro.', ja:'私をタロウと呼んでください。', accept:[],
+      choice:{ text:'Please (　) me Taro.', options:['call','calls','called','calling'], answer:0,
+               why:'お願いする文なので動詞の原形。' },
+      find:{ wrong:'Please calls me Taro.', bad:'calls', correct:'call',
+             why:'Please で始まるお願いの文は、動詞の原形。' },
+      change:{ task:'「〜と呼んでください」の形に', from:'My name is Taro.',
+               tmpl:'Please ___ ___ Taro.', answers:['call','me'],
+               why:'call ＋ 人 ＋ 名前 の順。' } },
+
+    { en:'I will show you my pictures.', ja:'あなたに私の写真を見せます。', accept:[],
+      choice:{ text:'I will show (　) my pictures.', options:['you','your','yours','yourself'], answer:0,
+               why:'「あなたに」は you。' },
+      find:{ wrong:'I will show your my pictures.', bad:'your', correct:'you',
+             why:'your は「あなたの」。ここは「あなたに」なので you。' },
+      change:{ task:'to を使った形に言いかえよう', from:'I will show you my pictures.',
+               tmpl:'I will show my pictures ___ ___.', answers:['to','you'],
+               why:'「もの ＋ 人」の順にすると to がいる。' } },
+
+    { en:'The present made my sister happy.', ja:'そのプレゼントは妹を喜ばせました。', accept:[],
+      choice:{ text:'The present made my sister (　).', options:['happy','happily','happiness','to happy'], answer:0,
+               why:'状態を表すのは形容詞 happy。' },
+      find:{ wrong:'The present make my sister happy.', bad:'make', correct:'made',
+             why:'過去のことなので made。' },
+      change:{ task:'「〜を…にする」の形で言いかえよう', from:'My sister was happy to get the present.',
+               tmpl:'The present ___ my sister ___.', answers:['made','happy'],
+               why:'「プレゼントが妹を喜ばせた」と考える。' } }
+  ]
+},
+
+// ================================================================
+//  3. 現在完了（完了・継続）・現在完了進行形
+// ================================================================
+{
+  id: 'g3_kanryo',
+  icon: '⏳',
+  title: '現在完了（完了・継続）',
+  sub: 'just / already / yet ／ for / since ／ have been 〜ing',
+  intro: `
+    <div class="grammar-section">
+      <h3>✅ 「もう〜した」（完了）</h3>
+      <div class="formula-box">have / has ＋ <b>just / already</b> ＋ 過去分詞</div>
+      <div class="example-row">
+        <div class="en">I have <em>just</em> finished my homework.</div>
+        <div class="ja">私は<b>ちょうど</b>宿題を終えたところです。</div>
+      </div>
+      <table class="kw-table">
+        <tr><th>ことば</th><th>使う文</th><th>置く場所</th></tr>
+        <tr><td><span class="kw">just</span></td><td>ふつうの文</td><td>have のうしろ</td></tr>
+        <tr><td><span class="kw">already</span></td><td>ふつうの文</td><td>have のうしろ</td></tr>
+        <tr><td><span class="kw">yet</span></td><td>疑問文「もう」<br>否定文「まだ」</td><td>文の終わり</td></tr>
+      </table>
+    </div>
+    <div class="grammar-section">
+      <h3>⏳ 「ずっと〜している」（継続）</h3>
+      <div class="formula-box">have / has ＋ 過去分詞 ＋ <b>for</b> / <b>since</b></div>
+      <div class="example-row">
+        <div class="en">I have lived in this town <em>for ten years</em>.</div>
+        <div class="ja">私は<b>10年間</b>この町に住んでいます。</div>
+      </div>
+      <div class="example-row">
+        <div class="en">We have known each other <em>since 2020</em>.</div>
+        <div class="ja">私たちは<b>2020年から</b>お互いを知っています。</div>
+      </div>
+      <div class="notice">
+        <strong>for</strong> は「どれくらいの間」（for ten years）、
+        <strong>since</strong> は「いつから」（since 2020）。
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>🔁 「ずっと〜し続けている」（現在完了進行形）</h3>
+      <div class="formula-box">have / has ＋ <b>been</b> ＋ 動詞の〜ing形</div>
+      <div class="example-row">
+        <div class="en">I have <em>been reading</em> this book for two hours.</div>
+        <div class="ja">私は2時間この本を<b>読み続けて</b>います。</div>
+      </div>
+      <div class="notice">
+        live や know のように「ずっと続く」意味の動詞は、進行形にしないのがふつうです。
+      </div>
+    </div>`,
+  sentences: [
+    { en:'I have just finished my homework.', ja:'私はちょうど宿題を終えたところです。', accept:[],
+      choice:{ text:'I have (　) finished my homework.', options:['just','yet','ever','since'], answer:0,
+               why:'「ちょうど〜したところ」は just。have のうしろに置く。' },
+      find:{ wrong:'I have just finish my homework.', bad:'finish', correct:'finished',
+             why:'have のあとは過去分詞 finished。' },
+      change:{ task:'just を使って「ちょうど終えたところ」という文に', from:'I finished my homework.',
+               tmpl:'I have ___ ___ my homework.', answers:['just','finished'],
+               why:'just は have と過去分詞の間。' } },
+
+    { en:'Have you finished your lunch yet?', ja:'あなたはもう昼食を終えましたか。', accept:[],
+      choice:{ text:'Have you finished your lunch (　)?', options:['yet','just','already','since'], answer:0,
+               why:'疑問文の「もう」は yet。文の終わりに置く。' },
+      find:{ wrong:'Did you finish your lunch yet?', bad:'Did', correct:'Have',
+             why:'yet といっしょに使う現在完了なので Have。' },
+      change:{ task:'yet を使ってたずねる文に', from:'You finished your lunch.',
+               tmpl:'___ you ___ your lunch yet?', answers:['Have','finished'],
+               why:'Have ＋ 主語 ＋ 過去分詞 ＋ yet? の順。' } },
+
+    { en:'She has already read the book.', ja:'彼女はもうその本を読んでしまいました。', accept:[],
+      choice:{ text:'She has (　) read the book.', options:['already','yet','ever','for'], answer:0,
+               why:'ふつうの文の「もう」は already。' },
+      find:{ wrong:'She has already readed the book.', bad:'readed', correct:'read',
+             why:'read の過去分詞は read。readed という形はない。' },
+      change:{ task:'already を使った文に', from:'She read the book.',
+               tmpl:'She has ___ ___ the book.', answers:['already','read'],
+               why:'already は has と過去分詞の間。' } },
+
+    { en:'I have lived in this town for ten years.', ja:'私は10年間この町に住んでいます。', accept:[],
+      choice:{ text:'I have lived in this town (　) ten years.', options:['for','since','from','in'], answer:0,
+               why:'「10年間」は期間の長さなので for。' },
+      find:{ wrong:'I have lived in this town since ten years.', bad:'since', correct:'for',
+             why:'「10年間」は期間なので for。since は「いつから」。' },
+      change:{ task:'ずっと住んでいる、という文に', from:'I came to this town ten years ago.\nI still live here.',
+               tmpl:'I have ___ in this town ___ ten years.', answers:['lived','for'],
+               why:'期間の長さなので for。' } },
+
+    { en:'How long have you lived here?', ja:'あなたはどのくらいここに住んでいますか。', accept:[],
+      choice:{ text:'How (　) have you lived here?', options:['long','many','much','often'], answer:0,
+               why:'期間をたずねるのは How long。' },
+      find:{ wrong:'How long have you live here?', bad:'live', correct:'lived',
+             why:'have のあとは過去分詞 lived。' },
+      change:{ task:'どのくらいの期間かをたずねる文に', from:'You have lived here.',
+               tmpl:'___ ___ have you lived here?', answers:['How','long'],
+               why:'期間をたずねるときは How long を文の最初に置く。' } },
+
+    { en:'We have known each other since 2020.', ja:'私たちは2020年からお互いを知っています。', accept:[],
+      choice:{ text:'We have known each other (　) 2020.', options:['since','for','from','at'], answer:0,
+               why:'「2020年から」は始まりの時点なので since。' },
+      find:{ wrong:'We have known each other for 2020.', bad:'for', correct:'since',
+             why:'「2020年から」は時点なので since。' },
+      change:{ task:'since を使った文に', from:'We became friends in 2020.\nWe are still friends.',
+               tmpl:'We have known each other ___ ___.', answers:['since','2020'],
+               why:'始まりの時点なので since。' } },
+
+    { en:'I have been reading this book for two hours.', ja:'私は2時間この本を読み続けています。', accept:[],
+      choice:{ text:'I have (　) reading this book for two hours.', options:['been','be','being','was'], answer:0,
+               why:'現在完了進行形は have been ＋ 〜ing。' },
+      find:{ wrong:'I have been read this book for two hours.', bad:'read', correct:'reading',
+             why:'been のあとは 〜ing の形。' },
+      change:{ task:'ずっと読み続けている、という文に', from:'I started reading this book two hours ago.',
+               tmpl:'I have ___ ___ this book for two hours.', answers:['been','reading'],
+               why:'have been ＋ 〜ing。' } },
+
+    { en:'It has been raining since this morning.', ja:'今朝からずっと雨が降っています。', accept:[],
+      choice:{ text:'It has been (　) since this morning.', options:['raining','rain','rained','rains'], answer:0,
+               why:'been のあとは 〜ing。' },
+      find:{ wrong:'It has been raining from this morning.', bad:'from', correct:'since',
+             why:'「今朝から」は始まりの時点なので since。' },
+      change:{ task:'ずっと降り続いている、という文に', from:'It started raining this morning.',
+               tmpl:'It has ___ ___ since this morning.', answers:['been','raining'],
+               why:'have / has been ＋ 〜ing。' } },
+
+    { en:'He has not finished his work yet.', ja:'彼はまだ仕事を終えていません。', accept:["He hasn't finished his work yet."],
+      choice:{ text:'He has not finished his work (　).', options:['yet','already','just','since'], answer:0,
+               why:'否定文の「まだ」は yet。文の終わりに置く。' },
+      find:{ wrong:'He has not finished his work already.', bad:'already', correct:'yet',
+             why:'否定文では already ではなく yet。' },
+      change:{ task:'yet を使って「まだ終えていない」という文に', from:'He has finished his work.',
+               tmpl:'He has ___ finished his work ___.', answers:['not','yet'],
+               why:'has のうしろに not、文の終わりに yet。' } },
+
+    { en:'My sister has been studying English for five years.', ja:'姉は5年間英語を勉強し続けています。', accept:[],
+      choice:{ text:'My sister has been (　) English for five years.', options:['studying','study','studied','studies'], answer:0,
+               why:'been のあとは 〜ing。' },
+      find:{ wrong:'My sister has been study English for five years.', bad:'study', correct:'studying',
+             why:'been のあとは studying。' },
+      change:{ task:'ずっと勉強し続けている、という文に', from:'My sister started studying English five years ago.',
+               tmpl:'My sister has ___ ___ English for five years.', answers:['been','studying'],
+               why:'has been ＋ 〜ing。' } },
+
+    { en:'I have known him since we were children.', ja:'私は子どものころから彼を知っています。', accept:[],
+      choice:{ text:'I have known him (　) we were children.', options:['since','for','when','while'], answer:0,
+               why:'うしろが文のときも「〜のときから」は since。' },
+      find:{ wrong:'I have known him for we were children.', bad:'for', correct:'since',
+             why:'「子どものころから」は始まりを表すので since。' },
+      change:{ task:'since を使った文に', from:'I knew him when we were children.\nI still know him.',
+               tmpl:'I have ___ him ___ we were children.', answers:['known','since'],
+               why:'know の過去分詞は known。始まりなので since。' } },
+
+    { en:'They have been playing soccer for an hour.', ja:'彼らは1時間サッカーをし続けています。', accept:[],
+      choice:{ text:'They have been playing soccer (　) an hour.', options:['for','since','from','during'], answer:0,
+               why:'「1時間」は期間なので for。' },
+      find:{ wrong:'They have been played soccer for an hour.', bad:'played', correct:'playing',
+             why:'been のあとは 〜ing。' },
+      change:{ task:'ずっとし続けている、という文に', from:'They started playing soccer an hour ago.',
+               tmpl:'They have ___ ___ soccer for an hour.', answers:['been','playing'],
+               why:'have been ＋ 〜ing。' } }
+  ]
+},
+
+// ================================================================
+//  4. いろいろな不定詞
+// ================================================================
+{
+  id: 'g3_futeishi',
+  icon: '🎯',
+  title: 'いろいろな不定詞',
+  sub: 'It is … to ～ ／ want 人 to ～ ／ let・help 人 ～',
+  intro: `
+    <div class="grammar-section">
+      <h3>🎯 「〜することは…だ」</h3>
+      <p class="g-lead">「〜すること」が主語になると長くなるので、<b>It</b> を先に置いて、
+      あとから <b>to ＋ 動詞</b> で中身を言います。</p>
+      <div class="formula-box">It is ＋ 形容詞 ＋ <b>for 人</b> ＋ <b>to ＋ 動詞</b></div>
+      <div class="example-row">
+        <div class="en"><em>It</em> is important <em>for us to understand</em> each other.</div>
+        <div class="ja"><b>私たちがお互いを理解することは</b>大切です。</div>
+      </div>
+      <div class="notice">「だれにとって」を言うときは <strong>for</strong>。of ではありません。</div>
+    </div>
+    <div class="grammar-section">
+      <h3>🙏 「人に〜してほしい・〜するように言う」</h3>
+      <div class="formula-box">want / tell / ask ＋ <b>人</b> ＋ <b>to ＋ 動詞</b></div>
+      <div class="example-row">
+        <div class="en">I want <em>everyone to know</em> the truth.</div>
+        <div class="ja"><b>みんなに真実を知って</b>ほしいです。</div>
+      </div>
+      <div class="example-row">
+        <div class="en">My mother told <em>me to clean</em> my room.</div>
+        <div class="ja">母は<b>私に部屋をそうじするように</b>言いました。</div>
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>🤝 to のつかない形（let ・ help）</h3>
+      <div class="formula-box">let / help ＋ 人 ＋ <b>動詞の原形</b> <span>to はつけない</span></div>
+      <div class="example-row">
+        <div class="en"><em>Let us tell</em> you about our town.</div>
+        <div class="ja">私たちの町について<b>お話しさせて</b>ください。</div>
+      </div>
+      <div class="example-row">
+        <div class="en">People <em>helped sea otters live</em> safely.</div>
+        <div class="ja">人々は<b>ラッコが安全に暮らすのを</b>助けました。</div>
+      </div>
+      <div class="notice">
+        want / tell / ask は <strong>to がいる</strong>、let / help は <strong>to がいらない</strong>。
+        ここが分かれ目です。
+      </div>
+    </div>`,
+  sentences: [
+    { en:'It is important for us to understand each other.', ja:'私たちがお互いを理解することは大切です。', accept:[],
+      choice:{ text:'It is important for us (　) each other.', options:['to understand','understand','understanding','understood'], answer:0,
+               why:'It is … for 人 to ～ の形。' },
+      find:{ wrong:'It is important of us to understand each other.', bad:'of', correct:'for',
+             why:'「〜にとって」は for。' },
+      change:{ task:'It で始まる文に言いかえよう', from:'Understanding each other is important for us.',
+               tmpl:'___ is important for us ___ understand each other.', answers:['It','to'],
+               why:'長い主語を It にして、中身を to ～ で後ろに回す。' } },
+
+    { en:'I want everyone to know the truth.', ja:'みんなに真実を知ってほしいです。', accept:[],
+      choice:{ text:'I want everyone (　) the truth.', options:['to know','know','knowing','known'], answer:0,
+               why:'want ＋ 人 ＋ to ＋ 動詞。' },
+      find:{ wrong:'I want everyone know the truth.', bad:'know', correct:'to know',
+             why:'want のときは to がいる。' },
+      change:{ task:'want を使って「〜してほしい」という文に', from:'I hope everyone knows the truth.',
+               tmpl:'I want everyone ___ ___ the truth.', answers:['to','know'],
+               why:'want ＋ 人 ＋ to ＋ 動詞の原形。' } },
+
+    { en:'Let us tell you about our town.', ja:'私たちの町についてお話しさせてください。', accept:["Let's tell you about our town."],
+      choice:{ text:'Let us (　) you about our town.', options:['tell','to tell','telling','told'], answer:0,
+               why:'let のあとは to のつかない動詞の原形。' },
+      find:{ wrong:'Let us to tell you about our town.', bad:'to', correct:'（いらない）',
+             why:'let のあとに to はつけない。' },
+      change:{ task:'Let us を使って「〜させてください」という文に', from:'We will tell you about our town.',
+               tmpl:'___ us ___ you about our town.', answers:['Let','tell'],
+               why:'Let ＋ 人 ＋ 動詞の原形。' } },
+
+    { en:'People helped sea otters live safely.', ja:'人々はラッコが安全に暮らすのを助けました。', accept:['People helped sea otters to live safely.'],
+      choice:{ text:'People helped sea otters (　) safely.', options:['live','living','lived','lives'], answer:0,
+               why:'help ＋ 人 ＋ 動詞の原形。' },
+      find:{ wrong:'People helped sea otters lived safely.', bad:'lived', correct:'live',
+             why:'help のあとは動詞の原形 live。' },
+      change:{ task:'help を使って「〜するのを助けた」という文に', from:'Sea otters could live safely because of people.',
+               tmpl:'People ___ sea otters ___ safely.', answers:['helped','live'],
+               why:'help ＋ 人 ＋ 動詞の原形。' } },
+
+    { en:'It is difficult for me to get up early.', ja:'私にとって早起きすることは難しいです。', accept:[],
+      choice:{ text:'It is difficult (　) me to get up early.', options:['for','to','of','with'], answer:0,
+               why:'「〜にとって」は for。' },
+      find:{ wrong:'It is difficult for me getting up early.', bad:'getting', correct:'to get',
+             why:'It is … for 人 to ～ の形。〜ing ではなく to ＋ 動詞。' },
+      change:{ task:'It で始まる文に言いかえよう', from:'Getting up early is difficult for me.',
+               tmpl:'___ is difficult ___ me to get up early.', answers:['It','for'],
+               why:'It を先に置き、「だれにとって」は for で表す。' } },
+
+    { en:'My mother told me to clean my room.', ja:'母は私に部屋をそうじするように言いました。', accept:[],
+      choice:{ text:'My mother told me (　) my room.', options:['to clean','clean','cleaning','cleaned'], answer:0,
+               why:'tell ＋ 人 ＋ to ＋ 動詞。' },
+      find:{ wrong:'My mother told me clean my room.', bad:'clean', correct:'to clean',
+             why:'tell のときは to がいる。' },
+      change:{ task:'tell を使って「〜するように言った」という文に', from:'My mother said, "Clean your room."',
+               tmpl:'My mother ___ me ___ clean my room.', answers:['told','to'],
+               why:'tell ＋ 人 ＋ to ＋ 動詞の原形。' } },
+
+    { en:'It is fun to play soccer with friends.', ja:'友達とサッカーをすることは楽しいです。', accept:[],
+      choice:{ text:'It is fun (　) soccer with friends.', options:['to play','play','played','plays'], answer:0,
+               why:'It is … to ～ の形。' },
+      find:{ wrong:'It is fun to playing soccer with friends.', bad:'playing', correct:'play',
+             why:'to のあとは動詞の原形。' },
+      change:{ task:'It で始まる文に言いかえよう', from:'Playing soccer with friends is fun.',
+               tmpl:'___ is ___ to play soccer with friends.', answers:['It','fun'],
+               why:'長い主語を It にして、中身を to ～ で後ろに回す。' } },
+
+    { en:'She asked me to help her.', ja:'彼女は私に手伝ってくれるように頼みました。', accept:[],
+      choice:{ text:'She asked me (　) her.', options:['to help','help','helping','helped'], answer:0,
+               why:'ask ＋ 人 ＋ to ＋ 動詞。' },
+      find:{ wrong:'She asked me helping her.', bad:'helping', correct:'to help',
+             why:'ask のときは to ＋ 動詞の原形。' },
+      change:{ task:'ask を使って「〜するように頼んだ」という文に', from:'She said, "Please help me."',
+               tmpl:'She ___ me ___ help her.', answers:['asked','to'],
+               why:'ask ＋ 人 ＋ to ＋ 動詞の原形。' } },
+
+    { en:'My father let me use his computer.', ja:'父は私に彼のパソコンを使わせてくれました。', accept:[],
+      choice:{ text:'My father let me (　) his computer.', options:['use','to use','using','used'], answer:0,
+               why:'let のあとは to のつかない動詞の原形。' },
+      find:{ wrong:'My father let me to use his computer.', bad:'to', correct:'（いらない）',
+             why:'let のあとに to はつけない。' },
+      change:{ task:'let を使って「〜させてくれた」という文に', from:'My father allowed me to use his computer.',
+               tmpl:'My father ___ me ___ his computer.', answers:['let','use'],
+               why:'let ＋ 人 ＋ 動詞の原形。let は過去形も let。' } },
+
+    { en:'It is necessary for students to read books.', ja:'生徒が本を読むことは必要です。', accept:[],
+      choice:{ text:'It is necessary (　) students to read books.', options:['for','to','of','with'], answer:0,
+               why:'「〜にとって」は for。' },
+      find:{ wrong:'It is necessary of students to read books.', bad:'of', correct:'for',
+             why:'「〜にとって」は for。' },
+      change:{ task:'It で始まる文に言いかえよう', from:'Reading books is necessary for students.',
+               tmpl:'___ is necessary ___ students to read books.', answers:['It','for'],
+               why:'It を先に置き、「だれにとって」は for。' } },
+
+    { en:'The teacher helped us finish the work.', ja:'先生は私たちが作業を終えるのを助けてくれました。', accept:['The teacher helped us to finish the work.'],
+      choice:{ text:'The teacher helped us (　) the work.', options:['finish','finishing','finished','finishes'], answer:0,
+               why:'help ＋ 人 ＋ 動詞の原形。' },
+      find:{ wrong:'The teacher helped us to finished the work.', bad:'finished', correct:'finish',
+             why:'to のあとも動詞の原形 finish。' },
+      change:{ task:'help を使って「〜するのを助けた」という文に', from:"We finished the work with the teacher's help.",
+               tmpl:'The teacher ___ us ___ the work.', answers:['helped','finish'],
+               why:'help ＋ 人 ＋ 動詞の原形。' } },
+
+    { en:'I want you to come to my party.', ja:'あなたにパーティーに来てほしいです。', accept:[],
+      choice:{ text:'I want you (　) to my party.', options:['to come','come','coming','came'], answer:0,
+               why:'want ＋ 人 ＋ to ＋ 動詞。' },
+      find:{ wrong:'I want you come to my party.', bad:'come', correct:'to come',
+             why:'want のときは to がいる。' },
+      change:{ task:'want を使って「〜してほしい」という文に', from:'Please come to my party.',
+               tmpl:'I want ___ ___ come to my party.', answers:['you','to'],
+               why:'want ＋ 人 ＋ to ＋ 動詞の原形。' } }
+  ]
+},
+
+// ================================================================
+//  5. 間接疑問・分詞の後置修飾
+// ================================================================
+{
+  id: 'g3_kansetsu',
+  icon: '🔎',
+  title: '間接疑問・分詞',
+  sub: 'I know where … ／ the woman smiling …',
+  intro: `
+    <div class="grammar-section">
+      <h3>🔎 たずねる文が、文の中に入るとき</h3>
+      <p class="g-lead">たずねる文が別の文の中に入ると、<b>「主語 ＋ 動詞」の順</b>にもどります。
+      ひっくり返さないのがポイントです。</p>
+      <div class="formula-box">Where <b>is</b> the shelter?　→　I know where the shelter <b>is</b>.</div>
+      <div class="example-row">
+        <div class="en">I know <em>where the local shelter is</em>.</div>
+        <div class="ja">私は<b>地域の避難所がどこにあるか</b>知っています。</div>
+      </div>
+      <div class="example-row bad">
+        <div class="en">✗ I know where <b class="x">is</b> the local shelter.</div>
+        <div class="ja">文の中に入ったら、ひっくり返しません。</div>
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>🏃 「〜している人」「〜された物」（分詞）</h3>
+      <p class="g-lead">名詞のうしろに <b>〜ing</b> や <b>過去分詞</b> を置いて、後ろから説明します。</p>
+      <table class="kw-table">
+        <tr><th>形</th><th>意味</th><th>例</th></tr>
+        <tr><td><span class="kw">〜ing</span></td><td>〜している</td><td>the woman <b>smiling</b></td></tr>
+        <tr><td><span class="kw">過去分詞</span></td><td>〜された</td><td>a movie <b>called</b> …</td></tr>
+      </table>
+      <div class="example-row">
+        <div class="en">The woman <em>smiling in a kimono</em> is my aunt.</div>
+        <div class="ja"><b>着物を着て笑っている</b>女性は私のおばです。</div>
+      </div>
+      <div class="example-row">
+        <div class="en">I want a book <em>written in easy English</em>.</div>
+        <div class="ja"><b>やさしい英語で書かれた</b>本がほしいです。</div>
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>📌 見分け方</h3>
+      <div class="notice">
+        その人・ものが<strong>「する」側</strong>なら 〜ing（smiling, running）、<br>
+        <strong>「される」側</strong>なら過去分詞（called, written, spoken）。
+      </div>
+    </div>`,
+  sentences: [
+    { en:'I know where the local shelter is.', ja:'私は地域の避難所がどこにあるか知っています。', accept:[],
+      choice:{ text:'I know where the local shelter (　).', options:['is','is it','does','be'], answer:0,
+               why:'文の中に入ると「主語 ＋ 動詞」の順。' },
+      find:{ wrong:'I know where the local shelter are.', bad:'are', correct:'is',
+             why:'主語は the local shelter（単数）なので is。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'I know something.\nWhere is the local shelter?',
+               tmpl:'I know ___ the local shelter ___.', answers:['where','is'],
+               why:'文の中に入るので is をうしろに回す。' } },
+
+    { en:'Tell me what you have done.', ja:'あなたが何をしたのか教えてください。', accept:[],
+      choice:{ text:'Tell me (　) you have done.', options:['what','that','which','how'], answer:0,
+               why:'「何を」は what。' },
+      find:{ wrong:'Tell me that you have done.', bad:'that', correct:'what',
+             why:'「何をしたのか」なので what。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'Tell me something.\nWhat have you done?',
+               tmpl:'Tell me ___ you ___ done.', answers:['what','have'],
+               why:'「主語 ＋ 動詞」の順にもどす。' } },
+
+    { en:"I don't know when he will come.", ja:'私は彼がいつ来るのか知りません。', accept:['I do not know when he will come.'],
+      choice:{ text:"I don't know when (　).", options:['he will come','will he come','does he come','he will comes'], answer:0,
+               why:'文の中では「主語 ＋ 動詞」の順。' },
+      find:{ wrong:"I don't know when he will comes.", bad:'comes', correct:'come',
+             why:'will のあとは動詞の原形 come。' },
+      change:{ task:'2つの文を1つにまとめよう', from:"I don't know something.\nWhen will he come?",
+               tmpl:"I don't know ___ he ___ come.", answers:['when','will'],
+               why:'will を主語のうしろに回す。' } },
+
+    { en:'Do you know who that girl is?', ja:'あなたはあの女の子が誰か知っていますか。', accept:[],
+      choice:{ text:'Do you know who (　)?', options:['that girl is','is that girl','that girl does','that girl are'], answer:0,
+               why:'文の中では「主語 ＋ 動詞」の順。' },
+      find:{ wrong:'Do you know who that girl are?', bad:'are', correct:'is',
+             why:'主語は that girl（単数）なので is。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'Do you know something?\nWho is that girl?',
+               tmpl:'Do you know ___ that girl ___?', answers:['who','is'],
+               why:'is を主語のうしろに回す。' } },
+
+    { en:'This is a movie called Live Your Dream.', ja:'これは「Live Your Dream」という映画です。', accept:[],
+      choice:{ text:'This is a movie (　) Live Your Dream.', options:['called','calling','call','calls'], answer:0,
+               why:'「〜と呼ばれる」なので過去分詞 called。' },
+      find:{ wrong:'This is a movie calling Live Your Dream.', bad:'calling', correct:'called',
+             why:'映画は「呼ばれる」側なので過去分詞。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'This is a movie.\nIt is called Live Your Dream.',
+               tmpl:'This is a movie ___ Live Your Dream.', answers:['called'],
+               why:'is を消して、過去分詞だけを名詞のうしろに置く。' } },
+
+    { en:'The woman smiling in a kimono is my aunt.', ja:'着物を着て笑っている女性は私のおばです。', accept:[],
+      choice:{ text:'The woman (　) in a kimono is my aunt.', options:['smiling','smiled','smile','smiles'], answer:0,
+               why:'「笑っている」なので 〜ing。' },
+      find:{ wrong:'The woman smiled in a kimono is my aunt.', bad:'smiled', correct:'smiling',
+             why:'女性は「笑っている」側なので smiling。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'The woman is my aunt.\nShe is smiling in a kimono.',
+               tmpl:'The woman ___ in a kimono ___ my aunt.', answers:['smiling','is'],
+               why:'説明を名詞のうしろに入れる。文全体の動詞は is。' } },
+
+    { en:'Look at the boy running in the park.', ja:'公園を走っている男の子を見て。', accept:[],
+      choice:{ text:'Look at the boy (　) in the park.', options:['running','run','ran','runs'], answer:0,
+               why:'「走っている」なので 〜ing。' },
+      find:{ wrong:'Look at the boy run in the park.', bad:'run', correct:'running',
+             why:'「走っている男の子」なので running。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'Look at the boy.\nHe is running in the park.',
+               tmpl:'Look at the boy ___ in the park.', answers:['running'],
+               why:'is を消して、〜ing を名詞のうしろに置く。' } },
+
+    { en:'I want a book written in easy English.', ja:'私はやさしい英語で書かれた本がほしいです。', accept:[],
+      choice:{ text:'I want a book (　) in easy English.', options:['written','writing','write','wrote'], answer:0,
+               why:'「書かれた」なので過去分詞 written。' },
+      find:{ wrong:'I want a book writing in easy English.', bad:'writing', correct:'written',
+             why:'本は「書かれる」側なので過去分詞。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'I want a book.\nIt is written in easy English.',
+               tmpl:'I want a book ___ in easy English.', answers:['written'],
+               why:'is を消して、過去分詞を名詞のうしろに置く。' } },
+
+    { en:"I don't know why she was angry.", ja:'私は彼女がなぜ怒っていたのか知りません。', accept:['I do not know why she was angry.'],
+      choice:{ text:"I don't know why (　) angry.", options:['she was','was she','did she','she were'], answer:0,
+               why:'文の中では「主語 ＋ 動詞」の順。' },
+      find:{ wrong:"I don't know why she were angry.", bad:'were', correct:'was',
+             why:'主語は she なので was。' },
+      change:{ task:'2つの文を1つにまとめよう', from:"I don't know something.\nWhy was she angry?",
+               tmpl:"I don't know ___ she ___ angry.", answers:['why','was'],
+               why:'was を主語のうしろに回す。' } },
+
+    { en:'Can you tell me how I can get to the station?', ja:'駅へどうやって行けるか教えてくれますか。', accept:[],
+      choice:{ text:'Can you tell me how (　) to the station?', options:['I can get','can I get','do I get','I can gets'], answer:0,
+               why:'文の中では「主語 ＋ 動詞」の順。' },
+      find:{ wrong:'Can you tell me how I can got to the station?', bad:'got', correct:'get',
+             why:'can のあとは動詞の原形 get。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'Can you tell me something?\nHow can I get to the station?',
+               tmpl:'Can you tell me ___ I ___ get to the station?', answers:['how','can'],
+               why:'can を主語のうしろに回す。' } },
+
+    { en:'The language spoken in Brazil is Portuguese.', ja:'ブラジルで話されている言語はポルトガル語です。', accept:[],
+      choice:{ text:'The language (　) in Brazil is Portuguese.', options:['spoken','speaking','speak','spoke'], answer:0,
+               why:'「話されている」なので過去分詞 spoken。' },
+      find:{ wrong:'The language speaking in Brazil is Portuguese.', bad:'speaking', correct:'spoken',
+             why:'言語は「話される」側なので過去分詞。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'The language is Portuguese.\nIt is spoken in Brazil.',
+               tmpl:'The language ___ in Brazil ___ Portuguese.', answers:['spoken','is'],
+               why:'説明を名詞のうしろに入れる。文全体の動詞は is。' } },
+
+    { en:'The girl playing the guitar is my friend.', ja:'ギターを弾いている女の子は私の友達です。', accept:[],
+      choice:{ text:'The girl (　) the guitar is my friend.', options:['playing','played','play','plays'], answer:0,
+               why:'「弾いている」なので 〜ing。' },
+      find:{ wrong:'The girl played the guitar is my friend.', bad:'played', correct:'playing',
+             why:'女の子は「弾いている」側なので playing。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'The girl is my friend.\nShe is playing the guitar.',
+               tmpl:'The girl ___ the guitar ___ my friend.', answers:['playing','is'],
+               why:'説明を名詞のうしろに入れる。文全体の動詞は is。' } }
+  ]
+},
+
+// ================================================================
+//  6. 関係代名詞
+// ================================================================
+{
+  id: 'g3_kankeidaimeishi',
+  icon: '🔗',
+  title: '関係代名詞',
+  sub: 'who / which / that ― 後ろから説明する',
+  intro: `
+    <div class="grammar-section">
+      <h3>🔗 関係代名詞ってなに？</h3>
+      <p class="g-lead">2つの文を1つにまとめて、<b>「どんな〜か」を後ろから説明する</b>ときに使います。
+      日本語は前から（「カナダに住んでいる友達」）、英語は<b>後ろから</b>説明します。</p>
+      <div class="formula-box">I have a friend <span>＋</span> He lives in Canada.<br>↓<br>I have a friend <b>who lives in Canada</b>.</div>
+      <div class="example-row">
+        <div class="en">I have a friend <em>who lives in Canada</em>.</div>
+        <div class="ja">私には<b>カナダに住んでいる</b>友達がいます。</div>
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>📌 who / which / that の使い分け</h3>
+      <table class="kw-table">
+        <tr><th>説明するもの（先行詞）</th><th>使う語</th></tr>
+        <tr><td>人（a man, a friend, the girl）</td><td><span class="kw">who</span> ／ that</td></tr>
+        <tr><td>もの・動物（a movie, a bag, the train）</td><td><span class="kw">which</span> ／ that</td></tr>
+        <tr><td>どちらでも使える</td><td><span class="kw">that</span></td></tr>
+      </table>
+      <div class="notice">まよったら <strong>that</strong> でOK。人にも、ものにも使えます。</div>
+    </div>
+    <div class="grammar-section">
+      <h3>🔍 すぐ後ろに来るものを見る</h3>
+      <div class="example-row">
+        <div class="en">a boy <em>who</em> <b>can speak</b> three languages</div>
+        <div class="ja">関係代名詞のすぐ後ろが<b>動詞</b> → その子が「する」側</div>
+      </div>
+      <div class="example-row">
+        <div class="en">a picture <em>that</em> <b>I found</b></div>
+        <div class="ja">すぐ後ろが<b>主語＋動詞</b> → その写真は「見つけられた」側</div>
+      </div>
+      <div class="notice">
+        後ろが<strong>主語＋動詞</strong>のときは、関係代名詞を<strong>省略できます</strong>。<br>
+        a picture <b>that</b> I found ＝ a picture I found（どちらも正解）
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>⚠️ よくあるまちがい</h3>
+      <div class="example-row bad">
+        <div class="en">✗ a picture that I found <b class="x">it</b></div>
+        <div class="ja">it は<b>いりません</b>。that がその役目をしています。</div>
+      </div>
+      <div class="example-row bad">
+        <div class="en">✗ I have a friend who <b class="x">live</b> in Canada</div>
+        <div class="ja">動詞は先行詞に合わせます → who <b>lives</b></div>
+      </div>
+    </div>`,
+  sentences: [
+    { en:'Gandhi is a man who has changed the world.', ja:'ガンジーは世界を変えた人です。',
+      accept:['Gandhi is a man that has changed the world.'],
+      choice:{ text:'Gandhi is a man (　) has changed the world.', options:['who','which','whose','what'], answer:0,
+               why:'先行詞の a man は「人」なので who。' },
+      find:{ wrong:'Gandhi is a man which has changed the world.', bad:'which', correct:'who',
+             why:'「人」を説明するときは which ではなく who を使う。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'Gandhi is a man.\nHe has changed the world.',
+               tmpl:'Gandhi is a man ___ ___ changed the world.', answers:['who','has'],
+               why:'2文目の He が who に変わって、1文目の後ろにつながる。' } },
+
+    { en:'I have a friend who lives in Canada.', ja:'私にはカナダに住んでいる友達がいます。',
+      accept:['I have a friend that lives in Canada.'],
+      choice:{ text:'I have a friend who (　) in Canada.', options:['lives','live','living','lived'], answer:0,
+               why:'who の後ろの動詞は先行詞 a friend に合わせる。3人称単数なので lives。' },
+      find:{ wrong:'I have a friend who live in Canada.', bad:'live', correct:'lives',
+             why:'先行詞 a friend は3人称単数。動詞に s がいる。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'I have a friend.\nShe lives in Canada.',
+               tmpl:'I have a friend ___ ___ in Canada.', answers:['who','lives'],
+               why:'She が who に変わる。動詞は lives のまま。' } },
+
+    { en:'This is a movie that makes me happy.', ja:'これは私を幸せにしてくれる映画です。',
+      accept:['This is a movie which makes me happy.'],
+      choice:{ text:'This is a movie (　) makes me happy.', options:['that','who','whose','what'], answer:0,
+               why:'先行詞の a movie は「もの」。that か which を使う。' },
+      find:{ wrong:'This is a movie who makes me happy.', bad:'who', correct:'that',
+             why:'「もの」には who は使えない。that か which。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'This is a movie.\nIt makes me happy.',
+               tmpl:'This is a movie ___ ___ me happy.', answers:['that','makes'],
+               why:'It が that に変わる。' } },
+
+    { en:'I want a bag which has many pockets.', ja:'私はポケットがたくさんあるかばんがほしいです。',
+      accept:['I want a bag that has many pockets.'],
+      choice:{ text:'I want a bag which (　) many pockets.', options:['has','have','having','had'], answer:0,
+               why:'先行詞 a bag は3人称単数なので has。' },
+      find:{ wrong:'I want a bag which have many pockets.', bad:'have', correct:'has',
+             why:'先行詞 a bag に合わせて has。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'I want a bag.\nIt has many pockets.',
+               tmpl:'I want a bag ___ ___ many pockets.', answers:['which','has'],
+               why:'「もの」なので which（that でもよい）。' } },
+
+    { en:'The girl who is playing the piano is my sister.', ja:'ピアノを弾いている女の子は私の妹です。',
+      accept:['The girl that is playing the piano is my sister.'],
+      choice:{ text:'The girl who is playing the piano (　) my sister.', options:['is','are','am','be'], answer:0,
+               why:'文全体の主語は The girl。あいだの説明にまどわされない。' },
+      find:{ wrong:'The girl who is playing the piano are my sister.', bad:'are', correct:'is',
+             why:'主語は The girl（単数）なので is。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'The girl is my sister.\nShe is playing the piano.',
+               tmpl:'The girl ___ ___ playing the piano is my sister.', answers:['who','is'],
+               why:'説明が主語のすぐ後ろに入りこむ形。' } },
+
+    { en:'This is a picture that I found in the library.', ja:'これは私が図書館で見つけた写真です。',
+      accept:['This is a picture which I found in the library.','This is a picture I found in the library.'],
+      choice:{ text:'This is a picture (　) I found in the library.', options:['that','who','whose','what'], answer:0,
+               why:'先行詞は a picture（もの）。後ろが「主語＋動詞」でも使う語は同じ。' },
+      find:{ wrong:'This is a picture that I found it in the library.', bad:'it', correct:'（いらない）',
+             why:'that が it の役目をしている。it を入れると二重になる。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'This is a picture.\nI found it in the library.',
+               tmpl:'This is a picture ___ I ___ in the library.', answers:['that','found'],
+               why:'it が that に変わって前に出る。' } },
+
+    { en:'The book which I read last night was interesting.', ja:'私が昨夜読んだ本はおもしろかったです。',
+      accept:['The book that I read last night was interesting.','The book I read last night was interesting.'],
+      choice:{ text:'The book which I read last night (　) interesting.', options:['was','were','is','are'], answer:0,
+               why:'主語は The book（単数）、昨夜のことなので was。' },
+      find:{ wrong:'The book which I read last night were interesting.', bad:'were', correct:'was',
+             why:'主語は The book。単数なので was。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'The book was interesting.\nI read it last night.',
+               tmpl:'The book ___ I ___ last night was interesting.', answers:['which','read'],
+               why:'it が which に変わる。read は過去形（発音はレッド）。' } },
+
+    { en:'He is a singer that everyone knows.', ja:'彼はみんなが知っている歌手です。',
+      accept:['He is a singer who everyone knows.','He is a singer everyone knows.'],
+      choice:{ text:'He is a singer that everyone (　).', options:['knows','know','knowing','known'], answer:0,
+               why:'everyone は単数あつかい。knows。' },
+      find:{ wrong:'He is a singer that everyone know.', bad:'know', correct:'knows',
+             why:'everyone は3人称単数あつかい。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'He is a singer.\nEveryone knows him.',
+               tmpl:'He is a singer ___ everyone ___.', answers:['that','knows'],
+               why:'him が that に変わって前に出る。文の最後に him は残さない。' } },
+
+    { en:'This is a picture I found in my room.', ja:'これは私が自分の部屋で見つけた写真です。',
+      accept:['This is a picture that I found in my room.','This is a picture which I found in my room.'],
+      choice:{ text:'This is a picture (　) in my room.', options:['I found','I found it','found I','I am found'], answer:0,
+               why:'関係代名詞を省略した形。後ろは「主語＋動詞」だけでよい。' },
+      find:{ wrong:'This is a picture I found it in my room.', bad:'it', correct:'（いらない）',
+             why:'省略されている that が it の役目をしている。' },
+      change:{ task:'関係代名詞を使わずに1つの文にまとめよう', from:'This is a picture.\nI found it in my room.',
+               tmpl:'This is a picture ___ ___ in my room.', answers:['I','found'],
+               why:'関係代名詞を省略すると、すぐ「主語＋動詞」が続く。' } },
+
+    { en:'The cake my mother made was delicious.', ja:'母が作ったケーキはおいしかったです。',
+      accept:['The cake that my mother made was delicious.','The cake which my mother made was delicious.'],
+      choice:{ text:'The cake my mother made (　) delicious.', options:['was','were','is','are'], answer:0,
+               why:'主語は The cake。「おいしかった」なので was。' },
+      find:{ wrong:'The cake my mother made it was delicious.', bad:'it', correct:'（いらない）',
+             why:'省略された that が it の役目をしている。' },
+      change:{ task:'関係代名詞を使わずに1つの文にまとめよう', from:'The cake was delicious.\nMy mother made it.',
+               tmpl:'The cake my mother ___ was delicious.', answers:['made'],
+               why:'made のあとに it は置かない。' } },
+
+    { en:'I know a boy who can speak three languages.', ja:'私は3か国語を話せる男の子を知っています。',
+      accept:['I know a boy that can speak three languages.'],
+      choice:{ text:'I know a boy (　) can speak three languages.', options:['who','which','whose','where'], answer:0,
+               why:'先行詞 a boy は「人」なので who。' },
+      find:{ wrong:'I know a boy which can speak three languages.', bad:'which', correct:'who',
+             why:'「人」なので who。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'I know a boy.\nHe can speak three languages.',
+               tmpl:'I know a boy ___ ___ speak three languages.', answers:['who','can'],
+               why:'He が who に変わる。can はそのまま。' } },
+
+    { en:'The train that goes to Tokyo leaves at ten.', ja:'東京に行く電車は10時に出発します。',
+      accept:['The train which goes to Tokyo leaves at ten.'],
+      choice:{ text:'The train that (　) to Tokyo leaves at ten.', options:['goes','go','going','went'], answer:0,
+               why:'先行詞 The train は3人称単数なので goes。' },
+      find:{ wrong:'The train that go to Tokyo leaves at ten.', bad:'go', correct:'goes',
+             why:'先行詞 The train に合わせて goes。' },
+      change:{ task:'2つの文を1つにまとめよう', from:'The train leaves at ten.\nIt goes to Tokyo.',
+               tmpl:'The train ___ ___ to Tokyo leaves at ten.', answers:['that','goes'],
+               why:'It が that に変わって、説明が主語の後ろに入る。' } }
+  ]
+},
+
+// ================================================================
+//  7. 仮定法
+// ================================================================
+{
+  id: 'g3_kateiho',
+  icon: '🌠',
+  title: '仮定法',
+  sub: 'I wish … / If I were … ― 「〜だったらいいのに」',
+  intro: `
+    <div class="grammar-section">
+      <h3>🌠 本当はちがう、を言うときの形</h3>
+      <p class="g-lead">「実際はそうではないけれど、もしそうだったら」と言うときは、
+      動詞を<b>わざと過去形</b>にします。これを仮定法といいます。</p>
+      <div class="formula-box">I wish ＋ 主語 ＋ <b>過去形</b> <span>〜だったらいいのに</span></div>
+      <div class="example-row">
+        <div class="en">I wish I <em>could</em> fly.</div>
+        <div class="ja">飛べたらいいのに。（実際は飛べない）</div>
+      </div>
+      <div class="formula-box">If ＋ 主語 ＋ <b>過去形</b>, 主語 ＋ <b>would / could</b> ＋ 動詞の原形</div>
+      <div class="example-row">
+        <div class="en">If I <em>were</em> you, I <em>would</em> ask the teacher.</div>
+        <div class="ja">もし私があなたなら、先生に聞くでしょう。（実際は私はあなたではない）</div>
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>📌 おぼえること</h3>
+      <table class="kw-table">
+        <tr><th>ふつうの文</th><th>仮定法</th></tr>
+        <tr><td>can</td><td><span class="kw">could</span></td></tr>
+        <tr><td>will</td><td><span class="kw">would</span></td></tr>
+        <tr><td>am / is / are</td><td><span class="kw">were</span></td></tr>
+        <tr><td>have</td><td><span class="kw">had</span></td></tr>
+      </table>
+      <div class="notice">
+        仮定法では、主語が <strong>I</strong> や <strong>he</strong> でも <strong>were</strong> を使います。
+        （I <b>were</b> / he <b>were</b>）
+      </div>
+    </div>
+    <div class="grammar-section">
+      <h3>⚠️ よくあるまちがい</h3>
+      <div class="example-row bad">
+        <div class="en">✗ I wish I <b class="x">can</b> fly.</div>
+        <div class="ja">I wish のあとは過去形。can ではなく <b>could</b>。</div>
+      </div>
+      <div class="example-row bad">
+        <div class="en">✗ If I had money, I <b class="x">will</b> donate it.</div>
+        <div class="ja">If の文に合わせて、うしろも <b>would</b>。</div>
+      </div>
+    </div>`,
+  sentences: [
+    { en:'I wish I could fly.', ja:'飛べたらいいのに。', accept:[],
+      choice:{ text:'I wish I (　) fly.', options:['could','can','will','am'], answer:0,
+               why:'I wish のあとは過去形。can → could。' },
+      find:{ wrong:'I wish I can fly.', bad:'can', correct:'could',
+             why:'実際はちがうことを言うので、can を過去形 could にする。' },
+      change:{ task:'「〜できたらいいのに」という文に', from:"I can't fly.",
+               tmpl:'I wish I ___ ___.', answers:['could','fly'],
+               why:"can't → could にして I wish のあとに置く。" } },
+
+    { en:'I wish I had a brother.', ja:'兄弟がいたらいいのに。', accept:[],
+      choice:{ text:'I wish I (　) a brother.', options:['had','have','has','having'], answer:0,
+               why:'I wish のあとは過去形。have → had。' },
+      find:{ wrong:'I wish I have a brother.', bad:'have', correct:'had',
+             why:'I wish のあとは過去形 had。' },
+      change:{ task:'「〜がいたらいいのに」という文に', from:"I don't have a brother.",
+               tmpl:'I wish I ___ a ___.', answers:['had','brother'],
+               why:'have を過去形 had にする。' } },
+
+    { en:'If I were you, I would ask the teacher.', ja:'もし私があなたなら、先生に聞くでしょう。', accept:[],
+      choice:{ text:'If I (　) you, I would ask the teacher.', options:['were','am','was','be'], answer:0,
+               why:'仮定法では主語が I でも were を使う。' },
+      find:{ wrong:'If I was you, I would ask the teacher.', bad:'was', correct:'were',
+             why:'仮定法の be 動詞は、主語が何でも were。' },
+      change:{ task:'「もし私があなたなら」で始まる文に', from:'You should ask the teacher.',
+               tmpl:'If I ___ you, I ___ ask the teacher.', answers:['were','would'],
+               why:'If のほうは were、うしろは would。' } },
+
+    { en:'If I had a lot of money, I would donate it.', ja:'たくさんお金があったら、寄付するのに。', accept:[],
+      choice:{ text:'If I had a lot of money, I (　) donate it.', options:['would','will','am','do'], answer:0,
+               why:'If の文が過去形なので、うしろは would。' },
+      find:{ wrong:'If I had a lot of money, I will donate it.', bad:'will', correct:'would',
+             why:'仮定法では will ではなく would。' },
+      change:{ task:'「もし〜だったら」の文に', from:"I don't have a lot of money.",
+               tmpl:'If I ___ a lot of money, I ___ donate it.', answers:['had','would'],
+               why:'have → had、そして would を使う。' } },
+
+    { en:'I wish I could speak French.', ja:'フランス語が話せたらいいのに。', accept:[],
+      choice:{ text:'I wish I could (　) French.', options:['speak','speaks','spoke','speaking'], answer:0,
+               why:'could のあとは動詞の原形。' },
+      find:{ wrong:'I wish I could spoke French.', bad:'spoke', correct:'speak',
+             why:'could のあとは原形 speak。二重に過去形にしない。' },
+      change:{ task:'「〜できたらいいのに」という文に', from:"I can't speak French.",
+               tmpl:'I wish I ___ ___ French.', answers:['could','speak'],
+               why:"can't → could ＋ 原形。" } },
+
+    { en:'If I were a bird, I could fly to you.', ja:'私が鳥なら、あなたのところへ飛んでいけるのに。', accept:[],
+      choice:{ text:'If I were a bird, I (　) fly to you.', options:['could','can','will','am'], answer:0,
+               why:'「〜できるのに」は could。' },
+      find:{ wrong:'If I were a bird, I can fly to you.', bad:'can', correct:'could',
+             why:'仮定法では can ではなく could。' },
+      change:{ task:'「もし〜だったら」の文に', from:'I am not a bird.',
+               tmpl:'If I ___ a bird, I ___ fly to you.', answers:['were','could'],
+               why:'am → were、そして could を使う。' } },
+
+    { en:'I wish my father were here.', ja:'父がここにいたらいいのに。', accept:['I wish my father was here.'],
+      choice:{ text:'I wish my father (　) here.', options:['were','is','are','be'], answer:0,
+               why:'仮定法では、主語が my father でも were を使うのがふつう。' },
+      find:{ wrong:'I wish my father is here.', bad:'is', correct:'were',
+             why:'I wish のあとは過去形。be 動詞は were。' },
+      change:{ task:'「〜がいたらいいのに」という文に', from:'My father is not here.',
+               tmpl:'I wish my father ___ ___.', answers:['were','here'],
+               why:'is → were にして I wish のあとに置く。' } },
+
+    { en:'If I knew her address, I would write to her.', ja:'彼女の住所を知っていたら、手紙を書くのに。', accept:[],
+      choice:{ text:'If I (　) her address, I would write to her.', options:['knew','know','known','knows'], answer:0,
+               why:'If の文は過去形。know → knew。' },
+      find:{ wrong:'If I know her address, I would write to her.', bad:'know', correct:'knew',
+             why:'仮定法の If の文は過去形 knew。' },
+      change:{ task:'「もし〜だったら」の文に', from:"I don't know her address.",
+               tmpl:'If I ___ her address, I ___ write to her.', answers:['knew','would'],
+               why:'know → knew、うしろは would。' } },
+
+    { en:'I wish I had more time.', ja:'もっと時間があったらいいのに。', accept:[],
+      choice:{ text:'I wish I (　) more time.', options:['had','have','has','having'], answer:0,
+               why:'I wish のあとは過去形 had。' },
+      find:{ wrong:'I wish I has more time.', bad:'has', correct:'had',
+             why:'I wish のあとは過去形。主語が I でも had。' },
+      change:{ task:'「もっと〜があったらいいのに」という文に', from:"I don't have much time.",
+               tmpl:'I wish I ___ ___ time.', answers:['had','more'],
+               why:'have → had。「もっと」は more。' } },
+
+    { en:'If it were sunny, we would play soccer.', ja:'晴れていたら、サッカーをするのに。', accept:['If it was sunny, we would play soccer.'],
+      choice:{ text:'If it (　) sunny, we would play soccer.', options:['were','is','was','be'], answer:0,
+               why:'仮定法では主語が it でも were を使うのがふつう。' },
+      find:{ wrong:'If it is sunny, we would play soccer.', bad:'is', correct:'were',
+             why:'仮定法の If の文は過去形。be 動詞は were。' },
+      change:{ task:'「もし〜だったら」の文に', from:'It is not sunny.',
+               tmpl:'If it ___ sunny, we ___ play soccer.', answers:['were','would'],
+               why:'is → were、うしろは would。' } },
+
+    { en:'I wish I could see you every day.', ja:'毎日あなたに会えたらいいのに。', accept:[],
+      choice:{ text:'I wish I (　) see you every day.', options:['could','can','will','do'], answer:0,
+               why:'「会えたらいいのに」は could。' },
+      find:{ wrong:'I wish I can see you every day.', bad:'can', correct:'could',
+             why:'I wish のあとは過去形。can → could。' },
+      change:{ task:'「〜できたらいいのに」という文に', from:"I can't see you every day.",
+               tmpl:'I wish I ___ ___ you every day.', answers:['could','see'],
+               why:"can't → could ＋ 原形 see。" } },
+
+    { en:'If I lived in Tokyo, I would visit the museum often.', ja:'東京に住んでいたら、その博物館によく行くのに。', accept:[],
+      choice:{ text:'If I (　) in Tokyo, I would visit the museum often.', options:['lived','live','living','lives'], answer:0,
+               why:'If の文は過去形 lived。' },
+      find:{ wrong:'If I live in Tokyo, I would visit the museum often.', bad:'live', correct:'lived',
+             why:'仮定法の If の文は過去形。live → lived。' },
+      change:{ task:'「もし〜だったら」の文に', from:"I don't live in Tokyo.",
+               tmpl:'If I ___ in Tokyo, I ___ visit the museum often.', answers:['lived','would'],
+               why:'live → lived、うしろは would。' } }
+  ]
+}
+
+];
+</script>
+<script>
+// 問題データ。読めていないときに画面が真っ白にならないよう、
+// ここで止めずに空の配列にして、一覧に理由を出す。
+const ITEMS = (typeof G3_GRAMMAR !== 'undefined') ? G3_GRAMMAR : [];
+const GRADE = 3;
+
+// ================================================================
+//  モードの設定（ポイントはB案：1文あたり合計8点）
+// ================================================================
+const MODES = {
+  choice: { key:'choice', icon:'✅', title:'形をえらぶ',     desc:'4つの中から正しい形を選ぶ',               badge:'CHOICE', pt:1 },
+  sort:   { key:'sort',   icon:'🔀', title:'語順ならべかえ', desc:'単語をタップして正しい順に並べる',         badge:'SORT',   pt:1 },
+  find:   { key:'find',   icon:'🔍', title:'まちがいさがし', desc:'まちがっている単語をタップする',           badge:'FIND',   pt:1 },
+  change: { key:'change', icon:'🔁', title:'文をかえる',     desc:'言いかえたり、2つの文を1つにまとめる',     badge:'CHANGE', pt:2 },
+  write:  { key:'write',  icon:'✍️', title:'日本語⇒英語',    desc:'日本語を見て英文を書く（いちばん難しい）', badge:'WRITE',  pt:3 }
+};
+const MODE_ORDER = ['choice', 'sort', 'find', 'change', 'write'];
+const PT_PER_SENTENCE = MODE_ORDER.reduce((a, k) => a + MODES[k].pt, 0);   // 8点
+
+let item = null;         // いま開いている文法項目
+let SENTENCES = [];      // その項目の文
+
+// ================================================================
+//  記録
+//
+//  保存できない環境（プレビュー表示やシークレットウィンドウ）では
+//  黙って失敗すると「やったのに未挑戦のまま」になって原因が分からない。
+//  使えないときは画面に知らせ、その場かぎりの入れ物で動かす。
+// ================================================================
+let storageOK = (function () {
+  try { localStorage.setItem('__test', '1'); localStorage.removeItem('__test'); return true; }
+  catch (e) { return false; }
+})();
+const memoryStore = {};
+
+function recKey(id) { return 'gram_' + id; }
+function loadRecord(id) {
+  if (!storageOK) return memoryStore[id] || {};
+  try { return JSON.parse(localStorage.getItem(recKey(id))) || {}; }
+  catch (e) { storageOK = false; return memoryStore[id] || {}; }
+}
+function saveRecord(id, rec) {
+  memoryStore[id] = rec;
+  if (!storageOK) return;
+  try { localStorage.setItem(recKey(id), JSON.stringify(rec)); }
+  catch (e) { storageOK = false; }
+}
+
+/** そのモードで一度でも正解した問題数（進み具合のバー用） */
+function clearedCount(id, modeKey) {
+  const r = loadRecord(id)[modeKey] || {};
+  return Object.keys(r).filter(i => r[i]).length;
+}
+function clearedTotal(it) {
+  return MODE_ORDER.reduce((s, k) => s + clearedCount(it.id, k), 0);
+}
+function clearedMax(it) { return it.sentences.length * MODE_ORDER.length; }
+
+/**
+ * 項目の累計ポイント。
+ * 正解するたびに加算し、上限は設けない（同じ問題を解き直しても増える）。
+ */
+function itemPoints(it) {
+  const p = loadRecord(it.id).pts || {};
+  return MODE_ORDER.reduce((s, k) => s + (Number(p[k]) || 0), 0);
+}
+function addPoints(id, modeKey, n) {
+  const rec = loadRecord(id);
+  rec.pts = rec.pts || {};
+  rec.pts[modeKey] = (Number(rec.pts[modeKey]) || 0) + n;
+  saveRecord(id, rec);
+  saveGrammarSummary();
+}
+
+/**
+ * 学年ぜんぶの到達状況を要約して保存し、先生のところへ送る。
+ * 先生用ダッシュボードはこの要約だけを読めばよい。
+ */
+function saveGrammarSummary() {
+  const sum = { points: 0, cleared: 0, total: 0, items: ITEMS.length };
+  ITEMS.forEach(it => {
+    sum.points  += itemPoints(it);
+    sum.cleared += clearedTotal(it);
+    sum.total   += clearedMax(it);
+  });
+  try { localStorage.setItem('grammar_summary_g' + GRADE, JSON.stringify(sum)); } catch (e) {}
+  if (window.ProgressSync) window.ProgressSync.sync(false);
+}
+
+/** 前にまちがえて、まだ正解できていない問題 */
+function weakList(id, modeKey) {
+  const w = (loadRecord(id).weak || {})[modeKey] || [];
+  const n = (ITEMS.filter(x => x.id === id)[0] || { sentences: [] }).sentences.length;
+  return w.filter(i => Number.isInteger(i) && i >= 0 && i < n);
+}
+function markWeak(id, modeKey, i, isWeak) {
+  const rec = loadRecord(id);
+  rec.weak = rec.weak || {};
+  const list = (rec.weak[modeKey] || []).filter(x => x !== i);
+  if (isWeak) list.push(i);
+  rec.weak[modeKey] = list;
+  saveRecord(id, rec);
+}
+
+// ================================================================
+//  画面の切り替え
+// ================================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'page-items') renderItems();
+  if (id === 'page-menu')  renderMenu();
+}
+
+function renderItems() {
+  document.getElementById('storage-warn').style.display = storageOK ? 'none' : 'block';
+  document.getElementById('hd-title').textContent = '📘 文法学習';
+  document.getElementById('hd-sub').textContent = '中学' + GRADE + '年';
+  if (!ITEMS.length) {
+    document.getElementById('item-list').innerHTML =
+      '<div class="notice">⚠ <strong>問題データが読み込めませんでした。</strong><br>'
+      + 'ファイルがこわれている可能性があります。先生に知らせてください。</div>';
+    return;
+  }
+  document.getElementById('item-list').innerHTML = ITEMS.map((it, i) => {
+    // バーは「何問クリアしたか」、数字は「ためたポイント」。
+    // ポイントは解き直すたびに増えるので、上限での割合は出せない。
+    const done = clearedTotal(it), max = clearedMax(it);
+    return '<button class="item-card" onclick="openItem(' + i + ')">'
+      + '<div class="ic-icon">' + it.icon + '</div>'
+      + '<div class="ic-body">'
+      +   '<div class="ic-title">' + it.title + '</div>'
+      +   '<div class="ic-sub">' + it.sub + '</div>'
+      +   '<div class="ic-bar-bg"><div class="ic-bar" style="width:' + (done / max * 100) + '%"></div></div>'
+      + '</div>'
+      + '<div class="ic-pt"><div class="ic-pt-num">' + itemPoints(it) + '点</div>'
+      +   '<div class="ic-pt-sub">' + done + ' / ' + max + '問</div></div>'
+      + '</button>';
+  }).join('');
+}
+
+function openItem(i) {
+  item = ITEMS[i];
+  SENTENCES = item.sentences;
+  document.getElementById('hd-title').textContent = item.icon + ' ' + item.title;
+  document.getElementById('hd-sub').textContent = '文法学習 ／ 中学' + GRADE + '年';
+  document.getElementById('explain-title').textContent = item.title;
+  document.getElementById('explain-body').innerHTML = item.intro;
+  document.getElementById('menu-title').textContent = item.title;
+  // はじめての項目は説明から、2回目からは練習メニューから
+  showPage(itemPoints(item) > 0 ? 'page-menu' : 'page-explain');
+}
+
+function renderMenu() {
+  if (!item) { showPage('page-items'); return; }
+  document.getElementById('menu-list').innerHTML = MODE_ORDER.map(k => {
+    const m = MODES[k];
+    const done = clearedCount(item.id, k), total = SENTENCES.length;
+    const pct = Math.round(done / total * 100);
+    let cls = '', label = '未挑戦';
+    if (done > 0) {
+      label = done + ' / ' + total + '問クリア';
+      cls = pct === 100 ? 'perfect' : (pct >= 70 ? 'high' : (pct >= 40 ? 'mid' : 'low'));
+    }
+    const weak = weakList(item.id, k);
+    const weakBtn = weak.length
+      ? '<button class="mc-weak" onclick="event.stopPropagation(); startQuiz(\'' + k + '\', weakList(item.id, \'' + k + '\'))">'
+        + '🔥 にがて ' + weak.length + '問だけ</button>'
+      : '';
+    return '<div class="menu-card" onclick="startQuiz(\'' + k + '\')">'
+      + '<div class="mc-icon">' + m.icon + '</div>'
+      + '<div class="mc-body">'
+      +   '<div class="mc-title">' + m.title + '</div>'
+      +   '<div class="mc-desc">' + m.desc + '</div>'
+      +   '<span class="mc-achievement ' + cls + '">' + label + '</span>'
+      +   weakBtn
+      + '</div>'
+      + '<div class="mc-pt">1問 ' + m.pt + '点</div>'
+      + '</div>';
+  }).join('');
+  const done = clearedTotal(item), max = clearedMax(item);
+  document.getElementById('menu-done').textContent = 'クリア ' + done + ' / ' + max + '問';
+  document.getElementById('menu-pt').textContent = '🏅 ' + itemPoints(item) + ' 点';
+  document.getElementById('menu-bar').style.width = (done / max * 100) + '%';
+}
+
+// ================================================================
+//  問題の進行
+// ================================================================
+let mode = null, order = [], qIndex = 0, correctCount = 0, answered = false;
+let sortPicked = [], wrongList = [];
+
+function shuffle(a) {
+  const b = a.slice();
+  for (let i = b.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+}
+
+/**
+ * 練習をはじめる。
+ * @param {string} modeKey モード
+ * @param {number[]} only  指定すると、その文だけを出す（にがて練習・まちがい直し）
+ */
+function startQuiz(modeKey, only) {
+  mode = MODES[modeKey];
+  order = shuffle(only && only.length ? only : SENTENCES.map((_, i) => i));
+  qIndex = 0; correctCount = 0; wrongList = [];
+  document.getElementById('quiz-title').textContent =
+    mode.title + ((only && only.length) ? '（にがて）' : '');
+  document.getElementById('quiz-badge').textContent = mode.badge;
+  showPage('page-quiz');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false; sortPicked = [];
+  const s = SENTENCES[order[qIndex]];
+  document.getElementById('quiz-count').textContent = '問題 ' + (qIndex + 1) + ' / ' + order.length;
+  document.getElementById('quiz-score').textContent = '正解 ' + correctCount;
+  document.getElementById('quiz-bar').style.width = (qIndex / order.length * 100) + '%';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').innerHTML = '';
+  document.getElementById('hint-box').className = 'hint-box';
+
+  // 「形をえらぶ」「まちがいさがし」はタップした瞬間に判定するので
+  // 「答え合わせ」ボタンは出さない。
+  const tapOnly = (mode.key === 'choice' || mode.key === 'find');
+  document.getElementById('btn-check').style.display = tapOnly ? 'none' : 'inline-block';
+  document.getElementById('btn-check').disabled = false;
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('btn-reset').style.display = (mode.key === 'sort') ? 'inline-block' : 'none';
+  document.getElementById('btn-hint').style.display = 'inline-block';
+
+  const body = document.getElementById('quiz-body');
+  if (mode.key === 'choice') body.innerHTML = viewChoice(s);
+  if (mode.key === 'sort')   body.innerHTML = viewSort(s);
+  if (mode.key === 'find')   body.innerHTML = viewFind(s);
+  if (mode.key === 'change') body.innerHTML = viewChange(s);
+  if (mode.key === 'write')  body.innerHTML = viewWrite(s);
+  if (mode.key === 'sort')   renderSort();
+}
+
+/**
+ * 英文を単語に分ける。
+ *  how 省略   … 文末のピリオドは落とす（並べ替え・語数かぞえ用）
+ *  how 'mark' … 文末のピリオドを最後の語にくっつける（まちがいさがし用）
+ */
+function splitWords(en, how) {
+  const m = String(en).match(/^(.*?)([.?!])$/);
+  const body = m ? m[1] : en;
+  const mark = m ? m[2] : '';
+  const words = body.trim().split(/\s+/);
+  if (how === 'mark' && mark) words[words.length - 1] += mark;
+  return words;
+}
+
+// ---------- ① 形をえらぶ ----------
+function viewChoice(s) {
+  return '<div class="q-card">'
+    + '<div class="q-label">正しい形をえらぼう</div>'
+    + '<div class="q-text">' + s.choice.text.replace('(　)', '<span class="q-blank">(　　)</span>') + '</div>'
+    + '<div class="q-ja">' + s.ja + '</div></div>'
+    + '<div class="choice-list" id="choice-list">'
+    + s.choice.options.map((o, i) => '<button class="choice-btn" data-i="' + i + '" onclick="pickChoice(' + i + ')">' + o + '</button>').join('')
+    + '</div>';
+}
+function pickChoice(i) {
+  if (answered) return;
+  const s = SENTENCES[order[qIndex]];
+  const ok = (i === s.choice.answer);
+  document.querySelectorAll('#choice-list .choice-btn').forEach((b, j) => {
+    b.disabled = true;
+    if (j === s.choice.answer) { b.className = 'choice-btn correct'; b.innerHTML += '<span class="choice-mark">⭕</span>'; }
+    else if (j === i) { b.className = 'choice-btn wrong'; b.innerHTML += '<span class="choice-mark">❌</span>'; }
+  });
+  finishQuestion(ok, s.choice.options[s.choice.answer], s.choice.why);
+}
+
+// ---------- ② 語順ならべかえ ----------
+let sortWords = [], sortShuffled = [];
+function viewSort(s) {
+  sortWords = splitWords(s.en);
+  sortShuffled = shuffle(sortWords.map((w, i) => ({ w: w, i: i })));
+  return '<div class="q-card">'
+    + '<div class="q-label">日本語を英語に直してみよう</div>'
+    + '<div class="q-text">' + s.ja + '</div></div>'
+    + '<div class="sort-area-label">👆 タップして並べ替えよう</div>'
+    + '<div class="answer-area" id="answer-area"></div>'
+    + '<div class="sort-area-label">単語バンク</div>'
+    + '<div class="word-bank" id="word-bank"></div>';
+}
+function renderSort() {
+  document.getElementById('answer-area').innerHTML = sortPicked.map((p, pos) =>
+    '<button class="word-chip in-answer" ' + (answered ? 'disabled' : '') + ' onclick="unpickWord(' + pos + ')">' + sortShuffled[p].w + '</button>').join('');
+  document.getElementById('word-bank').innerHTML = sortShuffled.map((o, i) =>
+    sortPicked.indexOf(i) >= 0 ? '' :
+    '<button class="word-chip" ' + (answered ? 'disabled' : '') + ' onclick="pickWord(' + i + ')">' + o.w + '</button>').join('');
+}
+function pickWord(i)   { if (!answered) { sortPicked.push(i); renderSort(); } }
+function unpickWord(p) { if (!answered) { sortPicked.splice(p, 1); renderSort(); } }
+function resetAnswer() { sortPicked = []; renderSort(); }
+
+// ---------- ③ まちがいさがし ----------
+let findWords = [];
+function viewFind(s) {
+  findWords = splitWords(s.find.wrong, 'mark');
+  return '<div class="q-card">'
+    + '<div class="q-label">まちがいは1か所</div>'
+    + '<div class="q-text">まちがっている単語をタップしよう。</div>'
+    + '<div class="q-ja">' + s.ja + '</div></div>'
+    + '<div class="find-sentence" id="find-bank">'
+    + findWords.map((w, i) => '<button class="find-word" onclick="pickFind(' + i + ')">' + w + '</button>').join(' ')
+    + '</div>';
+}
+/** 末尾のピリオドを無視して語をくらべる */
+function sameWord(a, b) {
+  return String(a).replace(/[.?!]+$/, '') === String(b).replace(/[.?!]+$/, '');
+}
+function pickFind(i) {
+  if (answered) return;
+  const s = SENTENCES[order[qIndex]];
+  const ok = sameWord(findWords[i], s.find.bad);
+  document.querySelectorAll('#find-bank .find-word').forEach((b, j) => {
+    b.disabled = true;
+    if (sameWord(findWords[j], s.find.bad)) b.className = 'find-word is-answer';
+    else if (j === i) b.className = 'find-word is-bad';
+  });
+  finishQuestion(ok, s.en,
+    '「' + s.find.bad + '」が まちがい。正しくは ' + s.find.correct + '。' + s.find.why);
+}
+
+// ---------- ④ 文をかえる ----------
+function viewChange(s) {
+  let n = 0;
+  const line = s.change.tmpl.replace(/___/g, () =>
+    '<input class="blank-input" id="blank' + (n++) + '" autocomplete="off" autocapitalize="off" spellcheck="false">');
+  return '<div class="q-card">'
+    + '<div class="q-label">' + s.change.task + '</div>'
+    + '<div class="q-text">' + s.change.from.replace(/\n/g, '<br>') + '</div>'
+    + '<div class="q-ja">' + s.ja + '</div></div>'
+    + '<div class="tmpl-line">' + line + '</div>';
+}
+
+// ---------- ⑤ 日本語⇒英語 ----------
+function viewWrite(s) {
+  return '<div class="q-card">'
+    + '<div class="q-label">英語で書いてみよう</div>'
+    + '<div class="q-text">' + s.ja + '</div>'
+    + '<div class="q-sub">単語は ' + splitWords(s.en).length + ' 語。ピリオドも忘れずに。</div></div>'
+    + '<input class="ans-input" id="write-input" placeholder="英語で入力…" autocomplete="off" autocapitalize="off" spellcheck="false">';
+}
+
+// ================================================================
+//  答え合わせ
+// ================================================================
+/** 大文字小文字・記号・空白のちがいは正解あつかいにする */
+function norm(t) {
+  return String(t || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function checkAnswer() {
+  if (answered) return;
+  const s = SENTENCES[order[qIndex]];
+  let ok = false, correctText = '', why = '';
+
+  if (mode.key === 'sort') {
+    if (!sortPicked.length) return;
+    const made = sortPicked.map(p => sortShuffled[p].w).join(' ');
+    ok = norm(made) === norm(sortWords.join(' '));
+    correctText = s.en;
+
+  } else if (mode.key === 'change') {
+    const got = s.change.answers.map((_, i) => document.getElementById('blank' + i).value);
+    if (got.some(v => !v.trim())) return;
+    ok = got.every((v, i) => norm(v) === norm(s.change.answers[i]));
+    let k = 0;
+    correctText = s.change.tmpl.replace(/___/g, () => s.change.answers[k++]);
+    why = s.change.why;
+    s.change.answers.forEach((a, i) => {
+      const el = document.getElementById('blank' + i);
+      el.disabled = true;
+      const good = norm(el.value) === norm(a);
+      el.style.color = good ? '#1a7a45' : '#c0392b';
+      el.style.borderBottomColor = good ? '#43e97b' : '#ff416c';
+    });
+
+  } else if (mode.key === 'write') {
+    const got = document.getElementById('write-input').value;
+    if (!got.trim()) return;
+    ok = [s.en].concat(s.accept || []).some(a => norm(a) === norm(got));
+    correctText = s.en;
+    why = (s.accept && s.accept.length) ? 'ほかに「' + s.accept.join('」「') + '」も正解。' : '';
+    const el = document.getElementById('write-input');
+    el.disabled = true;
+    el.style.borderColor = ok ? '#43e97b' : '#ff416c';
+  }
+
+  finishQuestion(ok, correctText, why);
+}
+
+/** 正解・不正解が決まったあとの共通処理（記録・表示・ボタン） */
+function finishQuestion(ok, correctText, why) {
+  answered = true;
+  if (mode.key === 'sort') renderSort();
+
+  if (ok) {
+    correctCount++;
+    const rec = loadRecord(item.id);
+    rec[mode.key] = rec[mode.key] || {};
+    rec[mode.key][order[qIndex]] = true;   // 進み具合（何問クリアしたか）
+    saveRecord(item.id, rec);
+    addPoints(item.id, mode.key, mode.pt); // ポイントは正解するたびに加算（上限なし）
+    markWeak(item.id, mode.key, order[qIndex], false);   // にがてを卒業
+  } else {
+    if (wrongList.indexOf(order[qIndex]) < 0) wrongList.push(order[qIndex]);
+    markWeak(item.id, mode.key, order[qIndex], true);
+  }
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback ' + (ok ? 'correct' : 'wrong');
+  fb.innerHTML = (ok ? '⭕ 正解！ <b>+' + mode.pt + '点</b>' : '❌ おしい！')
+    + (ok && !why ? '' : '<span class="fb-ans">' + correctText + '</span>')
+    + (why ? '<span class="fb-why">' + why + '</span>' : '');
+
+  document.getElementById('quiz-score').textContent = '正解 ' + correctCount;
+  document.getElementById('btn-check').style.display = 'none';
+  document.getElementById('btn-reset').style.display = 'none';
+  document.getElementById('btn-hint').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'inline-block';
+  document.getElementById('btn-next').textContent = (qIndex + 1 >= order.length) ? '結果を見る →' : '次へ →';
+}
+
+function toggleHint() {
+  const box = document.getElementById('hint-box');
+  const s = SENTENCES[order[qIndex]];
+  let text = '';
+  if (mode.key === 'choice') text = '日本語の意味と、空所の前後のことばをよく見てみよう。';
+  if (mode.key === 'sort')   text = '最初の単語は <b>' + splitWords(s.en)[0] + '</b>';
+  if (mode.key === 'find')   text = 'まちがいは1か所だけ。動詞の形と、使っている語が合っているかを見てみよう。';
+  if (mode.key === 'change') text = '最初のあなに入る語は <b>' + s.change.answers[0] + '</b>';
+  if (mode.key === 'write')  text = '書き出しは <b>' + splitWords(s.en).slice(0, 2).join(' ') + ' …</b>';
+  box.innerHTML = '💡 ' + text;
+  box.classList.toggle('visible');
+}
+
+function nextQuestion() {
+  qIndex++;
+  if (qIndex >= order.length) { showResult(); return; }
+  loadQuestion();
+}
+
+function showResult() {
+  const pct = Math.round(correctCount / order.length * 100);
+  document.getElementById('result-icon').textContent = pct === 100 ? '🏆' : (pct >= 70 ? '🎉' : '💪');
+  document.getElementById('result-main').textContent =
+    pct === 100 ? 'ぜんぶ正解！' : (pct >= 70 ? 'よくできました！' : 'もう一度ちょうせん！');
+  document.getElementById('result-score').textContent =
+    mode.title + '　' + correctCount + ' / ' + order.length + '問 正解（' + pct + '%）';
+  document.getElementById('result-pt').textContent = '+' + (correctCount * mode.pt) + ' 点';
+
+  const btn = document.getElementById('btn-retry-wrong');
+  if (wrongList.length) {
+    btn.style.display = 'block';
+    btn.textContent = '❌ まちがえた ' + wrongList.length + '問だけやり直す';
+  } else {
+    btn.style.display = 'none';
+  }
+  showPage('page-result');
+}
+
+function retryQuiz()  { startQuiz(mode.key); }
+function retryWrong() { startQuiz(mode.key, wrongList.slice()); }
+
+function confirmBack() {
+  if (qIndex > 0 && !confirm('とちゅうです。メニューにもどりますか？')) return;
+  showPage('page-menu');
+}
+
+// Enterキーで答え合わせ（タップで判定するモードは対象外）
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter') return;
+  if (!document.getElementById('page-quiz').classList.contains('active')) return;
+  e.preventDefault();
+  if (answered) nextQuestion();
+  else if (mode && mode.key !== 'choice' && mode.key !== 'find') checkAnswer();
+});
+
+renderItems();
+saveGrammarSummary();   // 開いた時点の状態も先生に送る（登録済みのときだけ送られる）
+</script>
+</body>
+</html>

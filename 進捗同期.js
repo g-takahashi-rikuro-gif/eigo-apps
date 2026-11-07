@@ -131,7 +131,9 @@
     return key.indexOf('wscroll_') === 0
         || key.indexOf('vocab_summary') === 0
         || key.indexOf('eiken_records_') === 0
-        || key.indexOf('typing_challenge') === 0;
+        || key.indexOf('typing_challenge') === 0
+        || key.indexOf('gram_') === 0            // 文法学習の記録
+        || key.indexOf('grammar_summary') === 0;
   }
   /** 単語ごとの記録を {en:[正解,不正解,連続]} に縮める／戻す */
   function packWords(obj) {
@@ -200,9 +202,16 @@
   function hasLocalProgress() {
     for (var i = 0; i < localStorage.length; i++) {
       var k = localStorage.key(i);
-      if (k && k.indexOf('wscroll_') === 0 && WORD_DICT.test(k)) {
+      if (!k) continue;
+      // 単語学習の記録
+      if (k.indexOf('wscroll_') === 0 && WORD_DICT.test(k)) {
         var d = readJSON(k);
         if (d && Object.keys(d).length) return true;
+      }
+      // 文法学習の記録（文法しかやっていない生徒も引き継げるように）
+      if (k.indexOf('gram_') === 0) {
+        var g = readJSON(k);
+        if (g && Object.keys(g).length) return true;
       }
     }
     return false;
@@ -264,7 +273,7 @@
     [VOCAB_KEY, VOCAB_KEY + '_g2', VOCAB_KEY + '_g1'].forEach(function (key) {
       var part = readJSON(key);
       if (!part) return;
-      ['qzMastered','qzTotal','tyMastered','tyTotal','stMastered','stTotal','silver','gold','boss','unitCount']
+      ['qzMastered','qzTotal','tyMastered','tyTotal','stMastered','stTotal','correctTotal','silver','gold','boss','unitCount']
         .forEach(function (f) { vocab[f] = (vocab[f] || 0) + (Number(part[f]) || 0); });
     });
 
@@ -305,10 +314,21 @@
       bestSprintSec: sprintSecs.length ? Math.min.apply(null, sprintSecs) : 0
     };
 
+    // 文法学習（学年ごとのアプリが grammar_summary_gN に要約を保存する）
+    var grammar = { points: 0, cleared: 0, total: 0, items: 0 };
+    ['grammar_summary_g1', 'grammar_summary_g2', 'grammar_summary_g3'].forEach(function (key) {
+      var part = readJSON(key);
+      if (!part) return;
+      ['points', 'cleared', 'total', 'items'].forEach(function (f) {
+        grammar[f] += Number(part[f]) || 0;
+      });
+    });
+
     return {
       vocab: vocab,
       eiken: { mockCount: mockCount, bestScore: bestScore, latestVerdict: latestVerdict },
-      typing: typing
+      typing: typing,
+      grammar: grammar
     };
   }
 

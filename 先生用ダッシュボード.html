@@ -187,6 +187,7 @@
             <th data-key="boss">🏆ボス<span class="arrow">↕</span></th>
             <th data-key="mockCount">模試回数<span class="arrow">↕</span></th>
             <th data-key="bestScore">模試最高<span class="arrow">↕</span></th>
+            <th data-key="gramPoints">📘文法pt<span class="arrow">↕</span></th>
             <th data-key="updated">最終更新<span class="arrow">↕</span></th>
           </tr>
         </thead>
@@ -197,7 +198,7 @@
   </div>
 </div>
 
-<script src="進捗同期.js?v=20261026"></script>
+<script src="進捗同期.js?v=20261107b"></script>
 <script>
 let allStudents = [];
 let sortKey = 'points';
@@ -410,6 +411,7 @@ function render() {
       '<td>' + (s.boss || '<span class="dim">0</span>') + '</td>' +
       '<td>' + (s.mockCount || '<span class="dim">0</span>') + '</td>' +
       '<td>' + (s.mockCount ? s.bestScore + '%' : '<span class="dim">-</span>') + '</td>' +
+      '<td>' + (s.gramPoints || '<span class="dim">0</span>') + '</td>' +
       '<td class="dim">' + escapeHtml(s.updated) + '</td>' +
     '</tr>';
   }).join('');
